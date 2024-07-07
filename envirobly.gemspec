@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version     = Envirobly::VERSION
   spec.authors     = [ "Robert Starsi" ]
   spec.email       = "klevo@klevo.sk"
-  spec.homepage    = "https://klevo.sk"
+  spec.homepage    = "https://github.com/envirobly/envirobly-cli"
   spec.summary     = "Envirobly command line interface"
   spec.license     = "MIT"
 
