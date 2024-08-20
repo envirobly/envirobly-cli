@@ -27,7 +27,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     puts deployment.to_json
 
     if archive_build_context
-      $stderr.puts "Build context exported into #{archive_path}"
+      $stderr.puts "Build context exported into #{archive_uri}"
     else
       $stderr.puts "Error exporting build context. Aborting."
       exit 1
@@ -51,12 +51,12 @@ class Envirobly::Cli::Main < Envirobly::Base
       Time.parse `git log #{options.commit} -n1 --date=iso --pretty=format:"%ad"`
     end
 
-    def archive_path
+    def archive_uri
       "s3://#{options.bucket}/#{commit_ref}.tar.gz"
     end
 
     def archive_build_context
-      `git archive --format=tar.gz #{commit_ref} | aws s3 cp - #{archive_path}`
+      `git archive --format=tar.gz #{commit_ref} | aws s3 cp - #{archive_uri}`
       $?.success?
     end
 end
