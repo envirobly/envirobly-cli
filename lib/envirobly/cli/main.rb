@@ -8,16 +8,28 @@ class Envirobly::Cli::Main < Envirobly::Base
   end
 
   desc "deploy ENVIRONMENT_NAME", "Deploy current commit to an environment"
+  method_option :commit, type: :string, default: "HEAD"
   def deploy(environ_name)
-    $stderr.puts "deploy to #{environ_name}"
-    commit_ref = `git rev-parse HEAD`.chomp("")
-    commit_message = `git log -1 --pretty=%B`.chomp("")
-    commit_time = Time.parse `git log -1 --date=iso --pretty=format:"%ad"`
-    commit = {
-      ref: commit_ref,
-      message: commit_message,
-      time: commit_time
+    # $stderr.puts "deploy to #{environ_name}"
+    deployment = {
+      environ_name:,
+      commit_ref:,
+      commit_time:,
+      commit_message:
     }
-    puts commit.to_json
+    puts deployment.to_json
   end
+
+  private
+    def commit_ref
+      `git rev-parse #{options.commit}`.chomp("")
+    end
+
+    def commit_message
+      `git log #{options.commit} -n1 --pretty=%B`.chomp("")
+    end
+
+    def commit_time
+      Time.parse `git log #{options.commit} -n1 --date=iso --pretty=format:"%ad"`
+    end
 end
