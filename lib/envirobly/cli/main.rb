@@ -9,6 +9,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   end
 
   desc "deploy ENVIRONMENT_NAME", "Deploy current commit to an environment"
+  method_option :bucket, type: :string, required: true
   method_option :commit, type: :string, default: "HEAD"
   def deploy(environ_name)
     unless commit_exists?
@@ -51,11 +52,11 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
 
     def archive_path
-      "/tmp/#{commit_ref}.tar.gz"
+      "s3://#{options.bucket}/#{commit_ref}.tar.gz"
     end
 
     def archive_build_context
-      `git archive --format=tar.gz --output=#{archive_path} #{commit_ref}`
+      `git archive --format=tar.gz #{commit_ref} | aws s3 cp - #{archive_path}`
       $?.success?
     end
 end
