@@ -88,8 +88,8 @@ class Envirobly::Cli::Main < Envirobly::Base
         "User-Agent" => "Envirobly CLI v#{Envirobly::VERSION} #{Socket.gethostname}"
       }
       request = Net::HTTP::Post.new(uri, headers)
-      request.body = params.to_json
       request.content_type = "application/json"
+      request.body = params.to_json
 
       http.request request
     end
