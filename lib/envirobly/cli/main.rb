@@ -9,7 +9,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   end
 
   desc "deploy ENVIRONMENT_NAME", "Deploy current commit to an environment"
-  method_option :bucket, type: :string, required: true
+  method_option :bucket, type: :string
   method_option :commit, type: :string, default: "HEAD"
   def deploy(environ_name)
     unless commit_exists?
@@ -18,15 +18,19 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
 
     # $stderr.puts "deploy to #{environ_name}"
-    deployment = {
-      environ_name:,
-      commit_ref:,
-      commit_time:,
-      commit_message:
+    deployment_params = {
+      environ: {
+        name: environ_name
+      },
+      commit: {
+        ref: commit_ref,
+        time: commit_time,
+        message: commit_message
+      }
     }
-    puts deployment.to_json
+    puts deployment_params.to_json
 
-    if archive_build_context
+    if options.bucket && archive_build_context
       $stderr.puts "Build context exported into #{archive_uri}"
     else
       $stderr.puts "Error exporting build context. Aborting."
