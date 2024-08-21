@@ -81,8 +81,8 @@ class Envirobly::Cli::Main < Envirobly::Base
     def post_as_json(uri, params = {})
       http = Net::HTTP.new uri.host, uri.port
       http.use_ssl = true
-      http.open_timeout = 3
-      http.read_timeout = 3
+      http.open_timeout = 10
+      http.read_timeout = 10
 
       headers = {
         "User-Agent" => "Envirobly CLI v#{Envirobly::VERSION} #{Socket.gethostname}"
