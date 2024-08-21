@@ -1,5 +1,8 @@
 require "time"
 require "json"
+require "uri"
+require "net/http"
+require "socket"
 # require "debug"
 
 class Envirobly::Cli::Main < Envirobly::Base
@@ -29,6 +32,9 @@ class Envirobly::Cli::Main < Envirobly::Base
       }
     }
     puts deployment_params.to_json
+
+    response = post_as_json api_v1_deployments_url, deployment_params
+    $stderr.puts "#{api_v1_deployments_url} responded with #{response.code}"
 
     if options.bucket && archive_build_context
       $stderr.puts "Build context exported into #{archive_uri}"
@@ -62,5 +68,29 @@ class Envirobly::Cli::Main < Envirobly::Base
     def archive_build_context
       `git archive --format=tar.gz #{commit_ref} | aws s3 cp - #{archive_uri}`
       $?.success?
+    end
+
+    def api_host
+      ENV["ENVIROBLY_API_HOST"] || "envirobly.com"
+    end
+
+    def api_v1_deployments_url
+      URI::HTTPS.build(host: api_host, path: "/api/v1/deployments")
+    end
+
+    def post_as_json(uri, params = {})
+      http = Net::HTTP.new uri.host, uri.port
+      http.use_ssl = true
+      http.open_timeout = 3
+      http.read_timeout = 3
+
+      headers = {
+        "User-Agent" => "Envirobly CLI v#{Envirobly::VERSION} #{Socket.gethostname}"
+      }
+      request = Net::HTTP::Post.new(uri, headers)
+      request.body = params.to_json
+      request.content_type = "application/json"
+
+      http.request request
     end
 end
