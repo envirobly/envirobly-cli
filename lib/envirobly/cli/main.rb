@@ -11,7 +11,4 @@ class Envirobly::Cli::Main < Envirobly::Base
   def deploy(environment)
     Envirobly::Deployment.new environment, options
   end
-
-  desc "remote", "Manage remotes (connected projects)"
-  subcommand "remote", Envirobly::Cli::Remote
 end
