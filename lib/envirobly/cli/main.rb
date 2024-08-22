@@ -1,8 +1,3 @@
-require "time"
-require "json"
-require "uri"
-require "net/http"
-require "socket"
 # require "debug"
 
 class Envirobly::Cli::Main < Envirobly::Base

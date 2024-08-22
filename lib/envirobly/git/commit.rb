@@ -1,3 +1,5 @@
+require "time"
+
 class Envirobly::Git::Commit
   def initialize(ref)
     @ref = ref

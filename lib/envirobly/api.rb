@@ -1,5 +1,12 @@
+require "json"
+require "net/http"
+require "socket"
+require "uri"
+
 class Envirobly::Api
   HOST = ENV["ENVIROBLY_API_HOST"] || "envirobly.com"
+  USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION} #{Socket.gethostname}"
+  CONTENT_TYPE = "application/json"
 
   def create_deployment(params)
     post_as_json(api_v1_deployments_url, params)
@@ -12,11 +19,9 @@ class Envirobly::Api
       http.open_timeout = 10
       http.read_timeout = 10
 
-      headers = {
-        "User-Agent" => "Envirobly CLI v#{Envirobly::VERSION} #{Socket.gethostname}"
-      }
+      headers = { "User-Agent" => USER_AGENT }
       request = Net::HTTP::Post.new(uri, headers)
-      request.content_type = "application/json"
+      request.content_type = CONTENT_TYPE
       request.body = params.to_json
 
       http.request(request).tap do |response|
