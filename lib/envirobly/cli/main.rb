@@ -12,7 +12,6 @@ class Envirobly::Cli::Main < Envirobly::Base
   end
 
   desc "deploy ENVIRONMENT_NAME", "Deploy current commit to an environment"
-  method_option :bucket, type: :string
   method_option :commit, type: :string, default: "HEAD"
   def deploy(environ_name)
     unless commit_exists?
@@ -20,7 +19,6 @@ class Envirobly::Cli::Main < Envirobly::Base
       exit 1
     end
 
-    # $stderr.puts "deploy to #{environ_name}"
     deployment_params = {
       environ: {
         name: environ_name
@@ -31,12 +29,22 @@ class Envirobly::Cli::Main < Envirobly::Base
         message: commit_message
       }
     }
-    puts deployment_params.to_json
+    # puts deployment_params.to_json
 
     response = post_as_json api_v1_deployments_url, deployment_params
     $stderr.puts "#{api_v1_deployments_url} responded with #{response.code}"
 
-    if options.bucket && archive_build_context
+    unless response.code.to_i == 200
+      $stderr.puts "Request didn't succeed. Aborting."
+      exit 1
+    end
+
+    response_object = JSON.parse response.body
+    # puts response_object.to_json
+    @credentials = response_object.fetch("credentials")
+    @bucket = response_object.fetch("bucket")
+
+    if archive_build_context
       $stderr.puts "Build context exported into #{archive_uri}"
     else
       $stderr.puts "Error exporting build context. Aborting."
@@ -62,12 +70,20 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
 
     def archive_uri
-      "s3://#{options.bucket}/#{commit_ref}.tar.gz"
+      "s3://#{@bucket}/#{commit_ref}.tar.gz"
     end
 
     def archive_build_context
-      `git archive --format=tar.gz #{commit_ref} | aws s3 cp - #{archive_uri}`
+      `git archive --format=tar.gz #{commit_ref} | #{credentials_as_inline_env_vars} aws s3 cp - #{archive_uri}`
       $?.success?
+    end
+
+    def credentials_as_inline_env_vars
+      [
+        %{AWS_ACCESS_KEY_ID="#{@credentials.fetch("access_key_id")}"},
+        %{AWS_SECRET_ACCESS_KEY="#{@credentials.fetch("secret_access_key")}"},
+        %{AWS_SESSION_TOKEN="#{@credentials.fetch("session_token")}"}
+      ].join " "
     end
 
     def api_host
