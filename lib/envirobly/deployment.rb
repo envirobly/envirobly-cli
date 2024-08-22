@@ -1,4 +1,6 @@
 class Envirobly::Deployment
+  URL_MATCHER = /^https:\/\/envirobly\.(test|com)\/(\d+)\/environs\/(\d+)$/
+
   def initialize(environment, options)
     @commit = Envirobly::Git::Commit.new options.commit
 
@@ -9,7 +11,7 @@ class Envirobly::Deployment
 
     deployment_params = {
       environ: {
-        name: environment
+        logical_id: environment
       },
       commit: {
         ref: @commit.ref,
@@ -17,6 +19,11 @@ class Envirobly::Deployment
         message: @commit.message
       }
     }
+
+    unless environment =~ URL_MATCHER
+      $stderr.puts "If no environ URL is provided, remote.origin is required in config"
+      exit 1
+    end
 
     api = Envirobly::Api.new
     response = api.create_deployment deployment_params
