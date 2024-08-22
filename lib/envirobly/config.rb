@@ -1,21 +1,21 @@
 require "yaml"
 
 class Envirobly::Config
-  CONFIG_PATH = ".envirobly/project.yml"
+  PATH = ".envirobly/project.yml"
 
   def initialize
-    @config = load_config
+    @project = load_from_file
   end
 
   def dig(*args)
-    @config.dig *args
+    @project.dig *args
   rescue NoMethodError
     nil
   end
 
   private
-    def load_config
-      YAML.load_file CONFIG_PATH
+    def load_from_file
+      YAML.load_file PATH
     rescue Errno::ENOENT
       {}
     end
