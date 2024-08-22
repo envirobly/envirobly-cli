@@ -32,14 +32,8 @@ class Envirobly::Cli::Main < Envirobly::Base
       }
     }
 
-    response = post_as_json api_v1_deployments_url, deployment_params
-    $stderr.puts "#{api_v1_deployments_url} responded with #{response.code}"
-
-    unless response.code.to_i == 200
-      $stderr.puts "Request didn't succeed. Aborting."
-      exit 1
-    end
-
+    api = Envirobly::Api.new
+    response = api.create_deployment deployment_params
     response_object = JSON.parse response.body
     @credentials = Envirobly::Aws::Credentials.new response_object.fetch("credentials")
     @bucket = response_object.fetch("bucket")
@@ -60,29 +54,5 @@ class Envirobly::Cli::Main < Envirobly::Base
     def archive_build_context
       `git archive --format=tar.gz #{@commit.ref} | #{@credentials.as_inline_env_vars} aws s3 cp - #{archive_uri}`
       $?.success?
-    end
-
-    def api_host
-      ENV["ENVIROBLY_API_HOST"] || "envirobly.com"
-    end
-
-    def api_v1_deployments_url
-      URI::HTTPS.build(host: api_host, path: "/api/v1/deployments")
-    end
-
-    def post_as_json(uri, params = {})
-      http = Net::HTTP.new uri.host, uri.port
-      http.use_ssl = true
-      http.open_timeout = 10
-      http.read_timeout = 10
-
-      headers = {
-        "User-Agent" => "Envirobly CLI v#{Envirobly::VERSION} #{Socket.gethostname}"
-      }
-      request = Net::HTTP::Post.new(uri, headers)
-      request.content_type = "application/json"
-      request.body = params.to_json
-
-      http.request request
     end
 end
