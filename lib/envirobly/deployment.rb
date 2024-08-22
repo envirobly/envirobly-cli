@@ -3,6 +3,7 @@ class Envirobly::Deployment
 
   def initialize(environment, options)
     @commit = Envirobly::Git::Commit.new options.commit
+    @config = Envirobly::Config.new
 
     unless @commit.exists?
       $stderr.puts "Commit #{options.commit} doesn't exist in this repository. Aborting."
@@ -21,8 +22,12 @@ class Envirobly::Deployment
     }
 
     unless environment =~ URL_MATCHER
-      $stderr.puts "If no environ URL is provided, remote.origin is required in config"
-      exit 1
+      if project_url = @config.dig("remote", "origin")
+        deployment_params[:environ][:project_url] = project_url
+      else
+        $stderr.puts "{remote.origin} is required in .envirobly/project.yml"
+        exit 1
+      end
     end
 
     api = Envirobly::Api.new
