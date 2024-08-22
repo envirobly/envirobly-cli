@@ -10,7 +10,7 @@ class Envirobly::Deployment
       exit 1
     end
 
-    deployment_params = {
+    params = {
       environ: {
         logical_id: environment
       },
@@ -23,7 +23,7 @@ class Envirobly::Deployment
 
     unless environment =~ URL_MATCHER
       if project_url = @config.dig("remote", "origin")
-        deployment_params[:environ][:project_url] = project_url
+        params[:environ][:project_url] = project_url
       else
         $stderr.puts "{remote.origin} is required in .envirobly/project.yml"
         exit 1
@@ -31,7 +31,7 @@ class Envirobly::Deployment
     end
 
     api = Envirobly::Api.new
-    response = api.create_deployment deployment_params
+    response = api.create_deployment params
     @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
     @bucket = response.object.fetch("bucket")
 
