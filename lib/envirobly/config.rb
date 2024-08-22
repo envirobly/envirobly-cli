@@ -9,6 +9,8 @@ class Envirobly::Config
 
   def dig(*args)
     @config.dig *args
+  rescue NoMethodError
+    nil
   end
 
   private
