@@ -29,7 +29,6 @@ class Envirobly::Cli::Main < Envirobly::Base
         message: commit_message
       }
     }
-    # puts deployment_params.to_json
 
     response = post_as_json api_v1_deployments_url, deployment_params
     $stderr.puts "#{api_v1_deployments_url} responded with #{response.code}"
@@ -40,7 +39,6 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
 
     response_object = JSON.parse response.body
-    # puts response_object.to_json
     @credentials = response_object.fetch("credentials")
     @bucket = response_object.fetch("bucket")
 
