@@ -24,6 +24,10 @@ class Envirobly::Api
           $stderr.puts "Request to #{uri} responded with #{response.code}. Aborting."
           exit 1
         end
+
+        def response.object
+          @json_parsed_body ||= JSON.parse body
+        end
       end
     end
 

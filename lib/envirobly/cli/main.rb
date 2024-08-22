@@ -34,9 +34,8 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     api = Envirobly::Api.new
     response = api.create_deployment deployment_params
-    response_object = JSON.parse response.body
-    @credentials = Envirobly::Aws::Credentials.new response_object.fetch("credentials")
-    @bucket = response_object.fetch("bucket")
+    @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
+    @bucket = response.object.fetch("bucket")
 
     if archive_build_context
       $stderr.puts "Build context exported into #{archive_uri}"
