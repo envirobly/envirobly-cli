@@ -4,7 +4,7 @@ class Envirobly::Config
   PATH = ".envirobly/project.yml"
 
   def initialize
-    @project = load_from_file
+    @project = load_file
   end
 
   def dig(*args)
@@ -14,7 +14,7 @@ class Envirobly::Config
   end
 
   private
-    def load_from_file
+    def load_file
       YAML.load_file PATH
     rescue Errno::ENOENT
       {}
