@@ -20,5 +20,5 @@ gem push envirobly-0.1.0.gem
 
 ```sh
 export ENVIROBLY_API_HOST=hostname # to override the default envirobly.com
-envirobly deploy production --bucket s3-bucket-name
+envirobly deploy <env-logical-id-or-url>
 ```
