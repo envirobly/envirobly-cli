@@ -1,1 +1,2 @@
-module Envirobly::Cli; end
+module Envirobly::Cli
+end
