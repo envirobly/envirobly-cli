@@ -41,7 +41,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
 
     response_object = JSON.parse response.body
-    @credentials = response_object.fetch("credentials")
+    @credentials = Envirobly::Aws::Credentials.new response_object.fetch("credentials")
     @bucket = response_object.fetch("bucket")
 
     if archive_build_context
@@ -58,16 +58,8 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
 
     def archive_build_context
-      `git archive --format=tar.gz #{@commit.ref} | #{credentials_as_inline_env_vars} aws s3 cp - #{archive_uri}`
+      `git archive --format=tar.gz #{@commit.ref} | #{@credentials.as_inline_env_vars} aws s3 cp - #{archive_uri}`
       $?.success?
-    end
-
-    def credentials_as_inline_env_vars
-      [
-        %{AWS_ACCESS_KEY_ID="#{@credentials.fetch("access_key_id")}"},
-        %{AWS_SECRET_ACCESS_KEY="#{@credentials.fetch("secret_access_key")}"},
-        %{AWS_SESSION_TOKEN="#{@credentials.fetch("session_token")}"}
-      ].join " "
     end
 
     def api_host

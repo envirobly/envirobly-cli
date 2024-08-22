@@ -1,0 +1,2 @@
+module Envirobly::Aws
+end
