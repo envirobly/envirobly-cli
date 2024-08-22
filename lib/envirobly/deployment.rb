@@ -1,4 +1,6 @@
 class Envirobly::Deployment
+  URL_MATCHER = /^https:\/\/envirobly\.(test|com)\/(\d+)\/environs\/(\d+)$/
+
   def initialize(environment, options)
     @commit = Envirobly::Git::Commit.new options.commit
 
@@ -7,9 +9,9 @@ class Envirobly::Deployment
       exit 1
     end
 
-    deployment_params = {
+    params = {
       environ: {
-        name: environment
+        logical_id: environment
       },
       commit: {
         ref: @commit.ref,
@@ -18,8 +20,18 @@ class Envirobly::Deployment
       }
     }
 
+    config = Envirobly::Config.new
+    unless environment =~ URL_MATCHER
+      if project_url = config.dig("remote", "origin")
+        params[:environ][:project_url] = project_url
+      else
+        $stderr.puts "{remote.origin} is required in .envirobly/project.yml"
+        exit 1
+      end
+    end
+
     api = Envirobly::Api.new
-    response = api.create_deployment deployment_params
+    response = api.create_deployment params
     @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
     @bucket = response.object.fetch("bucket")
 
