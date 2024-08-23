@@ -2,8 +2,16 @@
 
 ## Development
 
+### Running from within the working dir
+
 ```sh
 ruby -Ilib/ bin/envirobly version
+```
+
+### Creating global alias to the dev executable
+
+```sh
+alias envirobly="ruby -I$HOME/envirobly/envirobly-cli/lib/ $HOME/envirobly/envirobly-cli/bin/envirobly"
 ```
 
 ## Releasing
