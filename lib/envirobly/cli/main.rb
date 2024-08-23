@@ -6,7 +6,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     puts Envirobly::VERSION
   end
 
-  desc "deploy ENVIRONMENT_NAME", "Deploy current commit to an environment"
+  desc "deploy ENVIRONMENT", "Deploy to environment identified by name or URL"
   method_option :commit, type: :string, default: "HEAD"
   def deploy(environment)
     Envirobly::Deployment.new environment, options
