@@ -9,6 +9,13 @@ class Envirobly::Deployment
       exit 1
     end
 
+    config = Envirobly::Config.new(@commit)
+    if config.parsing_error?
+      $stderr.puts "Error while parsing #{config.path}"
+      $stderr.puts config.parsing_error
+      exit 1
+    end
+
     params = {
       environ: {
         logical_id: environment
@@ -17,10 +24,12 @@ class Envirobly::Deployment
         ref: @commit.ref,
         time: @commit.time,
         message: @commit.message
-      }
+      },
+      config: config.to_h
     }
 
-    config = Envirobly::Config.new
+    puts params.to_json
+
     unless environment =~ URL_MATCHER
       if project_url = config.dig("remote", "origin")
         params[:environ][:project_url] = project_url
