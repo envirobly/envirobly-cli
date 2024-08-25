@@ -3,8 +3,11 @@ require "yaml"
 class Envirobly::Config
   PATH = ".envirobly/project.yml"
 
+  attr_reader :parsing_error
+
   def initialize(commit)
     @commit = commit
+    @parsing_error = nil
     @project = parse_config_content_at_commit
   end
 
@@ -18,14 +21,23 @@ class Envirobly::Config
     @project
   end
 
+  def parsing_error?
+    !@parsing_error.nil?
+  end
+
+  def path
+    PATH
+  end
+
   private
     def parse_config_content_at_commit
       YAML.load config_content_at_commit
-    rescue Errno::ENOENT
-      {}
+    rescue Psych::Exception => exception
+      @parsing_error = exception.message
+      nil
     end
 
     def config_content_at_commit
-      `git show #{@commit.ref}:#{PATH}`
+      `git show #{@commit.ref}:#{path}`
     end
 end

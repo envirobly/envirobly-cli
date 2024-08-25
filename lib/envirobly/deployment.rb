@@ -10,6 +10,11 @@ class Envirobly::Deployment
     end
 
     config = Envirobly::Config.new(@commit)
+    if config.parsing_error?
+      $stderr.puts "Error while parsing #{config.path}"
+      $stderr.puts config.parsing_error
+      exit 1
+    end
 
     params = {
       environ: {
