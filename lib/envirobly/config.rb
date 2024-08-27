@@ -44,7 +44,7 @@ class Envirobly::Config
     end
 
     def transform_env_var_values!
-      @project["services"].each do |logical_id, service|
+      @project.fetch("services", {}).each do |logical_id, service|
         service.fetch("env", {}).each do |key, value|
           if value.is_a?(Hash) && value.has_key?("file")
             @project["services"][logical_id]["env"][key] = File.read value.fetch("file")
