@@ -29,7 +29,6 @@ class Envirobly::Deployment
     }
 
     puts params.to_json
-    exit 1
 
     unless environment =~ URL_MATCHER
       if project_url = config.dig("remote", "origin")
