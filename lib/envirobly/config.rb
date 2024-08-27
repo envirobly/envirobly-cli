@@ -9,6 +9,8 @@ class Envirobly::Config
     @commit = commit
     @parsing_error = nil
     @project = parse_config_content_at_commit
+
+    transform_env_var_values! if @project
   end
 
   def dig(*args)
@@ -31,7 +33,7 @@ class Envirobly::Config
 
   private
     def parse_config_content_at_commit
-      YAML.load config_content_at_commit
+      YAML.load config_content_at_commit, aliases: true
     rescue Psych::Exception => exception
       @parsing_error = exception.message
       nil
@@ -39,5 +41,15 @@ class Envirobly::Config
 
     def config_content_at_commit
       `git show #{@commit.ref}:#{path}`
+    end
+
+    def transform_env_var_values!
+      @project["services"].each do |logical_id, service|
+        service.fetch("env", {}).each do |key, value|
+          if value.is_a?(Hash) && value.has_key?("file")
+            @project["services"][logical_id]["env"][key] = File.read value.fetch("file")
+          end
+        end
+      end
     end
 end
