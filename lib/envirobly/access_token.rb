@@ -2,8 +2,6 @@ require "fileutils"
 require "pathname"
 
 class Envirobly::AccessToken
-  attr_reader :token
-
   def initialize(token = nil)
     if token.nil? && File.exist?(access_token_path)
       @token = File.read(access_token_path)
@@ -17,6 +15,10 @@ class Envirobly::AccessToken
     File.write access_token_path, @token
     File.chmod 0600, access_token_path
     puts "Access token saved to #{access_token_path}"
+  end
+
+  def as_http_bearer
+    "Bearer #{@token}"
   end
 
   private

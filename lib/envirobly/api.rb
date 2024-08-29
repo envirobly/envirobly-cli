@@ -9,7 +9,7 @@ class Envirobly::Api
   CONTENT_TYPE = "application/json"
 
   def initialize
-    @access_token = Envirobly::AccessToken.new.token
+    @access_token = Envirobly::AccessToken.new
   end
 
   def create_deployment(params)
@@ -23,7 +23,7 @@ class Envirobly::Api
       http.open_timeout = 10
       http.read_timeout = 10
 
-      headers = { "User-Agent" => USER_AGENT }
+      headers = { "User-Agent" => USER_AGENT, "Authorization" => @access_token.as_http_bearer }
       request = Net::HTTP::Post.new(uri, headers)
       request.content_type = CONTENT_TYPE
       request.body = params.to_json
