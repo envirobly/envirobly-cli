@@ -8,6 +8,10 @@ class Envirobly::Api
   USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION} #{Socket.gethostname}"
   CONTENT_TYPE = "application/json"
 
+  def initialize
+    @access_token = Envirobly::AccessToken.new.token
+  end
+
   def create_deployment(params)
     post_as_json(api_v1_deployments_url, params)
   end

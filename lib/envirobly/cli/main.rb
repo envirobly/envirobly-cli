@@ -11,4 +11,9 @@ class Envirobly::Cli::Main < Envirobly::Base
   def deploy(environment)
     Envirobly::Deployment.new environment, options
   end
+
+  desc "set_access_token TOKEN", "Save and use an access token generated at Envirobly"
+  def set_access_token(token)
+    Envirobly::AccessToken.new(token).save
+  end
 end
