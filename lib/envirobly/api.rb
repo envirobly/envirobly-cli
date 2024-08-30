@@ -21,9 +21,10 @@ class Envirobly::Api
     end
   end
 
-  RETRY_INTERVAL_SECONDS = 2
+  RETRY_INTERVAL_SECONDS = 3
   MAX_RETRIES = 5
-  def get_deployment_with_retry(url, tries = 1)
+  def get_deployment_with_delay_and_retry(url, tries = 1)
+    sleep RETRY_INTERVAL_SECONDS * tries
     response = get_as_json URI(url)
 
     if response.code.to_i == 200
@@ -33,7 +34,7 @@ class Envirobly::Api
       exit 1
     else
       sleep RETRY_INTERVAL_SECONDS * tries
-      get_deployment_with_retry(url, tries + 1)
+      get_deployment_with_delay_and_retry(url, tries + 1)
     end
   end
 
