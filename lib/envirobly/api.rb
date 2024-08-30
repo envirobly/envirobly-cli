@@ -5,7 +5,7 @@ require "uri"
 
 class Envirobly::Api
   HOST = ENV["ENVIROBLY_API_HOST"] || "envirobly.com"
-  USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION} #{Socket.gethostname}"
+  USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION}"
   CONTENT_TYPE = "application/json"
 
   def initialize
@@ -13,34 +13,69 @@ class Envirobly::Api
   end
 
   def create_deployment(params)
-    post_as_json(api_v1_deployments_url, params)
+    post_as_json(api_v1_deployments_url, params:, headers: authorization_headers).tap do |response|
+      unless response.code.to_i == 200
+        $stderr.puts "Deployment creation request responded with #{response.code}. Aborting."
+        exit 1
+      end
+    end
+  end
+
+  RETRY_INTERVAL_SECONDS = 2
+  MAX_RETRIES = 5
+  def get_deployment_with_retry(url, tries = 1)
+    response = get_as_json URI(url)
+
+    if response.code.to_i == 200
+      return response
+    elsif MAX_RETRIES <= tries
+      $stderr.puts "Max retries exhausted while waiting for deployment credentials. Aborting."
+      exit 1
+    else
+      sleep RETRY_INTERVAL_SECONDS * tries
+      get_deployment_with_retry(url, tries + 1)
+    end
   end
 
   private
-    def post_as_json(uri, params = {}, require_response_code: 200)
+    def get_as_json(uri, headers: {})
+      request(uri, type: Net::HTTP::Get, headers:)
+    end
+
+    def post_as_json(uri, params: {}, headers: {})
+      request(uri, type: Net::HTTP::Post, headers:) do |request|
+        request.body = params.to_json
+      end
+    end
+
+    def api_v1_deployments_url
+      URI::HTTPS.build(host: HOST, path: "/api/v1/deployments")
+    end
+
+    def request(uri, type:, headers: {})
       http = Net::HTTP.new uri.host, uri.port
       http.use_ssl = true
       http.open_timeout = 10
       http.read_timeout = 10
 
-      headers = { "User-Agent" => USER_AGENT, "Authorization" => @access_token.as_http_bearer }
-      request = Net::HTTP::Post.new(uri, headers)
+      headers = default_headers.merge headers
+      request = type.new(uri, headers)
       request.content_type = CONTENT_TYPE
-      request.body = params.to_json
+
+      yield request if block_given?
 
       http.request(request).tap do |response|
-        unless response.code.to_i == require_response_code
-          $stderr.puts "Request to #{uri} responded with #{response.code}. Aborting."
-          exit 1
-        end
-
         def response.object
           @json_parsed_body ||= JSON.parse body
         end
       end
     end
 
-    def api_v1_deployments_url
-      URI::HTTPS.build(host: HOST, path: "/api/v1/deployments")
+    def default_headers
+      { "User-Agent" => USER_AGENT, "X-Cli-Host" => Socket.gethostname }
+    end
+
+    def authorization_headers
+      { "Authorization" => @access_token.as_http_bearer }
     end
 end

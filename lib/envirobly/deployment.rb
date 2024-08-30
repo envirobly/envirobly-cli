@@ -41,6 +41,7 @@ class Envirobly::Deployment
 
     api = Envirobly::Api.new
     response = api.create_deployment params
+    response = api.get_deployment_with_retry response.object.fetch("url")
     @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
     @bucket = response.object.fetch("bucket")
 
