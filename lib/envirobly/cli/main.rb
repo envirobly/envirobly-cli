@@ -9,6 +9,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   desc "deploy ENVIRONMENT", "Deploy to environment identified by name or URL"
   method_option :commit, type: :string, default: "HEAD"
   def deploy(environment)
+    abort_if_aws_cli_is_missing
     Envirobly::Deployment.new environment, options
   end
 
@@ -16,4 +17,13 @@ class Envirobly::Cli::Main < Envirobly::Base
   def set_access_token(token)
     Envirobly::AccessToken.new(token).save
   end
+
+  private
+    def abort_if_aws_cli_is_missing
+      `command -v aws`
+      unless $?.success?
+        $stderr.puts "AWS CLI is missing. Please install it first: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html"
+        exit 1
+      end
+    end
 end
