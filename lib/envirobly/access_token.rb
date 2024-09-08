@@ -2,7 +2,7 @@ require "fileutils"
 require "pathname"
 
 class Envirobly::AccessToken
-  def initialize(token = nil)
+  def initialize(token = ENV.fetch("ENVIROBLY_ACCESS_TOKEN", nil))
     if token.nil? && File.exist?(access_token_path)
       @token = File.read(access_token_path)
     else
