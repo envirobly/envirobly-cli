@@ -18,7 +18,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   private
     def abort_if_aws_cli_is_missing
-      `command -v aws`
+      `which aws`
       unless $?.success?
         $stderr.puts "AWS CLI is missing. Please install it first: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html"
         exit 1
