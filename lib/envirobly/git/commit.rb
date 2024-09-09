@@ -6,15 +6,15 @@ class Envirobly::Git::Commit
   end
 
   def exists?
-    `git cat-file -t #{@ref}`.chomp("") == "commit"
+    `git cat-file -t #{@ref}`.strip == "commit"
   end
 
   def ref
-    @normalized_ref ||= `git rev-parse #{@ref}`.chomp("")
+    @normalized_ref ||= `git rev-parse #{@ref}`.strip
   end
 
   def message
-    `git log #{@ref} -n1 --pretty=%B`.chomp("")
+    `git log #{@ref} -n1 --pretty=%B`.strip
   end
 
   def time
