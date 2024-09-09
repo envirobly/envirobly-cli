@@ -39,18 +39,21 @@ class Envirobly::Deployment
       end
     end
 
-    api = Envirobly::Api.new
-    response = api.create_deployment params
-    response = api.get_deployment_with_delay_and_retry response.object.fetch("url")
+    @api = Envirobly::Api.new
+    response = @api.create_deployment params
+    @url = response.object.fetch("url")
+    response = @api.get_deployment_with_delay_and_retry @url
     @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
     @bucket = response.object.fetch("bucket")
 
     if archive_commit_and_upload
-      $stderr.puts "Build context exported into #{archive_uri}"
+      $stderr.puts "Build context uploaded."
     else
       $stderr.puts "Error exporting build context. Aborting."
       exit 1
     end
+
+    # TODO: Output URL to watch the deployment progress
   end
 
   private
@@ -60,6 +63,13 @@ class Envirobly::Deployment
 
     def archive_commit_and_upload
       `git archive --format=tar.gz #{@commit.ref} | #{@credentials.as_inline_env_vars} aws s3 cp - #{archive_uri}`
-      $?.success?
+      $?.success?.tap do |result|
+        params = {
+          deployment: {
+            build_context_available: result
+          }
+        }
+        @api.put_as_json @url, params: params
+      end
     end
 end

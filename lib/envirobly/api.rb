@@ -38,22 +38,29 @@ class Envirobly::Api
     end
   end
 
+  def get_as_json(url, headers: {})
+    request(url, type: Net::HTTP::Get, headers:)
+  end
+
+  def post_as_json(url, params: {}, headers: {})
+    request(url, type: Net::HTTP::Post, headers:) do |request|
+      request.body = params.to_json
+    end
+  end
+
+  def put_as_json(url, params: {}, headers: {})
+    request(url, type: Net::HTTP::Put, headers:) do |request|
+      request.body = params.to_json
+    end
+  end
+
   private
-    def get_as_json(uri, headers: {})
-      request(uri, type: Net::HTTP::Get, headers:)
-    end
-
-    def post_as_json(uri, params: {}, headers: {})
-      request(uri, type: Net::HTTP::Post, headers:) do |request|
-        request.body = params.to_json
-      end
-    end
-
     def api_v1_deployments_url
       URI::HTTPS.build(host: HOST, path: "/api/v1/deployments")
     end
 
-    def request(uri, type:, headers: {})
+    def request(url, type:, headers: {})
+      uri = URI(url)
       http = Net::HTTP.new uri.host, uri.port
       http.use_ssl = true
       http.open_timeout = 10
