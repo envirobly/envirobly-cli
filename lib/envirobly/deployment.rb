@@ -28,7 +28,8 @@ class Envirobly::Deployment
       config: config.to_h
     }
 
-    puts params.to_json
+    puts "Deployment config:"
+    puts params.to_yaml
 
     unless environment =~ URL_MATCHER
       if project_url = config.dig("remote", "origin")
