@@ -30,6 +30,7 @@ class Envirobly::Deployment
 
     puts "Deployment config:"
     puts params.to_yaml
+    puts
 
     unless environment =~ URL_MATCHER
       if project_url = config.dig("remote", "origin")
@@ -47,8 +48,9 @@ class Envirobly::Deployment
     @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
     @bucket = response.object.fetch("bucket")
 
+    puts "Uploading build context, please wait..."
     if archive_commit_and_upload
-      $stderr.puts "Build context uploaded."
+      puts "Build context uploaded."
     else
       $stderr.puts "Error exporting build context. Aborting."
       exit 1
