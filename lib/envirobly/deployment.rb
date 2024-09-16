@@ -47,6 +47,7 @@ class Envirobly::Deployment
     @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
     @bucket = response.object.fetch("bucket")
 
+    puts "Uploading build context, please wait..."
     unless archive_commit_and_upload
       $stderr.puts "Error exporting build context. Aborting."
       exit 1
