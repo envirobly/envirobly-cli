@@ -8,8 +8,7 @@ class Envirobly::Config
 
   attr_reader :parsing_error, :raw
 
-  def initialize(commit, working_dir: Dir.getwd)
-    @working_dir = working_dir
+  def initialize(commit)
     @commit = commit
     @parsing_error = nil
     @raw = @commit.config_content

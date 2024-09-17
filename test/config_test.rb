@@ -15,13 +15,17 @@ class Envirobly::ConfigTest < TestCase
 
   def test_parsing
     commit = Envirobly::Git::Commit.new @commits.first, working_dir: @working_dir
-    config = Envirobly::Config.new commit, working_dir: @working_dir
+    config = Envirobly::Config.new commit
     assert_equal config_yml, config.raw
     expected_hash = {
       "services" => {
         "db" => {
           "type" => "postgres",
           "instance_type" => "t4g.small"
+        },
+        "app" => {
+          "dockerfile" => "Dockerfile",
+          "image_tag" => "164374825086dc65cd5dc548c248f61328b5d668"
         }
       }
     }
@@ -35,6 +39,8 @@ class Envirobly::ConfigTest < TestCase
           db:
             type: postgres
             instance_type: t4g.small
+          app:
+            dockerfile: Dockerfile
       YAML
     end
 
