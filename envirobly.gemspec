@@ -12,7 +12,6 @@ Gem::Specification.new do |spec|
   spec.files = Dir[ "lib/**/*", "LICENSE" ]
   spec.executables = %w[ envirobly ]
 
-  # spec.add_dependency "activesupport", "~> 7.0"
   spec.add_dependency "thor", "~> 1.3"
   spec.add_dependency "zeitwerk", "~> 2.6"
   # spec.add_dependency "aws-sdk-s3", "~> 1.141"
