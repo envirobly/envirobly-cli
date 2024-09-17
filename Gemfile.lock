@@ -1,7 +1,8 @@
 PATH
   remote: .
   specs:
-    envirobly (0.1.0)
+    envirobly (0.4.3)
+      ostruct (~> 0.1.0)
       thor (~> 1.3)
       zeitwerk (~> 2.6)
 
@@ -15,15 +16,18 @@ GEM
     irb (1.14.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    minitest (5.25.1)
+    ostruct (0.1.0)
     psych (5.1.2)
       stringio
+    rake (13.2.1)
     rdoc (6.7.0)
       psych (>= 4.0.0)
-    reline (0.5.9)
+    reline (0.5.10)
       io-console (~> 0.5)
     stringio (3.1.1)
-    thor (1.3.1)
-    zeitwerk (2.6.16)
+    thor (1.3.2)
+    zeitwerk (2.6.18)
 
 PLATFORMS
   arm64-darwin-23
@@ -32,6 +36,8 @@ PLATFORMS
 DEPENDENCIES
   debug (~> 1.8)
   envirobly!
+  minitest (~> 5.21)
+  rake (~> 13.0)
 
 BUNDLED WITH
-   2.5.14
+   2.5.18

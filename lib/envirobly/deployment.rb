@@ -25,7 +25,8 @@ class Envirobly::Deployment
         time: @commit.time,
         message: @commit.message
       },
-      config: config.to_h
+      config: config.to_h,
+      raw_config: config.raw
     }
 
     puts "Deployment config:"
@@ -39,6 +40,8 @@ class Envirobly::Deployment
         exit 1
       end
     end
+
+    exit if options.dry_run?
 
     @api = Envirobly::Api.new
     response = @api.create_deployment params

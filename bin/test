@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+require "listen"
+
+QUEUE = Thread::Queue.new
+
+def log(text)
+  puts "\e[2m#{text}\e[0m"
+end
+
+def capture_input
+  log "[Enter] rake test"
+
+  Thread.new do
+    loop do
+      if [ "\r", "\n" ].include?($stdin.getc)
+        QUEUE << { command: "bundle exec rake test", message: "rake test" }
+      end
+    end
+  end
+end
+
+file_listener = Listen.to(Dir.getwd, relative: true, latency: 0.5) do |modified, added|
+  changes = modified + added
+  # puts "Changes: #{changes}"
+  next if changes.empty?
+
+  tests = []
+
+  changes.each do |path|
+    case path
+    when /^lib\/envirobly\/.*\.rb$/
+      result = path.gsub %r{^lib/envirobly/(.+)\.rb$}, 'test/\1_test.rb'
+      tests << result if File.exist?(result)
+    when /^test\/.*_test\.rb$/
+      tests << path
+    end
+  end
+
+  if tests.any?
+    command = "bundle exec rake test #{tests.join " "}"
+    message = "#{changes.join ", "} => #{tests.join ", "}"
+    QUEUE << { command:, message: }
+  end
+end
+
+log "🧸 Minibuddy starting"
+file_listener.start
+capture_input_thread = capture_input
+
+loop do
+  sleep 0.5
+  if item = QUEUE.shift
+    capture_input_thread.kill
+    log item[:message]
+    system item[:command]
+    capture_input_thread = capture_input
+  end
+end
