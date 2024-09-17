@@ -14,9 +14,10 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "thor", "~> 1.3"
   spec.add_dependency "zeitwerk", "~> 2.6"
+  # spec.add_dependency "aws-sdk-s3", "~> 1.141"
+
   # .rbenv/versions/3.3.5/lib/ruby/3.3.0/json/generic_object.rb:2: warning: ostruct was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.5.0.
   spec.add_dependency "ostruct", "~> 0.1.0"
-  # spec.add_dependency "aws-sdk-s3", "~> 1.141"
 
   spec.add_development_dependency "debug", "~> 1.8"
   spec.add_development_dependency "minitest", "~> 5.21"
