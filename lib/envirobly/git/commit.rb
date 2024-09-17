@@ -24,6 +24,6 @@ class Envirobly::Git::Commit
 
   private
     def run(cmd)
-      `GIT_WORK_TREE="#{@working_dir}" git #{cmd}`
+      `GIT_WORK_TREE="#{@working_dir}" GIT_DIR="#{@working_dir}/.git" git #{cmd}`
     end
 end
