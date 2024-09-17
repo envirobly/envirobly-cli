@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    envirobly (0.1.0)
+    envirobly (0.4.3)
       thor (~> 1.3)
       zeitwerk (~> 2.6)
 
@@ -19,11 +19,11 @@ GEM
       stringio
     rdoc (6.7.0)
       psych (>= 4.0.0)
-    reline (0.5.9)
+    reline (0.5.10)
       io-console (~> 0.5)
     stringio (3.1.1)
-    thor (1.3.1)
-    zeitwerk (2.6.16)
+    thor (1.3.2)
+    zeitwerk (2.6.18)
 
 PLATFORMS
   arm64-darwin-23
@@ -34,4 +34,4 @@ DEPENDENCIES
   envirobly!
 
 BUNDLED WITH
-   2.5.14
+   2.5.18
