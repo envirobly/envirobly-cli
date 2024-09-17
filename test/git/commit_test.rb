@@ -6,6 +6,7 @@ class Envirobly::Git::CommitTest < TestCase
     `#{init_repository_script}`
     assert $?.success?
     @commits = `GIT_DIR=#{@working_dir}/.git git log --reflog --pretty=format:"%H"`.lines
+    assert_equal 1, @commits.size
   end
 
   def teardown
