@@ -18,4 +18,5 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "aws-sdk-s3", "~> 1.141"
 
   spec.add_development_dependency "debug", "~> 1.8"
+  spec.add_development_dependency "minitest", "~> 5.21"
 end
