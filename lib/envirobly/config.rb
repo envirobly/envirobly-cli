@@ -6,14 +6,14 @@ class Envirobly::Config
   DIR = ".envirobly"
   PATH = "#{DIR}/project.yml"
 
-  attr_reader :parsing_error
+  attr_reader :parsing_error, :raw
 
   def initialize(commit)
     @commit = commit
     @parsing_error = nil
-    @project = parse_config_content_at_commit
+    @raw = config_content_at_commit
 
-    if @project
+    if @project = parse
       transform_env_var_values!
       append_image_tags!
     end
@@ -38,8 +38,8 @@ class Envirobly::Config
   end
 
   private
-    def parse_config_content_at_commit
-      YAML.load config_content_at_commit, aliases: true
+    def parse
+      YAML.load @raw, aliases: true
     rescue Psych::Exception => exception
       @parsing_error = exception.message
       nil
