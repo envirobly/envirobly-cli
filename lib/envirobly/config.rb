@@ -20,7 +20,7 @@ class Envirobly::Config
   end
 
   def dig(*args)
-    @project.dig *args
+    @project.dig(*args)
   rescue NoMethodError
     nil
   end
