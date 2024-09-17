@@ -13,10 +13,19 @@ class Envirobly::ConfigTest < TestCase
     FileUtils.rm_rf @working_dir
   end
 
-  def test_one
+  def test_parsing
     commit = Envirobly::Git::Commit.new @commits.first, working_dir: @working_dir
     config = Envirobly::Config.new commit, working_dir: @working_dir
     assert_equal config_yml, config.raw
+    expected_hash = {
+      "services" => {
+        "db" => {
+          "type" => "postgres",
+          "instance_type" => "t4g.small"
+        }
+      }
+    }
+    assert_equal expected_hash, config.to_h
   end
 
   private
