@@ -1,23 +1,29 @@
 require "time"
 
 class Envirobly::Git::Commit
-  def initialize(ref)
+  def initialize(ref, working_dir: Dir.getwd)
     @ref = ref
+    @working_dir = working_dir
   end
 
   def exists?
-    `git cat-file -t #{@ref}`.strip == "commit"
+    run(%{cat-file -t #{@ref}}).strip == "commit"
   end
 
   def ref
-    @normalized_ref ||= `git rev-parse #{@ref}`.strip
+    @normalized_ref ||= run(%{rev-parse #{@ref}}).strip
   end
 
   def message
-    `git log #{@ref} -n1 --pretty=%B`.strip
+    run(%{log #{@ref} -n1 --pretty=%B}).strip
   end
 
   def time
-    Time.parse `git log #{@ref} -n1 --date=iso --pretty=format:"%ad"`
+    Time.parse run(%{log #{@ref} -n1 --date=iso --pretty=format:"%ad"})
   end
+
+  private
+    def run(cmd)
+      `GIT_WORK_TREE="#{@working_dir}" git #{cmd}`
+    end
 end

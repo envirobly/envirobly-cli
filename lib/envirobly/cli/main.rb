@@ -6,6 +6,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "deploy ENVIRONMENT", "Deploy to environment identified by name or URL"
   method_option :commit, type: :string, default: "HEAD"
+  method_option :dry_run, type: :boolean, default: false
   def deploy(environment)
     abort_if_aws_cli_is_missing
     Envirobly::Deployment.new environment, options

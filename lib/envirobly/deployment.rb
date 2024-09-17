@@ -41,6 +41,8 @@ class Envirobly::Deployment
       end
     end
 
+    exit if options.dry_run?
+
     @api = Envirobly::Api.new
     response = @api.create_deployment params
     deployment_url = response.object.fetch("url")
