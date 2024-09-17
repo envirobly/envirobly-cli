@@ -61,14 +61,9 @@ class Envirobly::Config
         build_context = service.fetch("build_context", ".")
 
         @project["services"][logical_id]["image_tag"] = Digest::SHA1.hexdigest [
-          git_path_checksums_at_commit(dockerfile),
-          git_path_checksums_at_commit(build_context)
+          @commit.objects_with_checksum_at(dockerfile),
+          @commit.objects_with_checksum_at(build_context)
         ].to_json
       end
-    end
-
-    def git_path_checksums_at_commit(path)
-      `GIT_WORK_TREE="#{@working_dir}" GIT_DIR="#{@working_dir}/.git" git ls-tree #{@commit.ref} --format='%(objectname) %(path)' #{PATH}`.
-        lines.reject { _1.split(" ").last == DIR }
     end
 end
