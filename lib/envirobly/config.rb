@@ -8,7 +8,9 @@ class Envirobly::Config
 
   attr_reader :parsing_error, :raw
 
-  def initialize(commit)
+  def initialize(commit, working_dir: Dir.getwd)
+    @working_dir = working_dir
+    @path = Pathname.new(working_dir).join PATH
     @commit = commit
     @parsing_error = nil
     @raw = config_content_at_commit
@@ -33,10 +35,6 @@ class Envirobly::Config
     !@parsing_error.nil?
   end
 
-  def path
-    PATH
-  end
-
   private
     def parse
       YAML.load @raw, aliases: true
@@ -46,7 +44,7 @@ class Envirobly::Config
     end
 
     def config_content_at_commit
-      `git show #{@commit.ref}:#{path}`
+      `GIT_WORK_TREE="#{@working_dir}" GIT_DIR="#{@working_dir}/.git" git show #{@commit.ref}:#{@path}`
     end
 
     def transform_env_var_values!
@@ -75,7 +73,7 @@ class Envirobly::Config
     end
 
     def git_path_checksums_at_commit(path)
-      `git ls-tree #{@commit.ref} --format='%(objectname) %(path)' #{path}`.
+      `GIT_WORK_TREE="#{@working_dir}" GIT_DIR="#{@working_dir}/.git" git ls-tree #{@commit.ref} --format='%(objectname) %(path)' #{@path}`.
         lines.reject { _1.split(" ").last == DIR }
     end
 end

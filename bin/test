@@ -37,7 +37,7 @@ file_listener = Listen.to(Dir.getwd, relative: true, latency: 0.5) do |modified,
   end
 
   if tests.any?
-    command = "bundle exec rake test #{tests.join " "}"
+    command = %{bundle exec rake test TEST="#{tests.join " "}"}
     message = "#{changes.join ", "} => #{tests.join ", "}"
     QUEUE << { command:, message: }
   end
