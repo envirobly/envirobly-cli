@@ -12,13 +12,17 @@ class Envirobly::Git::CommitTest < TestCase
     FileUtils.rm_rf @working_dir
   end
 
-  def test_exists
+  def test_exists_when_not_a_git_object
     commit = Envirobly::Git::Commit.new("not-a-git-object", working_dir: @working_dir)
     refute commit.exists?
+  end
 
+  def test_exists_when_ref_does_not_exist
     commit = Envirobly::Git::Commit.new("5b30cdac88626750ad840f11d86f56a3c89d2180", working_dir: @working_dir)
     refute commit.exists?
+  end
 
+  def test_exists_with_existing_ref
     commit = Envirobly::Git::Commit.new(@commits.first, working_dir: @working_dir)
     assert commit.exists?
   end
