@@ -16,9 +16,19 @@ class Envirobly::ConfigTest < TestCase
   def test_one
     commit = Envirobly::Git::Commit.new @commits.first, working_dir: @working_dir
     config = Envirobly::Config.new commit, working_dir: @working_dir
+    assert_equal config_yml, config.raw
   end
 
   private
+    def config_yml
+      <<~YAML
+        services:
+          db:
+            type: postgres
+            instance_type: t4g.small
+      YAML
+    end
+
     def init_repository_script
       <<~BASH
         cd #{@working_dir}
@@ -26,10 +36,7 @@ class Envirobly::ConfigTest < TestCase
 
         mkdir .envirobly
         cat <<EOT > .envirobly/project.yml
-        services:
-          db:
-            type: postgres
-            instance_type: t4g.small
+        #{config_yml.chomp}
         EOT
 
         git add .
