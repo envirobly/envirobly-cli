@@ -23,6 +23,10 @@ class Envirobly::Git::Commit
     Time.parse run(%{log #{@ref} -n1 --date=iso --pretty=format:"%ad"})
   end
 
+  def config_content
+    run %{show #{@normalized_ref}:#{Envirobly::Config::PATH}}
+  end
+
   private
     def run(cmd)
       @stdout = @stderr = @exit_code = @success = nil

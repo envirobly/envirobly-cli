@@ -12,7 +12,7 @@ class Envirobly::Config
     @working_dir = working_dir
     @commit = commit
     @parsing_error = nil
-    @raw = config_content_at_commit
+    @raw = @commit.config_content
 
     if @project = parse
       transform_env_var_values!
@@ -40,10 +40,6 @@ class Envirobly::Config
     rescue Psych::Exception => exception
       @parsing_error = exception.message
       nil
-    end
-
-    def config_content_at_commit
-      `GIT_WORK_TREE="#{@working_dir}" GIT_DIR="#{@working_dir}/.git" git show #{@commit.ref}:#{PATH}`
     end
 
     def transform_env_var_values!
