@@ -22,9 +22,29 @@ class Envirobly::Git::CommitTest < TestCase
     refute commit.exists?
   end
 
+  def test_ref_otputs_full_hash_when_given_short_one
+    commit = Envirobly::Git::Commit.new(@commits.first.slice(0, 7), working_dir: @working_dir)
+    assert_equal @commits.first, commit.ref
+  end
+
+  def test_ref_otputs_object_hash_when_given_tag
+    commit = Envirobly::Git::Commit.new("v1", working_dir: @working_dir)
+    assert_equal @commits.first, commit.ref
+  end
+
   def test_exists_with_existing_ref
     commit = Envirobly::Git::Commit.new(@commits.first, working_dir: @working_dir)
     assert commit.exists?
+  end
+
+  def test_message
+    commit = Envirobly::Git::Commit.new(@commits.first, working_dir: @working_dir)
+    assert_equal "a", commit.message
+  end
+
+  def test_time
+    commit = Envirobly::Git::Commit.new(@commits.first, working_dir: @working_dir)
+    assert_kind_of Time, commit.time
   end
 
   private
@@ -35,6 +55,7 @@ class Envirobly::Git::CommitTest < TestCase
         echo "a" > a.txt
         git add .
         git commit -m "a"
+        git tag v1
       BASH
     end
 end
