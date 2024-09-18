@@ -13,6 +13,14 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_config_yml, config.raw
     assert_equal kitchen_sink_config, config.compile
+    assert_equal kitchen_sink_config, config.compile("staging"), "Compiling for an arbitrary environment that is not specified in overrides"
+  end
+
+  test "compile kitchen sink config for environment with overrides" do
+    skip "TODO"
+    commit = Envirobly::Git::Commit.new("210f84ac05698bbb494ff329e84910f5981fdd86", working_dir:)
+    config = Envirobly::Config.new commit
+    assert_equal kitchen_sink_production_config, config.compile("production")
   end
 
   def simple_config_yml

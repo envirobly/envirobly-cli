@@ -12,11 +12,6 @@ class Envirobly::Config
     @commit = commit
     @parsing_error = nil
     @raw = @commit.file_content PATH
-
-    if @project = parse
-      transform_env_var_values!
-      append_image_tags!
-    end
   end
 
   def dig(*args)
@@ -25,7 +20,11 @@ class Envirobly::Config
     nil
   end
 
-  def compile
+  def compile(environment = nil)
+    @environment = environment
+    return unless @project = parse
+    transform_env_var_values!
+    append_image_tags!
     @project.slice(:services)
   end
 
