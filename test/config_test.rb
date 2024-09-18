@@ -20,15 +20,14 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal expected_hash, config.to_h
   end
 
-  private
-    def config_yml
-      <<~YAML
-        services:
-          db:
-            type: postgres
-            instance_type: t4g.small
-          app:
-            dockerfile: Dockerfile
-      YAML
-    end
+  def config_yml
+    <<~YAML
+      services:
+        db:
+          type: postgres
+          instance_type: t4g.small
+        app:
+          dockerfile: Dockerfile
+    YAML
+  end
 end
