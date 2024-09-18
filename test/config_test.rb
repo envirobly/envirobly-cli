@@ -60,7 +60,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
               service: pg
               key: url
           instance_type: t4g.small
-          health_check_path: /up
+          health_check: /up
         blog:
           image: wordpress
           env:
