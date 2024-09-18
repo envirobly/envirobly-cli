@@ -39,17 +39,18 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
           type: postgres
           engine_version: 16.0
           instance_type: t4g.nano
-          disk_size: 25
+          volume_size: 25
         mysql:
           name: Sun ☀️
           type: mysql
           engine_version: 8.1
           instance_type: t4g.nano
-          disk_size: 30
+          volume_size: 30
         app:
           name: SuperApp
           dockerfile: Dockerfile.production
           build_context: app
+          command: rails s
           env:
             RAILS_MASTER_KEY:
               file: config/master.key
@@ -69,17 +70,18 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
             DATABASE_NAME:
               service: mysql
               key: name
-          volume_mount_path: /usr/public/html
-          disk_size: 30
+          volume_mount: /usr/public/html
+          volume_size: 30
+          private: true
 
       environments:
         production:
           pg:
             instance_type: t4g.large
-            disk_size: 400
+            volume_size: 400
           mysql:
             instance_type: t4g.2xlarge
-            disk_size: 500
+            volume_size: 500
           app:
             name: SuperApp Production
             dockerfile: Dockerfile.production
