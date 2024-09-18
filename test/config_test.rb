@@ -6,14 +6,14 @@ class Envirobly::ConfigTest < TestCase
     config = Envirobly::Config.new commit
     assert_equal config_yml, config.raw
     expected_hash = {
-      "services" => {
-        "db" => {
-          "type" => "postgres",
-          "instance_type" => "t4g.small"
+      services: {
+        db: {
+          type: "postgres",
+          instance_type: "t4g.small"
         },
-        "app" => {
-          "dockerfile" => "Dockerfile",
-          "image_tag" => "51d8ebcdc089ffec5c81c01c349377d658d71953"
+        app: {
+          dockerfile: "Dockerfile",
+          image_tag: "51d8ebcdc089ffec5c81c01c349377d658d71953"
         }
       }
     }

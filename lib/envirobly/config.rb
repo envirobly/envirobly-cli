@@ -35,17 +35,17 @@ class Envirobly::Config
 
   private
     def parse
-      YAML.load @raw, aliases: true
+      YAML.load @raw, aliases: true, symbolize_names: true
     rescue Psych::Exception => exception
       @parsing_error = exception.message
       nil
     end
 
     def transform_env_var_values!
-      @project.fetch("services", {}).each do |logical_id, service|
-        service.fetch("env", {}).each do |key, value|
-          if value.is_a?(Hash) && value.has_key?("file")
-            @project["services"][logical_id]["env"][key] = File.read value.fetch("file")
+      @project.fetch(:services, {}).each do |logical_id, service|
+        service.fetch(:env, {}).each do |key, value|
+          if value.is_a?(Hash) && value.has_key?(:file)
+            @project[:services][logical_id][:env][key] = File.read value.fetch(:file)
           end
         end
       end
@@ -53,13 +53,13 @@ class Envirobly::Config
 
     NON_BUILDABLE_TYPES = %w[ postgres mysql valkey ]
     def append_image_tags!
-      @project.fetch("services", {}).each do |logical_id, service|
-        next if NON_BUILDABLE_TYPES.include?(service["type"]) || service["image_uri"]
+      @project.fetch(:services, {}).each do |logical_id, service|
+        next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image_uri]
 
-        dockerfile = service.fetch("dockerfile", "Dockerfile")
-        build_context = service.fetch("build_context", ".")
+        dockerfile = service.fetch(:dockerfile, "Dockerfile")
+        build_context = service.fetch(:build_context, ".")
 
-        @project["services"][logical_id]["image_tag"] = Digest::SHA1.hexdigest [
+        @project[:services][logical_id][:image_tag] = Digest::SHA1.hexdigest [
           @commit.objects_with_checksum_at(dockerfile),
           @commit.objects_with_checksum_at(build_context)
         ].to_json
