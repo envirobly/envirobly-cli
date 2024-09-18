@@ -28,7 +28,7 @@ class Envirobly::Api
     response = get_as_json URI(url)
 
     if response.code.to_i == 200
-      return response
+      response
     elsif MAX_RETRIES <= tries
       $stderr.puts "Max retries exhausted while waiting for deployment credentials. Aborting."
       exit 1
