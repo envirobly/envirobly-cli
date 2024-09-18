@@ -23,6 +23,7 @@ class Envirobly::Config
   def compile(environment = nil)
     @environment = environment
     return unless @project = parse
+    merge_environment_overrides! unless @environment.nil?
     transform_env_var_values!
     append_image_tags!
     @project.slice(:services)
@@ -62,6 +63,20 @@ class Envirobly::Config
           @commit.objects_with_checksum_at(dockerfile),
           @commit.objects_with_checksum_at(build_context)
         ].to_json
+      end
+    end
+
+    def merge_environment_overrides!
+      return unless services = @project.dig(:environments, @environment.to_sym)
+      services.each do |logical_id, service|
+        service.each do |attribute, value|
+          if value.is_a?(Hash) && @project[:services][logical_id][attribute].is_a?(Hash)
+            @project[:services][logical_id][attribute].merge! value
+            @project[:services][logical_id][attribute].compact!
+          else
+            @project[:services][logical_id][attribute] = value
+          end
+        end
       end
     end
 end

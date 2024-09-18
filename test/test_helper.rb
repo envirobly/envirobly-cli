@@ -11,7 +11,7 @@ class ActiveSupport::TestCase
       "61fe5eb7c26d589b7cbb69c87b9f3f8412d8fca3", # a
       "83d49dc06cdd6a4629d59888386622e1c3bdfeb9", # config
       "38541a424ac370a6cccb4a4131f1125a7535cb84", # simple services definition
-      "210f84ac05698bbb494ff329e84910f5981fdd86" # kitchen sink config
+      "eff48c2767a7355dd14f7f7c4b786a8fd45868d0" # kitchen sink config
     ]
   end
 

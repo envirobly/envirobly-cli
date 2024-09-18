@@ -9,7 +9,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   end
 
   test "compile kitchen sink config" do
-    commit = Envirobly::Git::Commit.new("210f84ac05698bbb494ff329e84910f5981fdd86", working_dir:)
+    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_config_yml, config.raw
     assert_equal kitchen_sink_config, config.compile
@@ -17,7 +17,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   end
 
   test "compile kitchen sink config for environment with overrides" do
-    commit = Envirobly::Git::Commit.new("210f84ac05698bbb494ff329e84910f5981fdd86", working_dir:)
+    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_production_config, config.compile("production")
   end
@@ -104,10 +104,9 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
             dockerfile: Dockerfile.production
             build_context: app
             env:
-              RAILS_MASTER_KEY:
-                WEATHER: null
-                RAILS_ENV: production
-                RAILS_MAX_THREADS: 5
+              WEATHER: null
+              RAILS_ENV: production
+              RAILS_MAX_THREADS: 5
             instance_type: t4g.medium
             min_instances: 2
             max_instances: 4
