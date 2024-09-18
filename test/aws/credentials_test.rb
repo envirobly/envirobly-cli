@@ -1,6 +1,6 @@
 require "test_helper"
 
-class Envirobly::Aws::CredentialsTest < TestCase
+class Envirobly::Aws::CredentialsTest < ActiveSupport::TestCase
   def test_as_env_vars
     credential = Envirobly::Aws::Credentials.new(
       "access_key_id" => "a",

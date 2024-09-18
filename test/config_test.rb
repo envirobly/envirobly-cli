@@ -1,6 +1,6 @@
 require "test_helper"
 
-class Envirobly::ConfigTest < TestCase
+class Envirobly::ConfigTest < ActiveSupport::TestCase
   def test_parsing
     commit = Envirobly::Git::Commit.new("38541a424ac370a6cccb4a4131f1125a7535cb84", working_dir:)
     config = Envirobly::Config.new commit

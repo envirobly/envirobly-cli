@@ -5,7 +5,7 @@ require "minitest/autorun"
 require "debug"
 require "envirobly"
 
-class TestCase < Minitest::Test
+class ActiveSupport::TestCase
   private
     def repo1_commits
       %w[
