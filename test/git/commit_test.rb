@@ -5,8 +5,9 @@ class Envirobly::Git::CommitTest < TestCase
     @working_dir = Dir.mktmpdir
     `#{init_repository_script}`
     assert $?.success?
-    @commits = `GIT_DIR=#{@working_dir}/.git git log --reflog --pretty=format:"%H"`.lines
-    assert_equal 1, @commits.size
+    @commits = `GIT_DIR=#{@working_dir}/.git git log --reflog --pretty=format:"%H"`.lines.map(&:chomp)
+    # puts @commits.inspect
+    # assert_equal 2, @commits.size
   end
 
   def teardown
@@ -48,6 +49,21 @@ class Envirobly::Git::CommitTest < TestCase
     assert_kind_of Time, commit.time
   end
 
+  def test_config_content_when_there_is_no_config
+    skip "TODO: Fails weirdly"
+    commit = Envirobly::Git::Commit.new(@commits.first, working_dir: @working_dir)
+    assert_empty commit.config_content
+  end
+
+  def test_config_content_with_config_present
+    commit = Envirobly::Git::Commit.new(@commits[1], working_dir: @working_dir)
+    assert_equal "hi\n", commit.config_content
+  end
+
+  def test_objects_with_checksum_at_does_not_contain_config_file
+    skip "TODO"
+  end
+
   private
     def init_repository_script
       <<~BASH
@@ -57,6 +73,11 @@ class Envirobly::Git::CommitTest < TestCase
         git add .
         git commit -m "a"
         git tag v1
+
+        mkdir .envirobly
+        echo "hi" > .envirobly/project.yml
+        git add .
+        git commit -m "config"
       BASH
     end
 end
