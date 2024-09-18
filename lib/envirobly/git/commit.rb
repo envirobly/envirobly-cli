@@ -28,7 +28,7 @@ class Envirobly::Git::Commit
   end
 
   def objects_with_checksum_at(path)
-    run(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).lines.
+    run(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).lines.map(&:chomp).
       reject { _1.split(" ").last == Envirobly::Config::DIR }
   end
 

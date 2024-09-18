@@ -13,7 +13,7 @@ class Envirobly::ConfigTest < TestCase
         },
         app: {
           dockerfile: "Dockerfile",
-          image_tag: "51d8ebcdc089ffec5c81c01c349377d658d71953"
+          image_tag: "645842777640896aa3d68f2573be5d33571b5001"
         }
       }
     }

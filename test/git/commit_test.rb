@@ -46,7 +46,9 @@ class Envirobly::Git::CommitTest < TestCase
     assert_equal "hi\n", commit.config_content
   end
 
-  def test_objects_with_checksum_at_does_not_contain_config_file
-    skip "TODO"
+  def test_objects_with_checksum_at_root_dir_does_not_contain_config_dir
+    commit = Envirobly::Git::Commit.new(repo1_commits[1], working_dir:)
+    expected = [ "78981922613b2afb6025042ff6bd878ac1994e85 a.txt" ]
+    assert_equal expected, commit.objects_with_checksum_at(".")
   end
 end
