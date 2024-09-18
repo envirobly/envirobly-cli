@@ -1,7 +1,7 @@
 require "test_helper"
 
 class Envirobly::ConfigTest < ActiveSupport::TestCase
-  test "parsing" do
+  test "parsing simple config" do
     commit = Envirobly::Git::Commit.new("38541a424ac370a6cccb4a4131f1125a7535cb84", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal simple_config_yml, config.raw
@@ -18,6 +18,13 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
       }
     }
     assert_equal expected_hash, config.to_h
+  end
+
+  test "parsing kitchen sink config" do
+    commit = Envirobly::Git::Commit.new("210f84ac05698bbb494ff329e84910f5981fdd86", working_dir:)
+    config = Envirobly::Config.new commit
+    assert_equal kitchen_sink_config_yml, config.raw
+    assert_equal kitchen_sink_config, config.to_h
   end
 
   def simple_config_yml
@@ -95,5 +102,60 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
             min_instances: 2
             max_instances: 4
     YAML
+  end
+
+  def kitchen_sink_config
+    {
+      services: {
+        pg: {
+          name: "Elephant",
+          type: "postgres",
+          engine_version: 16.0,
+          instance_type: "t4g.nano",
+          volume_size: 25
+        },
+        mysql: {
+          name: "Sun ☀️",
+          type: "mysql",
+          engine_version: 8.1,
+          instance_type: "t4g.nano",
+          volume_size: 30
+        },
+        app: {
+          name: "SuperApp",
+          dockerfile: "Dockerfile.production",
+          build_context: "app",
+          command: "rails s",
+          env: {
+            RAILS_MASTER_KEY: "MKEY",
+            WEATHER: "sunny",
+            RAILS_ENV: "preview",
+            DATABASE_URL: {
+              service: "pg",
+              key: "url"
+            }
+          },
+          instance_type: "t4g.small",
+          health_check: "/up",
+          image_tag: "202ee5bc619132740ead9058ac2b702d08407d3b"
+        },
+        blog: {
+          image: "wordpress",
+          env: {
+            DATABASE_HOST: {
+              service: "mysql",
+              key: "host"
+            },
+            DATABASE_NAME: {
+              service: "mysql",
+              key: "name"
+            }
+          },
+          volume_mount: "/usr/public/html",
+          volume_size: 30,
+          private: true
+        }
+      }
+    }
   end
 end

@@ -26,7 +26,7 @@ class Envirobly::Config
   end
 
   def to_h
-    @project
+    @project.slice(:services)
   end
 
   def parsing_error?
@@ -45,7 +45,7 @@ class Envirobly::Config
       @project.fetch(:services, {}).each do |logical_id, service|
         service.fetch(:env, {}).each do |key, value|
           if value.is_a?(Hash) && value.has_key?(:file)
-            @project[:services][logical_id][:env][key] = File.read value.fetch(:file)
+            @project[:services][logical_id][:env][key] = @commit.file_content(value.fetch(:file)).strip
           end
         end
       end
@@ -54,7 +54,7 @@ class Envirobly::Config
     NON_BUILDABLE_TYPES = %w[ postgres mysql valkey ]
     def append_image_tags!
       @project.fetch(:services, {}).each do |logical_id, service|
-        next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image_uri]
+        next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image]
 
         dockerfile = service.fetch(:dockerfile, "Dockerfile")
         build_context = service.fetch(:build_context, ".")

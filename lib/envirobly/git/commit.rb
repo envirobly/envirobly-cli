@@ -23,8 +23,12 @@ class Envirobly::Git::Commit
     Time.parse run(%(log #{@ref} -n1 --date=iso --pretty=format:"%ad"))
   end
 
+  def file_content(path)
+    run %(show #{@ref}:#{path})
+  end
+
   def config_content
-    run %(show #{@ref}:#{Envirobly::Config::PATH})
+    file_content Envirobly::Config::PATH
   end
 
   def objects_with_checksum_at(path)
