@@ -1,18 +1,18 @@
 require "test_helper"
 
 class Envirobly::ConfigTest < ActiveSupport::TestCase
-  test "parsing simple config" do
+  test "compile simple config" do
     commit = Envirobly::Git::Commit.new("38541a424ac370a6cccb4a4131f1125a7535cb84", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal simple_config_yml, config.raw
-    assert_equal simple_config, config.to_h
+    assert_equal simple_config, config.compile
   end
 
-  test "parsing kitchen sink config" do
+  test "compile kitchen sink config" do
     commit = Envirobly::Git::Commit.new("210f84ac05698bbb494ff329e84910f5981fdd86", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_config_yml, config.raw
-    assert_equal kitchen_sink_config, config.to_h
+    assert_equal kitchen_sink_config, config.compile
   end
 
   def simple_config_yml

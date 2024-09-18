@@ -25,7 +25,7 @@ class Envirobly::Config
     nil
   end
 
-  def to_h
+  def compile
     @project.slice(:services)
   end
 

@@ -25,7 +25,7 @@ class Envirobly::Deployment
         time: @commit.time,
         message: @commit.message
       },
-      config: config.to_h,
+      config: config.compile,
       raw_config: config.raw
     }
 
