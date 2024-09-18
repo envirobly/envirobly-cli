@@ -25,13 +25,14 @@ class Envirobly::Deployment
         time: @commit.time,
         message: @commit.message
       },
-      config: config.compile,
+      config: config.compile(environment),
       raw_config: config.raw
     }
 
     puts "Deployment config:"
     puts params.to_yaml
 
+    # TODO: I should unify to require remote.origin always and not support deployments by environ URL
     unless environment =~ URL_MATCHER
       if project_url = config.dig("remote", "origin")
         params[:environ][:project_url] = project_url
