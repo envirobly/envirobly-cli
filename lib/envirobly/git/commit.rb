@@ -24,11 +24,11 @@ class Envirobly::Git::Commit
   end
 
   def config_content
-    run %{show #{@normalized_ref}:#{Envirobly::Config::PATH}}
+    run %{show #{@ref}:#{Envirobly::Config::PATH}}
   end
 
   def objects_with_checksum_at(path)
-    run(%{ls-tree #{@normalized_ref} --format='%(objectname) %(path)' #{path}}).lines.
+    run(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).lines.
       reject { _1.split(" ").last == Envirobly::Config::DIR }
   end
 

@@ -1,0 +1,3 @@
+[submodule "test/fixtures/repo1"]
+	path = test/fixtures/repo1
+	url = git@github.com:envirobly/envirobly-cli-test-repo1.git

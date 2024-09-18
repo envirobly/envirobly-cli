@@ -2,16 +2,19 @@ require "test_helper"
 
 class Envirobly::Git::CommitTest < TestCase
   def setup
-    @working_dir = Dir.mktmpdir
-    `#{init_repository_script}`
-    assert $?.success?
-    @commits = `GIT_DIR=#{@working_dir}/.git git log --reflog --pretty=format:"%H"`.lines.map(&:chomp)
+    @working_dir = "#{Dir.getwd}/test/fixtures/repo1"
+    # `#{init_repository_script}`
+    # assert $?.success?
+    @commits = %w[
+      61fe5eb7c26d589b7cbb69c87b9f3f8412d8fca3
+      83d49dc06cdd6a4629d59888386622e1c3bdfeb9
+    ]
     # puts @commits.inspect
-    # assert_equal 2, @commits.size
+    assert_equal 2, @commits.size
   end
 
   def teardown
-    FileUtils.rm_rf @working_dir
+    # FileUtils.rm_rf @working_dir
   end
 
   def test_exists_when_not_a_git_object
@@ -50,7 +53,6 @@ class Envirobly::Git::CommitTest < TestCase
   end
 
   def test_config_content_when_there_is_no_config
-    skip "TODO: Fails weirdly"
     commit = Envirobly::Git::Commit.new(@commits.first, working_dir: @working_dir)
     assert_empty commit.config_content
   end
@@ -64,20 +66,20 @@ class Envirobly::Git::CommitTest < TestCase
     skip "TODO"
   end
 
-  private
-    def init_repository_script
-      <<~BASH
-        cd #{@working_dir}
-        git init
-        echo "a" > a.txt
-        git add .
-        git commit -m "a"
-        git tag v1
+  # private
+  #   def init_repository_script
+  #     <<~BASH
+  #       cd #{@working_dir}
+  #       git init
+  #       echo "a" > a.txt
+  #       git add .
+  #       git commit -m "a"
+  #       git tag v1
 
-        mkdir .envirobly
-        echo "hi" > .envirobly/project.yml
-        git add .
-        git commit -m "config"
-      BASH
-    end
+  #       mkdir .envirobly
+  #       echo "hi" > .envirobly/project.yml
+  #       git add .
+  #       git commit -m "config"
+  #     BASH
+  #   end
 end
