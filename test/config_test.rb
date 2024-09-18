@@ -17,7 +17,6 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   end
 
   test "compile kitchen sink config for environment with overrides" do
-    skip "TODO"
     commit = Envirobly::Git::Commit.new("210f84ac05698bbb494ff329e84910f5981fdd86", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_production_config, config.compile("production")
@@ -147,6 +146,63 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
             }
           },
           instance_type: "t4g.small",
+          health_check: "/up",
+          image_tag: "202ee5bc619132740ead9058ac2b702d08407d3b"
+        },
+        blog: {
+          image: "wordpress",
+          env: {
+            DATABASE_HOST: {
+              service: "mysql",
+              key: "host"
+            },
+            DATABASE_NAME: {
+              service: "mysql",
+              key: "name"
+            }
+          },
+          volume_mount: "/usr/public/html",
+          volume_size: 30,
+          private: true
+        }
+      }
+    }
+  end
+
+  def kitchen_sink_production_config
+    {
+      services: {
+        pg: {
+          name: "Elephant",
+          type: "postgres",
+          engine_version: 16.0,
+          instance_type: "t4g.large",
+          volume_size: 400
+        },
+        mysql: {
+          name: "Sun ☀️",
+          type: "mysql",
+          engine_version: 8.1,
+          instance_type: "t4g.2xlarge",
+          volume_size: 500
+        },
+        app: {
+          name: "SuperApp Production",
+          dockerfile: "Dockerfile.production",
+          build_context: "app",
+          command: "rails s",
+          env: {
+            RAILS_MASTER_KEY: "MKEY",
+            RAILS_ENV: "production",
+            DATABASE_URL: {
+              service: "pg",
+              key: "url"
+            },
+            RAILS_MAX_THREADS: 5
+          },
+          instance_type: "t4g.medium",
+          min_instances: 2,
+          max_instances: 4,
           health_check: "/up",
           image_tag: "202ee5bc619132740ead9058ac2b702d08407d3b"
         },
