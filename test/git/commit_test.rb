@@ -26,27 +26,27 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
     assert_equal repo1_commits.first, commit.ref
   end
 
-  def test_message
+  test "message" do
     commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
     assert_equal "a", commit.message
   end
 
-  def test_time
+  test "time" do
     commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
     assert_kind_of Time, commit.time
   end
 
-  def test_config_content_when_there_is_no_config
+  test "config_content when there is no config" do
     commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
     assert_empty commit.config_content
   end
 
-  def test_config_content_with_config_present
+  test "config_content with config present" do
     commit = Envirobly::Git::Commit.new(repo1_commits[1], working_dir:)
     assert_equal "hi\n", commit.config_content
   end
 
-  def test_objects_with_checksum_at_root_dir_does_not_contain_config_dir
+  test "objects_with_checksum at root dir does not contain config dir" do
     commit = Envirobly::Git::Commit.new(repo1_commits[1], working_dir:)
     expected = [ "78981922613b2afb6025042ff6bd878ac1994e85 a.txt" ]
     assert_equal expected, commit.objects_with_checksum_at(".")
