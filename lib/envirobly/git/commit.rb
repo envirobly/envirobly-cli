@@ -27,10 +27,6 @@ class Envirobly::Git::Commit
     run %(show #{@ref}:#{path})
   end
 
-  def config_content
-    file_content Envirobly::Config::PATH
-  end
-
   def objects_with_checksum_at(path)
     run(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).lines.map(&:chomp).
       reject { _1.split(" ").last == Envirobly::Config::DIR }

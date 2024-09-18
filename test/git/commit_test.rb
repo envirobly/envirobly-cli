@@ -36,14 +36,14 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
     assert_equal Time.parse("Sep 18 10:20:34 2024 +0200"), commit.time
   end
 
-  test "config_content when there is no config" do
+  test "file_content with file missing" do
     commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
-    assert_empty commit.config_content
+    assert_empty commit.file_content("b.txt")
   end
 
-  test "config_content with config present" do
-    commit = Envirobly::Git::Commit.new(repo1_commits[1], working_dir:)
-    assert_equal "hi\n", commit.config_content
+  test "file_content with file present" do
+    commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
+    assert_equal "a\n", commit.file_content("a.txt")
   end
 
   test "objects_with_checksum at root dir does not contain config dir" do

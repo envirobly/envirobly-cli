@@ -11,7 +11,7 @@ class Envirobly::Config
   def initialize(commit)
     @commit = commit
     @parsing_error = nil
-    @raw = @commit.config_content
+    @raw = @commit.file_content PATH
 
     if @project = parse
       transform_env_var_values!
