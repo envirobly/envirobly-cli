@@ -19,7 +19,8 @@ Gem::Specification.new do |spec|
   # .rbenv/versions/3.3.5/lib/ruby/3.3.0/json/generic_object.rb:2: warning: ostruct was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.5.0.
   spec.add_dependency "ostruct", "~> 0.1.0"
 
-  spec.add_development_dependency "debug", "~> 1.8"
-  spec.add_development_dependency "minitest", "~> 5.21"
-  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "debug"
+  spec.add_development_dependency "minitest"
+  spec.add_development_dependency "activesupport"
+  spec.add_development_dependency "railties"
 end

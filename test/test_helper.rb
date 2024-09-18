@@ -1,7 +1,9 @@
+require "bundler/setup"
+require "active_support/test_case"
+require "active_support/testing/autorun"
 require "minitest/autorun"
-require "fileutils"
 require "debug"
-require_relative "../lib/envirobly"
+require "envirobly"
 
 class TestCase < Minitest::Test
   private
