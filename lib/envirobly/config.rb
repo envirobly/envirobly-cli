@@ -35,7 +35,7 @@ class Envirobly::Config
 
   private
     def parse
-      YAML.load @raw, aliases: true, symbolize_names: true
+      YAML.safe_load @raw, aliases: true, symbolize_names: true
     rescue Psych::Exception => exception
       @parsing_error = exception.message
       nil
