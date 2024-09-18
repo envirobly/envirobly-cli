@@ -3,12 +3,12 @@ require "test_helper"
 class Envirobly::Git::CommitTest < ActiveSupport::TestCase
   test "exists? when not a git object" do
     commit = Envirobly::Git::Commit.new("not-a-git-object", working_dir:)
-    refute commit.exists?
+    assert_not commit.exists?
   end
 
   test "exists? when provided hash is not found" do
     commit = Envirobly::Git::Commit.new("5b30cdac88626750ad840f11d86f56a3c89d2180", working_dir:)
-    refute commit.exists?
+    assert_not commit.exists?
   end
 
   test "ref outputs full hash when initialized from short one" do
@@ -16,14 +16,14 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
     assert_equal repo1_commits.first, commit.ref
   end
 
+  test "exists with existing ref" do
+    commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
+    assert commit.exists?
+  end
+
   test "ref outputs object hash when given its tag" do
     commit = Envirobly::Git::Commit.new("v1", working_dir:)
     assert_equal repo1_commits.first, commit.ref
-  end
-
-  def test_exists_with_existing_ref
-    commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
-    assert commit.exists?
   end
 
   def test_message
