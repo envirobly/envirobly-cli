@@ -36,7 +36,7 @@ class Envirobly::Deployment
     bucket = response.object.fetch("bucket")
 
     puts "Uploading build context, please wait..."
-    unless commit.archive_and_upload(bucket:, credentials:)
+    unless commit.archive_and_upload(bucket:, credentials:).success?
       $stderr.puts "Error exporting build context. Aborting."
       exit 1
     end

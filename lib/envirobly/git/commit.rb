@@ -8,46 +8,41 @@ class Envirobly::Git::Commit
   end
 
   def exists?
-    run(%(cat-file -t #{@ref})).strip == "commit"
+    git(%(cat-file -t #{@ref})).stdout.strip == "commit"
   end
 
   def ref
-    @normalized_ref ||= run(%(rev-parse #{@ref})).strip
+    @normalized_ref ||= git(%(rev-parse #{@ref})).stdout.strip
   end
 
   def message
-    run(%(log #{@ref} -n1 --pretty=%B)).strip
+    git(%(log #{@ref} -n1 --pretty=%B)).stdout.strip
   end
 
   def time
-    Time.parse run(%(log #{@ref} -n1 --date=iso --pretty=format:"%ad"))
+    Time.parse git(%(log #{@ref} -n1 --date=iso --pretty=format:"%ad")).stdout
   end
 
   def file_content(path)
-    run %(show #{@ref}:#{path})
+    git(%(show #{@ref}:#{path})).stdout
   end
 
   def objects_with_checksum_at(path)
-    run(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).lines.map(&:chomp).
+    git(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).stdout.lines.map(&:chomp).
       reject { _1.split(" ").last == Envirobly::Config::DIR }
   end
 
   def archive_and_upload(bucket:, credentials:)
-    `GIT_WORK_TREE="#{@working_dir}" GIT_DIR="#{@working_dir}/.git" git archive --format=tar.gz #{ref} | #{credentials.as_inline_env_vars} aws s3 cp - #{archive_uri(bucket)}`
-    $?.success?
+    git(%(archive --format=tar.gz #{ref} | #{credentials.as_inline_env_vars} aws s3 cp - #{archive_uri(bucket)}))
   end
 
   private
-    def run(cmd)
-      @stdout = @stderr = @exit_code = @success = nil
+    OUTPUT = Struct.new :stdout, :stderr, :exit_code, :success?
+    def git(cmd)
       Open3.popen3("git #{cmd}", chdir: @working_dir) do |stdin, stdout, stderr, thread|
         stdin.close
-        @stdout = stdout.read
-        @stderr = stderr.read
-        @exit_code = thread.value.exitstatus
-        @success = thread.value.success?
+        OUTPUT.new stdout.read, stderr.read, thread.value.exitstatus, thread.value.success?
       end
-      @stdout
     end
 
     def archive_uri(bucket)
