@@ -53,12 +53,23 @@ class Envirobly::Config
         next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image]
 
         dockerfile = service.fetch(:dockerfile, "Dockerfile")
-        build_context = service.fetch(:build_context, ".")
+        dockerfile_checksum = @commit.objects_with_checksum_at(dockerfile)
+        if dockerfile_checksum.empty?
+          @errors << "Service '#{logical_id}' specifies dockerfile '#{dockerfile}' that doesn't exist in the commit"
+        end
 
-        @project[:services][logical_id][:image_tag] = Digest::SHA1.hexdigest [
-          @commit.objects_with_checksum_at(dockerfile),
-          @commit.objects_with_checksum_at(build_context)
-        ].to_json
+        build_context = service.fetch(:build_context, ".")
+        build_context_checksum = @commit.objects_with_checksum_at(build_context)
+        if build_context_checksum.empty?
+          @errors << "Service '#{logical_id}' specifies build_context '#{build_context}' that doesn't exist in the commit"
+        end
+
+        if dockerfile_checksum.any? && build_context_checksum.any?
+          @project[:services][logical_id][:image_tag] = Digest::SHA1.hexdigest [
+            dockerfile_checksum,
+            build_context_checksum
+          ].to_json
+        end
       end
     end
 

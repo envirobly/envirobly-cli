@@ -37,7 +37,26 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   end
 
   test "errors: dockerfile and build_context specified don't exist in the commit" do
-    skip "TODO"
+    commit = Minitest::Mock.new
+
+    def commit.file_content(_)
+      <<~YAML
+        services:
+          hi:
+            dockerfile: nope
+            build_context: neither
+      YAML
+    end
+
+    def commit.objects_with_checksum_at(_)
+      []
+    end
+
+    config = Envirobly::Config.new commit
+    config.compile
+    assert_equal 2, config.errors.size
+    assert_equal "Service 'hi' specifies dockerfile 'nope' that doesn't exist in the commit", config.errors.first
+    assert_equal "Service 'hi' specifies build_context 'neither' that doesn't exist in the commit", config.errors[1]
   end
 
   test "errors: unknown top level key used" do
@@ -67,8 +86,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
           instance_type: "t4g.small"
         },
         app: {
-          dockerfile: "Dockerfile",
-          image_tag: "645842777640896aa3d68f2573be5d33571b5001"
+          dockerfile: "Dockerfile"
         }
       }
     }
