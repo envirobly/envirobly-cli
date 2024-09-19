@@ -32,6 +32,22 @@ class Envirobly::Config
     @result = @project.slice(:services)
   end
 
+  def to_deployment_params
+    {
+      environ: {
+        logical_id: @environment,
+        project_url: @project_url
+      },
+      commit: {
+        ref: @commit.ref,
+        time: @commit.time,
+        message: @commit.message
+      },
+      config: @result,
+      raw_config: @raw
+    }
+  end
+
   private
     def parse
       YAML.safe_load @raw, aliases: true, symbolize_names: true

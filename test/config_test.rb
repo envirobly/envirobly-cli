@@ -22,6 +22,59 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal kitchen_sink_production_config, config.compile("production")
   end
 
+  test "to_deployment_params" do
+    commit = Minitest::Mock.new
+    def commit.file_content(_)
+      <<~YAML
+        remote:
+          origin: https://envirobly.com/1/projects/1
+        services:
+          blog:
+            image: wordpress
+      YAML
+    end
+    def commit.ref
+      "eff48c2767a7355dd14f7f7c4b786a8fd45868d0"
+    end
+    def commit.time
+      Time.local(2024, 1, 1)
+    end
+    def commit.message
+      "hello"
+    end
+    def commit.objects_with_checksum_at(_)
+      []
+    end
+    config = Envirobly::Config.new commit
+    config.compile("staging")
+    expected = {
+      environ: {
+        logical_id: "staging",
+        project_url: "https://envirobly.com/1/projects/1"
+      },
+      commit: {
+        ref: "eff48c2767a7355dd14f7f7c4b786a8fd45868d0",
+        time: Time.local(2024, 1, 1),
+        message: "hello"
+      },
+      config: {
+        services: {
+          blog: {
+            image: "wordpress"
+          }
+        }
+      },
+      raw_config: <<~YAML
+        remote:
+          origin: https://envirobly.com/1/projects/1
+        services:
+          blog:
+            image: wordpress
+      YAML
+    }
+    assert_equal expected, config.to_deployment_params
+  end
+
   test "errors: YAML parsing error" do
     commit = Minitest::Mock.new
     def commit.file_content(_)

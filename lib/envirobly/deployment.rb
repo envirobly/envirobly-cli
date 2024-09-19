@@ -1,6 +1,4 @@
 class Envirobly::Deployment
-  URL_MATCHER = /^https:\/\/envirobly\.(test|com)\/(\d+)\/environs\/(\d+)$/
-
   def initialize(environment, options)
     @commit = Envirobly::Git::Commit.new options.commit
 
@@ -21,31 +19,10 @@ class Envirobly::Deployment
       exit 1
     end
 
-    params = {
-      environ: {
-        logical_id: environment
-      },
-      commit: {
-        ref: @commit.ref,
-        time: @commit.time,
-        message: @commit.message
-      },
-      config: config.result,
-      raw_config: config.raw
-    }
+    params = config.to_deployment_params
 
     puts "Deployment config:"
     puts params.to_yaml
-
-    # TODO: I should unify to require remote.origin always and not support deployments by environ URL
-    unless environment =~ URL_MATCHER
-      if project_url = config.dig("remote", "origin")
-        params[:environ][:project_url] = project_url
-      else
-        $stderr.puts "{remote.origin} is required in .envirobly/project.yml"
-        exit 1
-      end
-    end
 
     exit if options.dry_run?
 
