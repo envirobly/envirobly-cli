@@ -19,6 +19,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+        fetch-depth: 0 # fetch all history, needed for fixture repo
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
