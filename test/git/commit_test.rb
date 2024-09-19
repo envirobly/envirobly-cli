@@ -57,4 +57,10 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
     expected = [ "78981922613b2afb6025042ff6bd878ac1994e85 a.txt" ]
     assert_equal expected, commit.objects_with_checksum_at(".")
   end
+
+  test "objects_with_checksum when path does not exist" do
+    commit = Envirobly::Git::Commit.new("v1", working_dir:)
+    expected = []
+    assert_equal expected, commit.objects_with_checksum_at("i-am-not-there")
+  end
 end
