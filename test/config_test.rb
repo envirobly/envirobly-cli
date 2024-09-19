@@ -56,7 +56,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     config.compile
     assert_equal 2, config.errors.size
     assert_equal "Service `hi` specifies `dockerfile` as `nope` which doesn't exist in the commit", config.errors.first
-    assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in the commit", config.errors[1]
+    assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in the commit", config.errors.second
   end
 
   test "errors: unknown top level key used" do

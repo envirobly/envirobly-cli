@@ -54,7 +54,7 @@ class Envirobly::Config
     }
     def append_image_tags!
       @project.fetch(:services, {}).each do |logical_id, service|
-        next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image]
+        next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image].present?
         checksums = []
 
         BUILD_DEFAULTS.each do |attribute, default|
