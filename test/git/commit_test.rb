@@ -33,7 +33,7 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
 
   test "time" do
     commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
-    assert_equal Time.parse("Sep 18 10:20:34 2024"), commit.time
+    assert_equal Time.parse("2024-09-18 10:20:34 +0200"), commit.time
   end
 
   test "file_content with file missing" do
