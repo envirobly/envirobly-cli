@@ -6,11 +6,12 @@ class Envirobly::Config
   DIR = ".envirobly"
   PATH = "#{DIR}/project.yml"
 
-  attr_reader :errors, :raw
+  attr_reader :errors, :result, :raw
 
   def initialize(commit)
     @commit = commit
     @errors = []
+    @result = nil
     @raw = @commit.file_content PATH
   end
 
@@ -26,7 +27,7 @@ class Envirobly::Config
     merge_environment_overrides! unless @environment.nil?
     transform_env_var_values!
     append_image_tags!
-    @project.slice(:services)
+    @result = @project.slice(:services)
   end
 
   private

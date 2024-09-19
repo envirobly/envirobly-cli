@@ -10,6 +10,17 @@ class Envirobly::Deployment
     end
 
     config = Envirobly::Config.new(@commit)
+    config.compile(environment)
+
+    if config.errors.any?
+      $stderr.puts "Errors found while parsing #{Envirobly::Config::PATH}:"
+      config.errors.each do |error|
+        $stderr.puts "  - #{error}"
+      end
+      $stderr.puts "Please fix these, commit the changes and try again."
+      exit 1
+    end
+
     params = {
       environ: {
         logical_id: environment
@@ -19,18 +30,9 @@ class Envirobly::Deployment
         time: @commit.time,
         message: @commit.message
       },
-      config: config.compile(environment),
+      config: config.result,
       raw_config: config.raw
     }
-
-    if config.errors.any?
-      $stderr.puts "Errors found while parsing #{Envirobly::Config::PATH}:"
-      config.errors.each do |error|
-        $stderr.puts "  - #{error}"
-      end
-      $stderr.puts "Aborting."
-      exit 1
-    end
 
     puts "Deployment config:"
     puts params.to_yaml
@@ -55,7 +57,7 @@ class Envirobly::Deployment
     @bucket = response.object.fetch("bucket")
 
     puts "Uploading build context, please wait..."
-    unless archive_commit_and_upload
+    unless @commit.archive_and_upload(bucket:, credentials:)
       $stderr.puts "Error exporting build context. Aborting."
       exit 1
     end
@@ -65,14 +67,4 @@ class Envirobly::Deployment
 
     # TODO: Output URL to watch the deployment progress
   end
-
-  private
-    def archive_uri
-      "s3://#{@bucket}/#{@commit.ref}.tar.gz"
-    end
-
-    def archive_commit_and_upload
-      `git archive --format=tar.gz #{@commit.ref} | #{@credentials.as_inline_env_vars} aws s3 cp - #{archive_uri}`
-      $?.success?
-    end
 end

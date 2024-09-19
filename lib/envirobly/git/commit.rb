@@ -32,6 +32,11 @@ class Envirobly::Git::Commit
       reject { _1.split(" ").last == Envirobly::Config::DIR }
   end
 
+  def archive_and_upload(bucket:, credentials:)
+    `GIT_WORK_TREE="#{@working_dir}" GIT_DIR="#{@working_dir}/.git" git archive --format=tar.gz #{ref} | #{credentials.as_inline_env_vars} aws s3 cp - #{archive_uri(bucket)}`
+    $?.success?
+  end
+
   private
     def run(cmd)
       @stdout = @stderr = @exit_code = @success = nil
@@ -44,5 +49,9 @@ class Envirobly::Git::Commit
         @success = thread.value.success?
       end
       @stdout
+    end
+
+    def archive_uri(bucket)
+      "s3://#{bucket}/#{ref}.tar.gz"
     end
 end
