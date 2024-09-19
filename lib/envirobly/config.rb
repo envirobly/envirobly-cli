@@ -12,6 +12,7 @@ class Envirobly::Config
     @commit = commit
     @errors = []
     @result = nil
+    @project_url = nil
     @raw = @commit.file_content PATH
   end
 
@@ -24,6 +25,7 @@ class Envirobly::Config
   def compile(environment = nil)
     @environment = environment
     return unless @project = parse
+    set_project_url
     merge_environment_overrides! unless @environment.nil?
     transform_env_var_values!
     append_image_tags!
@@ -36,6 +38,13 @@ class Envirobly::Config
     rescue Psych::Exception => exception
       @errors << exception.message
       nil
+    end
+
+    def set_project_url
+      @project_url = dig :remote, :origin
+      if @project_url.blank?
+        @errors << "Missing a `remote.origin` link to project."
+      end
     end
 
     def transform_env_var_values!
@@ -62,7 +71,7 @@ class Envirobly::Config
           value = service.fetch(attribute, default)
           checksum = @commit.objects_with_checksum_at value
           if checksum.empty?
-            @errors << "Service `#{logical_id}` specifies `#{attribute}` as `#{value}` which doesn't exist in the commit"
+            @errors << "Service `#{logical_id}` specifies `#{attribute}` as `#{value}` which doesn't exist in the commit."
           else
             checksums << checksum
           end

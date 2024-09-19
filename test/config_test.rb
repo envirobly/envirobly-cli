@@ -38,25 +38,41 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
 
   test "errors: dockerfile and build_context specified don't exist in the commit" do
     commit = Minitest::Mock.new
-
     def commit.file_content(_)
       <<~YAML
+        remote:
+          origin: https://envirobly.test/1/projects/4
         services:
           hi:
             dockerfile: nope
             build_context: neither
       YAML
     end
-
     def commit.objects_with_checksum_at(_)
       []
     end
-
     config = Envirobly::Config.new commit
     config.compile
     assert_equal 2, config.errors.size
-    assert_equal "Service `hi` specifies `dockerfile` as `nope` which doesn't exist in the commit", config.errors.first
-    assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in the commit", config.errors.second
+    assert_equal "Service `hi` specifies `dockerfile` as `nope` which doesn't exist in the commit.", config.errors.first
+    assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in the commit.", config.errors.second
+  end
+
+  test "errors: no remote origin" do
+    commit = Minitest::Mock.new
+    def commit.file_content(_)
+      <<~YAML
+        services:
+          blog:
+            image: wordpress
+      YAML
+    end
+    def commit.objects_with_checksum_at(_)
+      []
+    end
+    config = Envirobly::Config.new commit
+    config.compile
+    assert_equal "Missing a `remote.origin` link to project.", config.errors.first
   end
 
   test "errors: env var source file does not exist in the commit" do
