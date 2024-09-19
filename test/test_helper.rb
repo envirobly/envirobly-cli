@@ -16,7 +16,6 @@ class ActiveSupport::TestCase
   end
 
   def repo1_working_dir
-    puts "repo1_working_dir: #{Dir.getwd}/test/fixtures/repo1"
     "#{Dir.getwd}/test/fixtures/repo1"
   end
   alias :working_dir :repo1_working_dir
