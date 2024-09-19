@@ -47,7 +47,6 @@ class Envirobly::Git::Commit
         @exit_code = thread.value.exitstatus
         @success = thread.value.success?
       end
-      puts @stderr
       @stdout
     end
 

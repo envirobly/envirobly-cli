@@ -25,7 +25,5 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-    - name: Debug
-      run: cd test/fixtures/repo1 && git log
     - name: Run tests
       run: bin/test
