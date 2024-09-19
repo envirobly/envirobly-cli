@@ -1,74 +1,49 @@
 class Envirobly::Deployment
-  URL_MATCHER = /^https:\/\/envirobly\.(test|com)\/(\d+)\/environs\/(\d+)$/
-
   def initialize(environment, options)
-    @commit = Envirobly::Git::Commit.new options.commit
+    commit = Envirobly::Git::Commit.new options.commit
 
-    unless @commit.exists?
+    unless commit.exists?
       $stderr.puts "Commit #{options.commit} doesn't exist in this repository. Aborting."
       exit 1
     end
 
-    config = Envirobly::Config.new(@commit)
-    if config.parsing_error?
-      $stderr.puts "Error while parsing #{config.path}"
-      $stderr.puts config.parsing_error
+    config = Envirobly::Config.new(commit)
+    config.compile(environment)
+
+    if config.errors.any?
+      $stderr.puts "Errors found while parsing #{Envirobly::Config::PATH}:"
+      $stderr.puts
+      config.errors.each do |error|
+        $stderr.puts "  - #{error}"
+      end
+      $stderr.puts
+      $stderr.puts "Please fix these, commit the changes and try again."
       exit 1
     end
 
-    params = {
-      environ: {
-        logical_id: environment
-      },
-      commit: {
-        ref: @commit.ref,
-        time: @commit.time,
-        message: @commit.message
-      },
-      config: config.to_h,
-      raw_config: config.raw
-    }
+    params = config.to_deployment_params
 
     puts "Deployment config:"
     puts params.to_yaml
 
-    unless environment =~ URL_MATCHER
-      if project_url = config.dig("remote", "origin")
-        params[:environ][:project_url] = project_url
-      else
-        $stderr.puts "{remote.origin} is required in .envirobly/project.yml"
-        exit 1
-      end
-    end
-
     exit if options.dry_run?
 
-    @api = Envirobly::Api.new
-    response = @api.create_deployment params
+    api = Envirobly::Api.new
+    response = api.create_deployment params
     deployment_url = response.object.fetch("url")
-    response = @api.get_deployment_with_delay_and_retry deployment_url
-    @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
-    @bucket = response.object.fetch("bucket")
+    response = api.get_deployment_with_delay_and_retry deployment_url
+    credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
+    bucket = response.object.fetch("bucket")
 
     puts "Uploading build context, please wait..."
-    unless archive_commit_and_upload
+    unless commit.archive_and_upload(bucket:, credentials:)
       $stderr.puts "Error exporting build context. Aborting."
       exit 1
     end
 
     puts "Build context uploaded."
-    @api.put_as_json deployment_url
+    api.put_as_json deployment_url
 
     # TODO: Output URL to watch the deployment progress
   end
-
-  private
-    def archive_uri
-      "s3://#{@bucket}/#{@commit.ref}.tar.gz"
-    end
-
-    def archive_commit_and_upload
-      `git archive --format=tar.gz #{@commit.ref} | #{@credentials.as_inline_env_vars} aws s3 cp - #{archive_uri}`
-      $?.success?
-    end
 end

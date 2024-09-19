@@ -5,9 +5,9 @@ class Envirobly::Aws::Credentials
 
   def as_env_vars
     [
-      %{AWS_ACCESS_KEY_ID="#{@params.fetch("access_key_id")}"},
-      %{AWS_SECRET_ACCESS_KEY="#{@params.fetch("secret_access_key")}"},
-      %{AWS_SESSION_TOKEN="#{@params.fetch("session_token")}"}
+      %(AWS_ACCESS_KEY_ID="#{@params.fetch("access_key_id")}"),
+      %(AWS_SECRET_ACCESS_KEY="#{@params.fetch("secret_access_key")}"),
+      %(AWS_SESSION_TOKEN="#{@params.fetch("session_token")}")
     ]
   end
 
