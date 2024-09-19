@@ -22,6 +22,31 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal kitchen_sink_production_config, config.compile("production")
   end
 
+  test "errors: YAML parsing error" do
+    commit = Minitest::Mock.new
+    def commit.file_content(_)
+      <<~YAML
+        invalid_yaml:
+        [
+      YAML
+    end
+    config = Envirobly::Config.new commit
+    config.compile
+    assert config.parsing_error?
+  end
+
+  test "errors: dockerfile and build_context specified don't exist in the commit" do
+    skip "TODO"
+  end
+
+  test "errors: unknown top level key used" do
+    skip "TODO"
+  end
+
+  test "errors: unknown service level key used" do
+    skip "TODO"
+  end
+
   def simple_config_yml
     <<~YAML
       services:
