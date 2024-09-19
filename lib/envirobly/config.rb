@@ -48,27 +48,27 @@ class Envirobly::Config
     end
 
     NON_BUILDABLE_TYPES = %w[ postgres mysql valkey ]
+    BUILD_DEFAULTS = {
+      dockerfile: "Dockerfile",
+      build_context: "."
+    }
     def append_image_tags!
       @project.fetch(:services, {}).each do |logical_id, service|
         next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image]
+        checksums = []
 
-        dockerfile = service.fetch(:dockerfile, "Dockerfile")
-        dockerfile_checksum = @commit.objects_with_checksum_at(dockerfile)
-        if dockerfile_checksum.empty?
-          @errors << "Service '#{logical_id}' specifies dockerfile '#{dockerfile}' that doesn't exist in the commit"
+        BUILD_DEFAULTS.each do |attribute, default|
+          value = service.fetch(attribute, default)
+          checksum = @commit.objects_with_checksum_at value
+          if checksum.empty?
+            @errors << "Service `#{logical_id}` specifies `#{attribute}` as `#{value}` which doesn't exist in the commit"
+          else
+            checksums << checksum
+          end
         end
 
-        build_context = service.fetch(:build_context, ".")
-        build_context_checksum = @commit.objects_with_checksum_at(build_context)
-        if build_context_checksum.empty?
-          @errors << "Service '#{logical_id}' specifies build_context '#{build_context}' that doesn't exist in the commit"
-        end
-
-        if dockerfile_checksum.any? && build_context_checksum.any?
-          @project[:services][logical_id][:image_tag] = Digest::SHA1.hexdigest [
-            dockerfile_checksum,
-            build_context_checksum
-          ].to_json
+        if checksums.size == 2
+          @project[:services][logical_id][:image_tag] = Digest::SHA1.hexdigest checksums.to_json
         end
       end
     end
