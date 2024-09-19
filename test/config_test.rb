@@ -59,6 +59,10 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in the commit", config.errors.second
   end
 
+  test "errors: env var source file does not exist in the commit" do
+    skip "TODO"
+  end
+
   test "errors: unknown top level key used" do
     skip "TODO"
   end
