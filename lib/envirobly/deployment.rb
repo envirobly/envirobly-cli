@@ -10,12 +10,6 @@ class Envirobly::Deployment
     end
 
     config = Envirobly::Config.new(@commit)
-    if config.parsing_error?
-      $stderr.puts "Error while parsing #{config.path}"
-      $stderr.puts config.parsing_error
-      exit 1
-    end
-
     params = {
       environ: {
         logical_id: environment
@@ -28,6 +22,15 @@ class Envirobly::Deployment
       config: config.compile(environment),
       raw_config: config.raw
     }
+
+    if config.errors.any?
+      $stderr.puts "Errors found while parsing #{Envirobly::Config::PATH}:"
+      config.errors.each do |error|
+        $stderr.puts "  - #{error}"
+      end
+      $stderr.puts "Aborting."
+      exit 1
+    end
 
     puts "Deployment config:"
     puts params.to_yaml

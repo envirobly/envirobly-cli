@@ -32,7 +32,8 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     end
     config = Envirobly::Config.new commit
     config.compile
-    assert config.parsing_error?
+    assert_equal 1, config.errors.size
+    assert_equal "(<unknown>): could not find expected ':' while scanning a simple key at line 2 column 1", config.errors.first
   end
 
   test "errors: dockerfile and build_context specified don't exist in the commit" do

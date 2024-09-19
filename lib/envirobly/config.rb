@@ -6,11 +6,11 @@ class Envirobly::Config
   DIR = ".envirobly"
   PATH = "#{DIR}/project.yml"
 
-  attr_reader :parsing_error, :raw
+  attr_reader :errors, :raw
 
   def initialize(commit)
     @commit = commit
-    @parsing_error = nil
+    @errors = []
     @raw = @commit.file_content PATH
   end
 
@@ -29,15 +29,11 @@ class Envirobly::Config
     @project.slice(:services)
   end
 
-  def parsing_error?
-    !@parsing_error.nil?
-  end
-
   private
     def parse
       YAML.safe_load @raw, aliases: true, symbolize_names: true
     rescue Psych::Exception => exception
-      @parsing_error = exception.message
+      @errors << exception.message
       nil
     end
 
