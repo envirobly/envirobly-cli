@@ -40,8 +40,7 @@ class Envirobly::Git::Commit
   private
     def run(cmd)
       @stdout = @stderr = @exit_code = @success = nil
-      full_cmd = %(GIT_WORK_TREE="#{@working_dir}" GIT_DIR="#{@working_dir}/.git" git #{cmd})
-      Open3.popen3(full_cmd) do |stdin, stdout, stderr, thread|
+      Open3.popen3("git #{cmd}", chdir: @working_dir) do |stdin, stdout, stderr, thread|
         stdin.close
         @stdout = stdout.read
         @stderr = stderr.read
