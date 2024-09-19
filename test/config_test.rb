@@ -89,7 +89,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "(<unknown>): could not find expected ':' while scanning a simple key at line 2 column 1", config.errors.first
   end
 
-  test "errors: dockerfile and build_context specified don't exist in the commit" do
+  test "errors: dockerfile and build_context specified don't exist in this commit" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -107,8 +107,8 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     config = Envirobly::Config.new commit
     config.compile
     assert_equal 2, config.errors.size
-    assert_equal "Service `hi` specifies `dockerfile` as `nope` which doesn't exist in the commit.", config.errors.first
-    assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in the commit.", config.errors.second
+    assert_equal "Service `hi` specifies `dockerfile` as `nope` which doesn't exist in this commit.", config.errors.first
+    assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in this commit.", config.errors.second
   end
 
   test "errors: no remote origin" do
@@ -128,7 +128,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "Missing a `remote.origin` link to project.", config.errors.first
   end
 
-  test "errors: env var source file does not exist in the commit" do
+  test "errors: env var source file does not exist in this commit" do
     skip "TODO"
   end
 

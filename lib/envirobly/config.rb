@@ -87,7 +87,7 @@ class Envirobly::Config
           value = service.fetch(attribute, default)
           checksum = @commit.objects_with_checksum_at value
           if checksum.empty?
-            @errors << "Service `#{logical_id}` specifies `#{attribute}` as `#{value}` which doesn't exist in the commit."
+            @errors << "Service `#{logical_id}` specifies `#{attribute}` as `#{value}` which doesn't exist in this commit."
           else
             checksums << checksum
           end
