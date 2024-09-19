@@ -1,13 +1,13 @@
 class Envirobly::Deployment
   def initialize(environment, options)
-    @commit = Envirobly::Git::Commit.new options.commit
+    commit = Envirobly::Git::Commit.new options.commit
 
-    unless @commit.exists?
+    unless commit.exists?
       $stderr.puts "Commit #{options.commit} doesn't exist in this repository. Aborting."
       exit 1
     end
 
-    config = Envirobly::Config.new(@commit)
+    config = Envirobly::Config.new(commit)
     config.compile(environment)
 
     if config.errors.any?
@@ -26,21 +26,21 @@ class Envirobly::Deployment
 
     exit if options.dry_run?
 
-    @api = Envirobly::Api.new
-    response = @api.create_deployment params
+    api = Envirobly::Api.new
+    response = api.create_deployment params
     deployment_url = response.object.fetch("url")
-    response = @api.get_deployment_with_delay_and_retry deployment_url
-    @credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
-    @bucket = response.object.fetch("bucket")
+    response = api.get_deployment_with_delay_and_retry deployment_url
+    credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
+    bucket = response.object.fetch("bucket")
 
     puts "Uploading build context, please wait..."
-    unless @commit.archive_and_upload(bucket:, credentials:)
+    unless commit.archive_and_upload(bucket:, credentials:)
       $stderr.puts "Error exporting build context. Aborting."
       exit 1
     end
 
     puts "Build context uploaded."
-    @api.put_as_json deployment_url
+    api.put_as_json deployment_url
 
     # TODO: Output URL to watch the deployment progress
   end
