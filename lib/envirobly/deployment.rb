@@ -12,9 +12,11 @@ class Envirobly::Deployment
 
     if config.errors.any?
       $stderr.puts "Errors found while parsing #{Envirobly::Config::PATH}:"
+      $stderr.puts
       config.errors.each do |error|
         $stderr.puts "  - #{error}"
       end
+      $stderr.puts
       $stderr.puts "Please fix these, commit the changes and try again."
       exit 1
     end
