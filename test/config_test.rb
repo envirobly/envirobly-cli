@@ -28,8 +28,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
-        remote:
-          origin: https://envirobly.com/1/projects/1
+        project: https://envirobly.com/1/projects/1
         services:
           blog:
             image: wordpress
@@ -67,8 +66,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
         }
       },
       raw_config: <<~YAML
-        remote:
-          origin: https://envirobly.com/1/projects/1
+        project: https://envirobly.com/1/projects/1
         services:
           blog:
             image: wordpress
@@ -95,8 +93,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
-        remote:
-          origin: https://envirobly.test/1/projects/4
+        project: https://envirobly.test/1/projects/4
         services:
           hi:
             dockerfile: nope
@@ -116,7 +113,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in this commit.", config.errors.second
   end
 
-  test "errors: no remote origin" do
+  test "errors: no project url" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -130,7 +127,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     end
     config = Envirobly::Config.new commit
     config.compile
-    assert_equal "Missing a `remote.origin` link to project.", config.errors.first
+    assert_equal "Missing `project: <url>` top level attribute.", config.errors.first
   end
 
   test "errors: env var source file does not exist in this commit" do

@@ -57,9 +57,9 @@ class Envirobly::Config
     end
 
     def set_project_url
-      @project_url = dig :remote, :origin
+      @project_url = dig :project
       if @project_url.blank?
-        @errors << "Missing a `remote.origin` link to project."
+        @errors << "Missing `project: <url>` top level attribute."
       end
     end
 
