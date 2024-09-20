@@ -19,7 +19,9 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   test "compile kitchen sink config for environment with overrides" do
     commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
     config = Envirobly::Config.new commit
-    assert_equal kitchen_sink_production_config, config.compile("production")
+    config.compile("production")
+    # puts config.errors
+    assert_equal kitchen_sink_production_config, config.result
   end
 
   test "to_deployment_params" do
@@ -101,8 +103,11 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
             build_context: neither
       YAML
     end
-    def commit.objects_with_checksum_at(_)
-      []
+    def commit.file_exists?(_)
+      false
+    end
+    def commit.dir_exists?(_)
+      false
     end
     config = Envirobly::Config.new commit
     config.compile

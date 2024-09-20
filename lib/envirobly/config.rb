@@ -75,21 +75,20 @@ class Envirobly::Config
 
     NON_BUILDABLE_TYPES = %w[ postgres mysql valkey ]
     BUILD_DEFAULTS = {
-      dockerfile: "Dockerfile",
-      build_context: "."
+      dockerfile: [ "Dockerfile", :file_exists? ],
+      build_context: [ ".", :dir_exists? ]
     }
     def append_image_tags!
       @project.fetch(:services, {}).each do |logical_id, service|
         next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image].present?
         checksums = []
 
-        BUILD_DEFAULTS.each do |attribute, default|
-          value = service.fetch(attribute, default)
-          checksum = @commit.objects_with_checksum_at value
-          if checksum.empty?
+        BUILD_DEFAULTS.each do |attribute, options|
+          value = service.fetch(attribute, options.first)
+          unless @commit.public_send(options.second, value)
             @errors << "Service `#{logical_id}` specifies `#{attribute}` as `#{value}` which doesn't exist in this commit."
           else
-            checksums << checksum
+            checksums << @commit.objects_with_checksum_at(value)
           end
         end
 
