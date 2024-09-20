@@ -64,6 +64,9 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
   test "dir_exists? with present dir" do
     commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
     assert commit.dir_exists?("app")
+    assert commit.dir_exists?("app/")
+    assert commit.dir_exists?("./")
+    assert commit.dir_exists?(".")
   end
 
   test "file_content with file missing" do

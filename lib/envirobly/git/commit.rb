@@ -28,7 +28,8 @@ class Envirobly::Git::Commit
   end
 
   def dir_exists?(path)
-    git(%(cat-file -t #{@ref}:#{path})).stdout.strip == "tree"
+    suffix = path.end_with?("/") ? nil : "/"
+    git(%(cat-file -t #{@ref}:#{path}#{suffix})).stdout.strip == "tree"
   end
 
   def file_content(path)
