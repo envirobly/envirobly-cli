@@ -50,7 +50,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     config.compile("staging")
     expected = {
       environ: {
-        logical_id: "staging",
+        name: "staging",
         project_url: "https://envirobly.com/1/projects/1"
       },
       commit: {
