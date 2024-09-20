@@ -35,7 +35,7 @@ class Envirobly::Config
   def to_deployment_params
     {
       environ: {
-        logical_id: @environment,
+        name: @environment,
         project_url: @project_url
       },
       commit: {
@@ -57,17 +57,17 @@ class Envirobly::Config
     end
 
     def set_project_url
-      @project_url = dig :remote, :origin
+      @project_url = dig :project
       if @project_url.blank?
-        @errors << "Missing a `remote.origin` link to project."
+        @errors << "Missing `project: <url>` top level attribute."
       end
     end
 
     def transform_env_var_values!
-      @project.fetch(:services, {}).each do |logical_id, service|
+      @project.fetch(:services, {}).each do |name, service|
         service.fetch(:env, {}).each do |key, value|
           if value.is_a?(Hash) && value.has_key?(:file)
-            @project[:services][logical_id][:env][key] = @commit.file_content(value.fetch(:file)).strip
+            @project[:services][name][:env][key] = @commit.file_content(value.fetch(:file)).strip
           end
         end
       end
@@ -75,39 +75,38 @@ class Envirobly::Config
 
     NON_BUILDABLE_TYPES = %w[ postgres mysql valkey ]
     BUILD_DEFAULTS = {
-      dockerfile: "Dockerfile",
-      build_context: "."
+      dockerfile: [ "Dockerfile", :file_exists? ],
+      build_context: [ ".", :dir_exists? ]
     }
     def append_image_tags!
-      @project.fetch(:services, {}).each do |logical_id, service|
+      @project.fetch(:services, {}).each do |name, service|
         next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image].present?
         checksums = []
 
-        BUILD_DEFAULTS.each do |attribute, default|
-          value = service.fetch(attribute, default)
-          checksum = @commit.objects_with_checksum_at value
-          if checksum.empty?
-            @errors << "Service `#{logical_id}` specifies `#{attribute}` as `#{value}` which doesn't exist in this commit."
+        BUILD_DEFAULTS.each do |attribute, options|
+          value = service.fetch(attribute, options.first)
+          unless @commit.public_send(options.second, value)
+            @errors << "Service `#{name}` specifies `#{attribute}` as `#{value}` which doesn't exist in this commit."
           else
-            checksums << checksum
+            checksums << @commit.objects_with_checksum_at(value)
           end
         end
 
         if checksums.size == 2
-          @project[:services][logical_id][:image_tag] = Digest::SHA1.hexdigest checksums.to_json
+          @project[:services][name][:image_tag] = Digest::SHA1.hexdigest checksums.to_json
         end
       end
     end
 
     def merge_environment_overrides!
       return unless services = @project.dig(:environments, @environment.to_sym)
-      services.each do |logical_id, service|
+      services.each do |name, service|
         service.each do |attribute, value|
-          if value.is_a?(Hash) && @project[:services][logical_id][attribute].is_a?(Hash)
-            @project[:services][logical_id][attribute].merge! value
-            @project[:services][logical_id][attribute].compact!
+          if value.is_a?(Hash) && @project[:services][name][attribute].is_a?(Hash)
+            @project[:services][name][attribute].merge! value
+            @project[:services][name][attribute].compact!
           else
-            @project[:services][logical_id][attribute] = value
+            @project[:services][name][attribute] = value
           end
         end
       end

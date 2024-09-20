@@ -36,6 +36,39 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
     assert_equal Time.parse("2024-09-18 10:20:34 +0200"), commit.time
   end
 
+  test "file_exists? with missing file" do
+    commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
+    assert_not commit.file_exists?("b.txt")
+  end
+
+  test "file_exists? when pointed to directory fails" do
+    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    assert_not commit.file_exists?("app")
+  end
+
+  test "file_exists? with present file" do
+    commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
+    assert commit.file_exists?("a.txt")
+  end
+
+  test "dir_exists? with missing dir" do
+    commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
+    assert_not commit.dir_exists?("not-there")
+  end
+
+  test "dir_exists? when pointed to file fails" do
+    commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
+    assert_not commit.dir_exists?("a.txt")
+  end
+
+  test "dir_exists? with present dir" do
+    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    assert commit.dir_exists?("app")
+    assert commit.dir_exists?("app/")
+    assert commit.dir_exists?("./")
+    assert commit.dir_exists?(".")
+  end
+
   test "file_content with file missing" do
     commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
     assert_empty commit.file_content("b.txt")

@@ -19,15 +19,16 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   test "compile kitchen sink config for environment with overrides" do
     commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
     config = Envirobly::Config.new commit
-    assert_equal kitchen_sink_production_config, config.compile("production")
+    config.compile("production")
+    # puts config.errors
+    assert_equal kitchen_sink_production_config, config.result
   end
 
   test "to_deployment_params" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
-        remote:
-          origin: https://envirobly.com/1/projects/1
+        project: https://envirobly.com/1/projects/1
         services:
           blog:
             image: wordpress
@@ -49,7 +50,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     config.compile("staging")
     expected = {
       environ: {
-        logical_id: "staging",
+        name: "staging",
         project_url: "https://envirobly.com/1/projects/1"
       },
       commit: {
@@ -65,8 +66,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
         }
       },
       raw_config: <<~YAML
-        remote:
-          origin: https://envirobly.com/1/projects/1
+        project: https://envirobly.com/1/projects/1
         services:
           blog:
             image: wordpress
@@ -93,16 +93,18 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
-        remote:
-          origin: https://envirobly.test/1/projects/4
+        project: https://envirobly.test/1/projects/4
         services:
           hi:
             dockerfile: nope
             build_context: neither
       YAML
     end
-    def commit.objects_with_checksum_at(_)
-      []
+    def commit.file_exists?(_)
+      false
+    end
+    def commit.dir_exists?(_)
+      false
     end
     config = Envirobly::Config.new commit
     config.compile
@@ -111,7 +113,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in this commit.", config.errors.second
   end
 
-  test "errors: no remote origin" do
+  test "errors: no project url" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -125,7 +127,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     end
     config = Envirobly::Config.new commit
     config.compile
-    assert_equal "Missing a `remote.origin` link to project.", config.errors.first
+    assert_equal "Missing `project: <url>` top level attribute.", config.errors.first
   end
 
   test "errors: env var source file does not exist in this commit" do
