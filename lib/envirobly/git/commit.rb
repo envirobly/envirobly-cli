@@ -23,11 +23,11 @@ class Envirobly::Git::Commit
     Time.parse git(%(log #{@ref} -n1 --date=iso --pretty=format:"%ad")).stdout
   end
 
-  def file_esists?(path)
+  def file_exists?(path)
     git(%(cat-file -t #{@ref}:#{path})).stdout.strip == "blob"
   end
 
-  def dir_esists?(path)
+  def dir_exists?(path)
     git(%(cat-file -t #{@ref}:#{path})).stdout.strip == "tree"
   end
 
