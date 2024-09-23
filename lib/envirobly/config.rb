@@ -67,9 +67,7 @@ class Envirobly::Config
 
     def set_project_url
       @project_url = dig :project
-      if @project_url.blank?
-        @errors << "Missing `project: <url>` top level attribute."
-      end
+      @errors << "Missing `project: <url>` top level attribute." if @project_url.blank?
     end
 
     def transform_env_var_values!
