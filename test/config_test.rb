@@ -5,15 +5,23 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     commit = Envirobly::Git::Commit.new("38541a424ac370a6cccb4a4131f1125a7535cb84", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal simple_config_yml, config.raw
-    assert_equal simple_config, config.compile
+    config.compile
+    assert_equal simple_config, config.result
   end
 
   test "compile kitchen sink config" do
     commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_config_yml, config.raw
-    assert_equal kitchen_sink_config, config.compile
-    assert_equal kitchen_sink_config, config.compile("staging"), "Compiling for an arbitrary environment that is not specified in overrides"
+    config.compile
+    assert_equal kitchen_sink_config, config.result
+  end
+
+  test "compile for an arbitrary environment that is not specified in overrides" do
+    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    config = Envirobly::Config.new commit
+    config.compile("staging")
+    assert_equal kitchen_sink_config, config.result
   end
 
   test "compile kitchen sink config for environment with overrides" do
@@ -107,7 +115,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
       false
     end
     config = Envirobly::Config.new commit
-    config.compile
+    config.validate
     assert_equal 2, config.errors.size
     assert_equal "Service `hi` specifies `dockerfile` as `nope` which doesn't exist in this commit.", config.errors.first
     assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in this commit.", config.errors.second
@@ -125,8 +133,14 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     def commit.objects_with_checksum_at(_)
       []
     end
+    def commit.file_exists?(_)
+      true
+    end
+    def commit.dir_exists?(_)
+      true
+    end
     config = Envirobly::Config.new commit
-    config.compile
+    config.validate
     assert_equal "Missing `project: <url>` top level attribute.", config.errors.first
   end
 

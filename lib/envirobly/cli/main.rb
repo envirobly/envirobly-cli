@@ -4,6 +4,25 @@ class Envirobly::Cli::Main < Envirobly::Base
     puts Envirobly::VERSION
   end
 
+  desc "validate", "Validates config"
+  def validate
+    commit = Envirobly::Git::Unstaged.new
+    config = Envirobly::Config.new(commit)
+    config.validate
+
+    if config.errors.any?
+      puts "Issues found validating `#{Envirobly::Config::PATH}`:"
+      puts
+      config.errors.each_with_index do |error, index|
+        puts "  #{index + 1}. #{error}"
+      end
+      puts
+      exit 1
+    else
+      puts "All checks pass."
+    end
+  end
+
   desc "deploy ENVIRONMENT", "Deploy to environment identified by name or URL"
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
@@ -15,7 +34,9 @@ class Envirobly::Cli::Main < Envirobly::Base
   desc "set_access_token TOKEN", "Save and use an access token generated at Envirobly"
   def set_access_token
     token = ask("Access Token:", echo: false).strip
-    if token == ""
+
+    if token.blank?
+      $stderr.puts
       $stderr.puts "Token can't be empty."
       exit 1
     end
