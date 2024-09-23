@@ -175,6 +175,14 @@ class Envirobly::Config
             @errors << "Service `#{name}` specifies `#{attribute}` as `#{value}` which doesn't exist in this commit."
           end
         end
+
+        service.fetch(:env, {}).each do |key, value|
+          if value.is_a?(Hash) && value.has_key?(:file)
+            unless @commit.file_exists?(value.fetch(:file))
+              @errors << "Environment variable `#{key}` referring to a file `#{value.fetch(:file)}` doesn't exist in this commit."
+            end
+          end
+        end
       end
     end
 

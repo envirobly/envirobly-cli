@@ -9,7 +9,6 @@ class Envirobly::Deployment
 
     config = Envirobly::Config.new(commit)
     config.validate
-    config.compile(environment)
 
     if config.errors.any?
       $stderr.puts "Errors found while parsing #{Envirobly::Config::PATH}:"
@@ -22,6 +21,7 @@ class Envirobly::Deployment
       exit 1
     end
 
+    config.compile(environment)
     params = config.to_deployment_params
 
     puts "Deployment config:"
