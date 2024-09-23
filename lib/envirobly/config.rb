@@ -22,6 +22,10 @@ class Envirobly::Config
     nil
   end
 
+  def validate
+    # TODO
+  end
+
   def compile(environment = nil)
     @environment = environment
     return unless @project = parse
