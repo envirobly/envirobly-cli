@@ -25,6 +25,7 @@ class Envirobly::Config
   def validate
     return unless @project = parse
     validate_top_level_keys
+    validate_service_keys
   end
 
   def compile(environment = nil)
@@ -129,5 +130,23 @@ class Envirobly::Config
           @errors << "Top level key `#{key}` is not allowed. Allowed keys: #{VALID_TOP_LEVEL_KEYS.map{ "`#{_1}`" }.join(", ")}."
         end
       end
+    end
+
+    VALID_SERVICE_KEYS = %i[
+      type
+      image
+      engine_version
+      instance_type
+      volume_size
+      volume_mount
+      dockerfile
+      build_context
+      command
+      env
+      health_check
+      private
+    ]
+    def validate_service_keys
+
     end
 end
