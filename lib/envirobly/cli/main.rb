@@ -34,7 +34,9 @@ class Envirobly::Cli::Main < Envirobly::Base
   desc "set_access_token TOKEN", "Save and use an access token generated at Envirobly"
   def set_access_token
     token = ask("Access Token:", echo: false).strip
-    if token == ""
+
+    if token.blank?
+      $stderr.puts
       $stderr.puts "Token can't be empty."
       exit 1
     end
