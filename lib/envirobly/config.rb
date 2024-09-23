@@ -25,7 +25,8 @@ class Envirobly::Config
   def validate
     return unless @project = parse
     validate_top_level_keys
-    validate_services
+    validate_services @project.fetch(:services)
+    validate_environments
   end
 
   def compile(environment = nil)
@@ -148,9 +149,7 @@ class Envirobly::Config
       aliases
     ]
     NAME_FORMAT = /\A[a-z0-9\-_]+\z/
-    def validate_services
-      services = @project.fetch(:services)
-
+    def validate_services(services)
       unless services.is_a?(Hash)
         @errors << "`services` key must be a hash."
         return
@@ -171,6 +170,23 @@ class Envirobly::Config
             @errors << "Service `#{name}` attribute `#{key}` is not a valid attribute."
           end
         end
+      end
+    end
+
+    def validate_environments
+      environments = @project.fetch :environments
+
+      unless environments.is_a?(Hash)
+        @errors << "`environments` key must be a hash."
+        return
+      end
+
+      environments.each do |environment, services|
+        unless environment =~ NAME_FORMAT
+          @errors << "`#{environment}` is not a valid environment name. Allowed characters: a-z, 0-9, -, _"
+        end
+
+        validate_services services
       end
     end
 end
