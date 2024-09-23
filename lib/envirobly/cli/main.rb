@@ -11,14 +11,15 @@ class Envirobly::Cli::Main < Envirobly::Base
     config.validate
 
     if config.errors.any?
-      $stderr.puts "Errors found while validating #{Envirobly::Config::PATH}:"
-      $stderr.puts
-      config.errors.each do |error|
-        $stderr.puts "  - #{error}"
+      puts "Issues found validating `#{Envirobly::Config::PATH}`:"
+      puts
+      config.errors.each_with_index do |error, index|
+        puts "  #{index + 1}. #{error}"
       end
+      puts
       exit 1
     else
-      puts "Great, #{Envirobly::Config::PATH} passes all checks."
+      puts "Great, `#{Envirobly::Config::PATH}` passes all checks."
     end
   end
 

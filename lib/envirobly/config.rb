@@ -23,7 +23,8 @@ class Envirobly::Config
   end
 
   def validate
-    # TODO
+    return unless @project = parse
+    validate_top_level_keys
   end
 
   def compile(environment = nil)
@@ -112,6 +113,20 @@ class Envirobly::Config
           else
             @project[:services][name][attribute] = value
           end
+        end
+      end
+    end
+
+    VALID_TOP_LEVEL_KEYS = %i[ project services environments ]
+    def validate_top_level_keys
+      unless @project.is_a?(Hash)
+        @errors << "Config doesn't contain a top level hash structure."
+        return
+      end
+
+      @project.keys.each do |key|
+        unless VALID_TOP_LEVEL_KEYS.include?(key)
+          @errors << "Top level key `#{key}` is not allowed. Allowed keys: #{VALID_TOP_LEVEL_KEYS.map{ "`#{_1}`" }.join(", ")}."
         end
       end
     end
