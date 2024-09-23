@@ -19,7 +19,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       puts
       exit 1
     else
-      puts "Great, `#{Envirobly::Config::PATH}` passes all checks."
+      puts "All checks pass."
     end
   end
 
