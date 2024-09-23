@@ -5,15 +5,23 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     commit = Envirobly::Git::Commit.new("38541a424ac370a6cccb4a4131f1125a7535cb84", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal simple_config_yml, config.raw
-    assert_equal simple_config, config.compile
+    config.compile
+    assert_equal simple_config, config.result
   end
 
   test "compile kitchen sink config" do
     commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_config_yml, config.raw
-    assert_equal kitchen_sink_config, config.compile
-    assert_equal kitchen_sink_config, config.compile("staging"), "Compiling for an arbitrary environment that is not specified in overrides"
+    config.compile
+    assert_equal kitchen_sink_config, config.result
+  end
+
+  test "compile for an arbitrary environment that is not specified in overrides" do
+    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    config = Envirobly::Config.new commit
+    config.compile("staging")
+    assert_equal kitchen_sink_config, config.result
   end
 
   test "compile kitchen sink config for environment with overrides" do

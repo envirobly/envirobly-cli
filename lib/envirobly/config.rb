@@ -14,6 +14,7 @@ class Envirobly::Config
     @result = nil
     @project_url = nil
     @raw = @commit.file_content PATH
+    @project = parse
   end
 
   def dig(*args)
@@ -23,7 +24,7 @@ class Envirobly::Config
   end
 
   def validate
-    return unless @project = parse
+    return unless @project
     validate_top_level_keys
     validate_services @project.fetch(:services)
     validate_environments
@@ -31,12 +32,13 @@ class Envirobly::Config
 
   def compile(environment = nil)
     @environment = environment
-    return unless @project = parse
+    return unless @project
     set_project_url
     merge_environment_overrides! unless @environment.nil?
     transform_env_var_values!
     append_image_tags!
     @result = @project.slice(:services)
+    nil
   end
 
   def to_deployment_params
