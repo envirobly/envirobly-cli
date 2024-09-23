@@ -11,7 +11,7 @@ class Envirobly::Config
   def initialize(commit)
     @commit = commit
     @errors = []
-    @result = nil
+    @result = {}
     @project_url = nil
     @raw = @commit.file_content PATH
     @project = parse
@@ -31,14 +31,13 @@ class Envirobly::Config
   end
 
   def compile(environment = nil)
-    @environment = environment
     return unless @project
+    @environment = environment
+    @result = @project.slice(:services)
     set_project_url
     merge_environment_overrides! unless @environment.nil?
     transform_env_var_values!
     append_image_tags!
-    @result = @project.slice(:services)
-    nil
   end
 
   def to_deployment_params
@@ -71,10 +70,10 @@ class Envirobly::Config
     end
 
     def transform_env_var_values!
-      @project.fetch(:services, {}).each do |name, service|
+      @result[:services].each do |name, service|
         service.fetch(:env, {}).each do |key, value|
           if value.is_a?(Hash) && value.has_key?(:file)
-            @project[:services][name][:env][key] = @commit.file_content(value.fetch(:file)).strip
+            @result[:services][name][:env][key] = @commit.file_content(value.fetch(:file)).strip
           end
         end
       end
@@ -86,7 +85,7 @@ class Envirobly::Config
       build_context: [ ".", :dir_exists? ]
     }
     def append_image_tags!
-      @project.fetch(:services, {}).each do |name, service|
+      @result[:services].each do |name, service|
         next if NON_BUILDABLE_TYPES.include?(service[:type]) || service[:image].present?
         checksums = []
 
@@ -100,7 +99,7 @@ class Envirobly::Config
         end
 
         if checksums.size == 2
-          @project[:services][name][:image_tag] = Digest::SHA1.hexdigest checksums.to_json
+          @result[:services][name][:image_tag] = Digest::SHA1.hexdigest checksums.to_json
         end
       end
     end
@@ -109,11 +108,11 @@ class Envirobly::Config
       return unless services = @project.dig(:environments, @environment.to_sym)
       services.each do |name, service|
         service.each do |attribute, value|
-          if value.is_a?(Hash) && @project[:services][name][attribute].is_a?(Hash)
-            @project[:services][name][attribute].merge! value
-            @project[:services][name][attribute].compact!
+          if value.is_a?(Hash) && @result[:services][name][attribute].is_a?(Hash)
+            @result[:services][name][attribute].merge! value
+            @result[:services][name][attribute].compact!
           else
-            @project[:services][name][attribute] = value
+            @result[:services][name][attribute] = value
           end
         end
       end
