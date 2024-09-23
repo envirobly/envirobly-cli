@@ -8,6 +8,7 @@ class Envirobly::Deployment
     end
 
     config = Envirobly::Config.new(commit)
+    config.validate
     config.compile(environment)
 
     if config.errors.any?

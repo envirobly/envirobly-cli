@@ -66,7 +66,6 @@ class Envirobly::Config
 
     def set_project_url
       @project_url = dig :project
-      @errors << "Missing `project: <url>` top level attribute." if @project_url.blank?
     end
 
     def transform_env_var_values!
@@ -91,9 +90,7 @@ class Envirobly::Config
 
         BUILD_DEFAULTS.each do |attribute, options|
           value = service.fetch(attribute, options.first)
-          unless @commit.public_send(options.second, value)
-            @errors << "Service `#{name}` specifies `#{attribute}` as `#{value}` which doesn't exist in this commit."
-          else
+          if @commit.public_send(options.second, value)
             checksums << @commit.objects_with_checksum_at(value)
           end
         end
@@ -125,6 +122,8 @@ class Envirobly::Config
         return
       end
 
+      @errors << "Missing `project: <url>` top level attribute." if @project[:project].blank?
+
       @project.keys.each do |key|
         unless VALID_TOP_LEVEL_KEYS.include?(key)
           @errors << "Top level key `#{key}` is not allowed. Allowed keys: #{VALID_TOP_LEVEL_KEYS.map{ "`#{_1}`" }.join(", ")}."
@@ -154,26 +153,35 @@ class Envirobly::Config
         return
       end
 
-      services.each do |name, attrs|
+      services.each do |name, service|
         unless name =~ NAME_FORMAT
           @errors << "`#{name}` is not a valid service name. Allowed characters: a-z, 0-9, -, _"
         end
 
-        unless attrs.is_a?(Hash)
+        unless service.is_a?(Hash)
           @errors << "Service `#{name}` must be a hash."
           next
         end
 
-        attrs.each do |key, value|
-          unless VALID_SERVICE_KEYS.include?(key)
-            @errors << "Service `#{name}` attribute `#{key}` is not a valid attribute."
+        service.each do |attribute, value|
+          unless VALID_SERVICE_KEYS.include?(attribute)
+            @errors << "Service `#{name}` attribute `#{attribute}` is not a valid attribute."
+          end
+        end
+
+        BUILD_DEFAULTS.each do |attribute, options|
+          value = service.fetch(attribute, options.first)
+          unless @commit.public_send(options.second, value)
+            @errors << "Service `#{name}` specifies `#{attribute}` as `#{value}` which doesn't exist in this commit."
           end
         end
       end
     end
 
     def validate_environments
-      environments = @project.fetch :environments
+      return unless @project.has_key?(:environments)
+
+      environments = @project.fetch :environments, nil
 
       unless environments.is_a?(Hash)
         @errors << "`environments` key must be a hash."
