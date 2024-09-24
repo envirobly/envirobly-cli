@@ -136,11 +136,14 @@ class Envirobly::Config
       image
       engine_version
       instance_type
+      min_instances
+      max_instances
       volume_size
       volume_mount
       dockerfile
       build_context
       command
+      release_command
       env
       health_check
       private
