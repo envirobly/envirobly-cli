@@ -92,7 +92,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
       YAML
     end
     config = Envirobly::Config.new commit
-    config.compile
+    config.validate
     assert_equal 1, config.errors.size
     assert_equal "(<unknown>): could not find expected ':' while scanning a simple key at line 2 column 1", config.errors.first
   end
@@ -173,7 +173,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_match /`stáging` is not a valid environment name/, config.errors.second
   end
 
-  test "errors: env var source file does not exist in this commit" do
+  test "errors: env var hash has unknown attributes" do
     skip "TODO"
   end
 
