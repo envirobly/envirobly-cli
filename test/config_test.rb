@@ -126,7 +126,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     def commit.file_content(_)
       <<~YAML
         services:
-          blog:
+          blog/.-_:
             image: wordpress
       YAML
     end
@@ -141,7 +141,36 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     end
     config = Envirobly::Config.new commit
     config.validate
+    assert_equal 1, config.errors.size
     assert_equal "Missing `project: <url>` top level attribute.", config.errors.first
+  end
+
+  test "errors: invalid service and environment names" do
+    commit = Minitest::Mock.new
+    def commit.file_content(_)
+      <<~YAML
+        project: https://envirobly.test/1/projects/4
+        services:
+          blóg:
+            image: wordpress
+        environments:
+          stáging: {}
+      YAML
+    end
+    def commit.objects_with_checksum_at(_)
+      []
+    end
+    def commit.file_exists?(_)
+      true
+    end
+    def commit.dir_exists?(_)
+      true
+    end
+    config = Envirobly::Config.new commit
+    config.validate
+    assert_equal 2, config.errors.size
+    assert_equal "`blóg` is not a valid service name. Use aplhanumeric characters, dash, underscore, slash or dot.", config.errors.first
+    assert_equal "`stáging` is not a valid environment name. Use aplhanumeric characters, dash, underscore, slash or dot.", config.errors.second
   end
 
   test "errors: env var source file does not exist in this commit" do
