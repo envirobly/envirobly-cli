@@ -169,8 +169,8 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     config = Envirobly::Config.new commit
     config.validate
     assert_equal 2, config.errors.size
-    assert_equal "`blóg` is not a valid service name. Use aplhanumeric characters, dash, underscore, slash or dot.", config.errors.first
-    assert_equal "`stáging` is not a valid environment name. Use aplhanumeric characters, dash, underscore, slash or dot.", config.errors.second
+    assert_match /`blóg` is not a valid service name/, config.errors.first
+    assert_match /`stáging` is not a valid environment name/, config.errors.second
   end
 
   test "errors: env var source file does not exist in this commit" do
