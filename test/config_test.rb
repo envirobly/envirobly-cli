@@ -83,7 +83,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal expected, config.to_deployment_params
   end
 
-  test "errors: YAML parsing error" do
+  test "validate: YAML parsing error" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -97,7 +97,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "(<unknown>): could not find expected ':' while scanning a simple key at line 2 column 1", config.errors.first
   end
 
-  test "errors: dockerfile and build_context specified don't exist in this commit" do
+  test "validate: dockerfile and build_context specified don't exist in this commit" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -121,7 +121,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in this commit.", config.errors.second
   end
 
-  test "errors: no project url" do
+  test "validate: no project url" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -145,7 +145,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "Missing `project: <url>` top level attribute.", config.errors.first
   end
 
-  test "errors: invalid service and environment names" do
+  test "validate: invalid service and environment names" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -173,15 +173,15 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_match /`stáging` is not a valid environment name/, config.errors.second
   end
 
-  test "errors: env var hash has unknown attributes" do
+  test "validate: env var hash has unknown attributes" do
     skip "TODO"
   end
 
-  test "errors: unknown top level key used" do
+  test "validate: unknown top level key used" do
     skip "TODO"
   end
 
-  test "errors: unknown service level key used" do
+  test "validate: unknown service level key used" do
     skip "TODO"
   end
 
