@@ -10,7 +10,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   end
 
   test "compile kitchen sink config" do
-    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    commit = Envirobly::Git::Commit.new("ac3457fbdd2ef219a8e2e0e074365092970d5dd3", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_config_yml, config.raw
     config.compile
@@ -18,14 +18,14 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   end
 
   test "compile for an arbitrary environment that is not specified in overrides" do
-    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    commit = Envirobly::Git::Commit.new("ac3457fbdd2ef219a8e2e0e074365092970d5dd3", working_dir:)
     config = Envirobly::Config.new commit
     config.compile("staging")
     assert_equal kitchen_sink_config, config.result
   end
 
   test "compile kitchen sink config for environment with overrides" do
-    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    commit = Envirobly::Git::Commit.new("ac3457fbdd2ef219a8e2e0e074365092970d5dd3", working_dir:)
     config = Envirobly::Config.new commit
     config.compile("production")
     # puts config.errors
@@ -43,7 +43,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
       YAML
     end
     def commit.ref
-      "eff48c2767a7355dd14f7f7c4b786a8fd45868d0"
+      "ac3457fbdd2ef219a8e2e0e074365092970d5dd3"
     end
     def commit.time
       Time.local(2024, 1, 1)
@@ -62,7 +62,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
         project_url: "https://envirobly.com/1/projects/1"
       },
       commit: {
-        ref: "eff48c2767a7355dd14f7f7c4b786a8fd45868d0",
+        ref: "ac3457fbdd2ef219a8e2e0e074365092970d5dd3",
         time: Time.local(2024, 1, 1),
         message: "hello"
       },
@@ -83,7 +83,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal expected, config.to_deployment_params
   end
 
-  test "errors: YAML parsing error" do
+  test "validate: YAML parsing error" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -92,12 +92,12 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
       YAML
     end
     config = Envirobly::Config.new commit
-    config.compile
+    config.validate
     assert_equal 1, config.errors.size
     assert_equal "(<unknown>): could not find expected ':' while scanning a simple key at line 2 column 1", config.errors.first
   end
 
-  test "errors: dockerfile and build_context specified don't exist in this commit" do
+  test "validate: dockerfile and build_context specified don't exist in this commit" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
@@ -121,12 +121,12 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal "Service `hi` specifies `build_context` as `neither` which doesn't exist in this commit.", config.errors.second
   end
 
-  test "errors: no project url" do
+  test "validate: no project url" do
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
         services:
-          blog:
+          blog/.-_:
             image: wordpress
       YAML
     end
@@ -141,18 +141,47 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     end
     config = Envirobly::Config.new commit
     config.validate
+    assert_equal 1, config.errors.size
     assert_equal "Missing `project: <url>` top level attribute.", config.errors.first
   end
 
-  test "errors: env var source file does not exist in this commit" do
+  test "validate: invalid service and environment names" do
+    commit = Minitest::Mock.new
+    def commit.file_content(_)
+      <<~YAML
+        project: https://envirobly.test/1/projects/4
+        services:
+          blóg:
+            image: wordpress
+        environments:
+          stáging: {}
+      YAML
+    end
+    def commit.objects_with_checksum_at(_)
+      []
+    end
+    def commit.file_exists?(_)
+      true
+    end
+    def commit.dir_exists?(_)
+      true
+    end
+    config = Envirobly::Config.new commit
+    config.validate
+    assert_equal 2, config.errors.size
+    assert_match /`blóg` is not a valid service name/, config.errors.first
+    assert_match /`stáging` is not a valid environment name/, config.errors.second
+  end
+
+  test "validate: env var hash has unknown attributes" do
     skip "TODO"
   end
 
-  test "errors: unknown top level key used" do
+  test "validate: unknown top level key used" do
     skip "TODO"
   end
 
-  test "errors: unknown service level key used" do
+  test "validate: unknown service level key used" do
     skip "TODO"
   end
 
@@ -185,25 +214,22 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     <<~YAML
       services:
         pg:
-          name: Elephant
           type: postgres
           engine_version: 16.0
           instance_type: t4g.nano
           volume_size: 25
         mysql:
-          name: Sun ☀️
           type: mysql
           engine_version: 8.1
           instance_type: t4g.nano
           volume_size: 30
         app:
-          name: SuperApp
           dockerfile: Dockerfile.production
           build_context: app
           command: rails s
           env:
             RAILS_MASTER_KEY:
-              file: config/master.key
+              secret: master-key
             WEATHER: sunny
             RAILS_ENV: preview
             DATABASE_URL:
@@ -233,7 +259,6 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
             instance_type: t4g.2xlarge
             volume_size: 500
           app:
-            name: SuperApp Production
             dockerfile: Dockerfile.production
             build_context: app
             env:
@@ -250,26 +275,25 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     {
       services: {
         pg: {
-          name: "Elephant",
           type: "postgres",
           engine_version: 16.0,
           instance_type: "t4g.nano",
           volume_size: 25
         },
         mysql: {
-          name: "Sun ☀️",
           type: "mysql",
           engine_version: 8.1,
           instance_type: "t4g.nano",
           volume_size: 30
         },
         app: {
-          name: "SuperApp",
           dockerfile: "Dockerfile.production",
           build_context: "app",
           command: "rails s",
           env: {
-            RAILS_MASTER_KEY: "MKEY",
+            RAILS_MASTER_KEY: {
+              secret: "master-key"
+            },
             WEATHER: "sunny",
             RAILS_ENV: "preview",
             DATABASE_URL: {
@@ -305,26 +329,25 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     {
       services: {
         pg: {
-          name: "Elephant",
           type: "postgres",
           engine_version: 16.0,
           instance_type: "t4g.large",
           volume_size: 400
         },
         mysql: {
-          name: "Sun ☀️",
           type: "mysql",
           engine_version: 8.1,
           instance_type: "t4g.2xlarge",
           volume_size: 500
         },
         app: {
-          name: "SuperApp Production",
           dockerfile: "Dockerfile.production",
           build_context: "app",
           command: "rails s",
           env: {
-            RAILS_MASTER_KEY: "MKEY",
+            RAILS_MASTER_KEY: {
+              secret: "master-key"
+            },
             RAILS_ENV: "production",
             DATABASE_URL: {
               service: "pg",

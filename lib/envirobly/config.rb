@@ -36,7 +36,6 @@ class Envirobly::Config
     @result = @project.slice(:services)
     set_project_url
     merge_environment_overrides! unless @environment.nil?
-    transform_env_var_values!
     append_image_tags!
   end
 
@@ -66,16 +65,6 @@ class Envirobly::Config
 
     def set_project_url
       @project_url = dig :project
-    end
-
-    def transform_env_var_values!
-      @result[:services].each do |name, service|
-        service.fetch(:env, {}).each do |key, value|
-          if value.is_a?(Hash) && value.has_key?(:file)
-            @result[:services][name][:env][key] = @commit.file_content(value.fetch(:file)).strip
-          end
-        end
-      end
     end
 
     NON_BUILDABLE_TYPES = %w[ postgres mysql valkey ]
@@ -149,7 +138,7 @@ class Envirobly::Config
       private
       aliases
     ]
-    NAME_FORMAT = /\A[a-z0-9\-_]+\z/
+    NAME_FORMAT = /\A[a-z0-9\-_\.\/]+\z/i
     def validate_services(services)
       unless services.is_a?(Hash)
         @errors << "`services` key must be a hash."
@@ -158,7 +147,7 @@ class Envirobly::Config
 
       services.each do |name, service|
         unless name =~ NAME_FORMAT
-          @errors << "`#{name}` is not a valid service name. Allowed characters: a-z, 0-9, -, _"
+          @errors << "`#{name}` is not a valid service name. Use aplhanumeric characters, dash, underscore, slash or dot."
         end
 
         unless service.is_a?(Hash)
@@ -201,7 +190,7 @@ class Envirobly::Config
 
       environments.each do |environment, services|
         unless environment =~ NAME_FORMAT
-          @errors << "`#{environment}` is not a valid environment name. Allowed characters: a-z, 0-9, -, _"
+          @errors << "`#{environment}` is not a valid environment name. Use aplhanumeric characters, dash, underscore, slash or dot."
         end
 
         validate_services services
