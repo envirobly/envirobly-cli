@@ -36,7 +36,6 @@ class Envirobly::Config
     @result = @project.slice(:services)
     set_project_url
     merge_environment_overrides! unless @environment.nil?
-    transform_env_var_values!
     append_image_tags!
   end
 
@@ -66,16 +65,6 @@ class Envirobly::Config
 
     def set_project_url
       @project_url = dig :project
-    end
-
-    def transform_env_var_values!
-      @result[:services].each do |name, service|
-        service.fetch(:env, {}).each do |key, value|
-          if value.is_a?(Hash) && value.has_key?(:file)
-            @result[:services][name][:env][key] = @commit.file_content(value.fetch(:file)).strip
-          end
-        end
-      end
     end
 
     NON_BUILDABLE_TYPES = %w[ postgres mysql valkey ]

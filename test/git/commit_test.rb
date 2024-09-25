@@ -42,7 +42,7 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
   end
 
   test "file_exists? when pointed to directory fails" do
-    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    commit = Envirobly::Git::Commit.new("ac3457fbdd2ef219a8e2e0e074365092970d5dd3", working_dir:)
     assert_not commit.file_exists?("app")
   end
 
@@ -62,7 +62,7 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
   end
 
   test "dir_exists? with present dir" do
-    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    commit = Envirobly::Git::Commit.new("ac3457fbdd2ef219a8e2e0e074365092970d5dd3", working_dir:)
     assert commit.dir_exists?("app")
     assert commit.dir_exists?("app/")
     assert commit.dir_exists?("./")

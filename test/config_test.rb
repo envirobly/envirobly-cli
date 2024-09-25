@@ -10,7 +10,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   end
 
   test "compile kitchen sink config" do
-    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    commit = Envirobly::Git::Commit.new("ac3457fbdd2ef219a8e2e0e074365092970d5dd3", working_dir:)
     config = Envirobly::Config.new commit
     assert_equal kitchen_sink_config_yml, config.raw
     config.compile
@@ -18,14 +18,14 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   end
 
   test "compile for an arbitrary environment that is not specified in overrides" do
-    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    commit = Envirobly::Git::Commit.new("ac3457fbdd2ef219a8e2e0e074365092970d5dd3", working_dir:)
     config = Envirobly::Config.new commit
     config.compile("staging")
     assert_equal kitchen_sink_config, config.result
   end
 
   test "compile kitchen sink config for environment with overrides" do
-    commit = Envirobly::Git::Commit.new("eff48c2767a7355dd14f7f7c4b786a8fd45868d0", working_dir:)
+    commit = Envirobly::Git::Commit.new("ac3457fbdd2ef219a8e2e0e074365092970d5dd3", working_dir:)
     config = Envirobly::Config.new commit
     config.compile("production")
     # puts config.errors
@@ -43,7 +43,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
       YAML
     end
     def commit.ref
-      "eff48c2767a7355dd14f7f7c4b786a8fd45868d0"
+      "ac3457fbdd2ef219a8e2e0e074365092970d5dd3"
     end
     def commit.time
       Time.local(2024, 1, 1)
@@ -62,7 +62,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
         project_url: "https://envirobly.com/1/projects/1"
       },
       commit: {
-        ref: "eff48c2767a7355dd14f7f7c4b786a8fd45868d0",
+        ref: "ac3457fbdd2ef219a8e2e0e074365092970d5dd3",
         time: Time.local(2024, 1, 1),
         message: "hello"
       },
@@ -214,25 +214,22 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     <<~YAML
       services:
         pg:
-          name: Elephant
           type: postgres
           engine_version: 16.0
           instance_type: t4g.nano
           volume_size: 25
         mysql:
-          name: Sun ☀️
           type: mysql
           engine_version: 8.1
           instance_type: t4g.nano
           volume_size: 30
         app:
-          name: SuperApp
           dockerfile: Dockerfile.production
           build_context: app
           command: rails s
           env:
             RAILS_MASTER_KEY:
-              file: config/master.key
+              secret: master-key
             WEATHER: sunny
             RAILS_ENV: preview
             DATABASE_URL:
@@ -262,7 +259,6 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
             instance_type: t4g.2xlarge
             volume_size: 500
           app:
-            name: SuperApp Production
             dockerfile: Dockerfile.production
             build_context: app
             env:
@@ -279,26 +275,25 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     {
       services: {
         pg: {
-          name: "Elephant",
           type: "postgres",
           engine_version: 16.0,
           instance_type: "t4g.nano",
           volume_size: 25
         },
         mysql: {
-          name: "Sun ☀️",
           type: "mysql",
           engine_version: 8.1,
           instance_type: "t4g.nano",
           volume_size: 30
         },
         app: {
-          name: "SuperApp",
           dockerfile: "Dockerfile.production",
           build_context: "app",
           command: "rails s",
           env: {
-            RAILS_MASTER_KEY: "MKEY",
+            RAILS_MASTER_KEY: {
+              secret: "master-key"
+            },
             WEATHER: "sunny",
             RAILS_ENV: "preview",
             DATABASE_URL: {
@@ -334,26 +329,25 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     {
       services: {
         pg: {
-          name: "Elephant",
           type: "postgres",
           engine_version: 16.0,
           instance_type: "t4g.large",
           volume_size: 400
         },
         mysql: {
-          name: "Sun ☀️",
           type: "mysql",
           engine_version: 8.1,
           instance_type: "t4g.2xlarge",
           volume_size: 500
         },
         app: {
-          name: "SuperApp Production",
           dockerfile: "Dockerfile.production",
           build_context: "app",
           command: "rails s",
           env: {
-            RAILS_MASTER_KEY: "MKEY",
+            RAILS_MASTER_KEY: {
+              secret: "master-key"
+            },
             RAILS_ENV: "production",
             DATABASE_URL: {
               service: "pg",
