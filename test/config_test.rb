@@ -36,7 +36,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     commit = Minitest::Mock.new
     def commit.file_content(_)
       <<~YAML
-        project: https://envirobly.com/1/projects/1
+        project: https://envirobly.com/projects/1
         services:
           blog:
             image: wordpress
@@ -59,7 +59,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     expected = {
       environ: {
         name: "staging",
-        project_url: "https://envirobly.com/1/projects/1"
+        project_url: "https://envirobly.com/projects/1"
       },
       commit: {
         ref: "ac3457fbdd2ef219a8e2e0e074365092970d5dd3",
@@ -74,7 +74,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
         }
       },
       raw_config: <<~YAML
-        project: https://envirobly.com/1/projects/1
+        project: https://envirobly.com/projects/1
         services:
           blog:
             image: wordpress
