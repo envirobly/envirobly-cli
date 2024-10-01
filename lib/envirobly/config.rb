@@ -123,6 +123,7 @@ class Envirobly::Config
     VALID_SERVICE_KEYS = %i[
       type
       image
+      build
       engine_version
       instance_type
       min_instances
@@ -139,6 +140,7 @@ class Envirobly::Config
       aliases
     ]
     NAME_FORMAT = /\A[a-z0-9\-_\.\/]+\z/i
+    BUILD_VALUE_FORMAT = /\Av[\d+]\z/
     def validate_services(services)
       unless services.is_a?(Hash)
         @errors << "`services` key must be a hash."
@@ -158,6 +160,12 @@ class Envirobly::Config
         service.each do |attribute, value|
           unless VALID_SERVICE_KEYS.include?(attribute)
             @errors << "Service `#{name}` attribute `#{attribute}` is not a valid attribute."
+          end
+
+          if attribute == :build
+            unless value =~ BUILD_VALUE_FORMAT
+              @errors << "Service `#{name}` attribute `#{attribute}` format needs to be a number prefixed with letter \"v\", for example \"v1\"."
+            end
           end
         end
 
