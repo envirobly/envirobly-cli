@@ -136,6 +136,7 @@ class Envirobly::Config
       release_command
       env
       health_check
+      http
       private
       aliases
     ]
