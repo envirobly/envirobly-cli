@@ -32,6 +32,7 @@ class Envirobly::Aws::S3
     def compress_and_upload_object(git_object_hash)
       key = "git-objects/#{git_object_hash}.gz"
 
+      # TODO: Replace with list objects first, then only uploading the ones that don't
       if object_exists?(key)
         puts "✔ #{key}"
         return
