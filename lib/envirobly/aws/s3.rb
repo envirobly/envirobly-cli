@@ -17,6 +17,8 @@ class Envirobly::Aws::S3
   def push(commit)
     puts "Pushing commit #{commit.ref} to #{@bucket}"
 
+    # TODO: If remote manifest already exists, exit
+
     remote_object_hashes = list_object_hashes
     # TODO: Distinguish between blob/symlink/commit types (if necessary)
     # TODO: Object tree map should do recursion for submodules (probably)
