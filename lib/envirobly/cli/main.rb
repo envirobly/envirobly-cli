@@ -51,6 +51,12 @@ class Envirobly::Cli::Main < Envirobly::Base
     s3.push commit
   end
 
+  desc "pull", "Download working copy from S3"
+  def pull(bucket, ref, path)
+    s3 = Envirobly::Aws::S3.new bucket
+    s3.pull ref, path
+  end
+
   private
     def abort_if_aws_cli_is_missing
       `which aws`

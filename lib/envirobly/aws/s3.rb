@@ -49,6 +49,15 @@ class Envirobly::Aws::S3
     puts "Done in #{format_duration timings.real}"
   end
 
+  def pull(ref, path)
+    puts "Pulling #{ref} into #{path}"
+
+    unless object_exists?(manifest_key(ref))
+      puts "Commit #{ref} doesn't exist at s3://#{@bucket}"
+      exit 1
+    end
+  end
+
   private
     def list_object_hashes
       @client.list_objects({
