@@ -7,6 +7,7 @@ require "aws-sdk-s3"
 class Envirobly::Aws::S3
   OBJECTS_PREFIX = "blobs"
   MANIFESTS_PREFIX = "manifests"
+  UPLOAD_CONCURRENCY = 6
 
   def initialize(bucket)
     @bucket = bucket
@@ -75,8 +76,8 @@ class Envirobly::Aws::S3
       end
     end
 
-    def upload_git_objects(object_hashes, thread_count: 6)
-      pool = Concurrent::FixedThreadPool.new(thread_count)
+    def upload_git_objects(object_hashes)
+      pool = Concurrent::FixedThreadPool.new(UPLOAD_CONCURRENCY)
 
       object_hashes.each do |object_hash|
         pool.post do
