@@ -15,6 +15,7 @@ class Envirobly::Aws::S3
     @client = Aws::S3::Client.new # TODO: region and creds should be passed
   end
 
+  # TODO: Test symlink behavior
   def push(commit)
     if object_exists?(manifest_key(commit.ref))
       puts "Commit #{commit.ref} is already uploaded."
@@ -23,16 +24,26 @@ class Envirobly::Aws::S3
 
     puts "Pushing commit #{commit.ref} to #{@bucket}"
 
-    remote_object_hashes = list_object_hashes
-    # TODO: Distinguish between blob/symlink/commit types (if necessary)
-    # TODO: Object tree map should do recursion for submodules (probably)
-    manifest = commit.object_tree
-    local_object_hashes = manifest.map { |object| object[2] }
-    object_hashes_to_upload = local_object_hashes - remote_object_hashes
-
     timings = Benchmark.measure do
-      puts "Uploading #{object_hashes_to_upload.size} out of #{local_object_hashes.size}"
-      upload_git_objects object_hashes_to_upload
+      manifest = []
+      objects_count = 0
+      object_hashes_to_upload = []
+      remote_object_hashes = list_object_hashes
+
+      commit.object_tree.each do |chdir, objects|
+        objects.each do |(mode, type, object_hash, path)|
+          objects_count += 1
+          path = File.join chdir.delete_prefix(commit.working_dir), path
+          manifest << [ mode, type, object_hash, path.delete_prefix("/") ]
+
+          next if remote_object_hashes.include?(object_hash)
+          object_hashes_to_upload << [ chdir, object_hash ]
+        end
+      end
+
+      puts "Uploading #{object_hashes_to_upload.size} out of #{objects_count}"
+      upload_git_objects(object_hashes_to_upload)
+
       upload_manifest manifest_key(commit.ref), manifest
     end
 
@@ -66,13 +77,13 @@ class Envirobly::Aws::S3
       false
     end
 
-    def compress_and_upload_object(object_hash)
+    def compress_and_upload_object(object_hash, chdir:)
       key = object_key object_hash
 
       Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
         gz = Zlib::GzipWriter.new(tempfile)
 
-        Open3.popen3("git", "cat-file", "-p", object_hash) do |_, stdout, stderr, thread|
+        Open3.popen3("git", "cat-file", "-p", object_hash, chdir:) do |_, stdout, stderr, thread|
           IO.copy_stream(stdout, gz)
 
           unless thread.value.success?
@@ -88,12 +99,12 @@ class Envirobly::Aws::S3
       end
     end
 
-    def upload_git_objects(object_hashes)
+    def upload_git_objects(objects)
       pool = Concurrent::FixedThreadPool.new(UPLOAD_CONCURRENCY)
 
-      object_hashes.each do |object_hash|
+      objects.each do |(chdir, object_hash)|
         pool.post do
-          compress_and_upload_object object_hash
+          compress_and_upload_object(object_hash, chdir:)
         end
       end
 

@@ -4,6 +4,8 @@ require "open3"
 class Envirobly::Git::Commit
   OUTPUT = Struct.new :stdout, :stderr, :exit_code, :success?
 
+  attr_reader :working_dir
+
   def initialize(ref, working_dir: Dir.getwd)
     @ref = ref
     @working_dir = working_dir
@@ -38,11 +40,21 @@ class Envirobly::Git::Commit
     git(%(show #{@ref}:#{path})).stdout
   end
 
-  def object_tree
-    git(%{ls-tree -r #{@ref}}).stdout.lines.map do |line|
-      # mode, type, hash, path
-      line.split /\s+/
+  def object_tree(ref: @ref, chdir: @working_dir)
+    objects = {}
+    objects[chdir] = []
+
+    git(%{ls-tree -r #{ref}}, chdir:).stdout.lines.each do |line|
+      mode, type, object_hash, path = line.split /\s+/
+
+      if type == "commit"
+        objects.merge! object_tree(ref: object_hash, chdir: File.join(chdir, path))
+      else
+        objects[chdir] << [ mode, type, object_hash, path ]
+      end
     end
+
+    objects
   end
 
   def objects_with_checksum_at(path)
@@ -55,8 +67,8 @@ class Envirobly::Git::Commit
   end
 
   private
-    def git(cmd)
-      Open3.popen3("git #{cmd}", chdir: @working_dir) do |stdin, stdout, stderr, thread|
+    def git(cmd, chdir: @working_dir)
+      Open3.popen3("git #{cmd}", chdir:) do |stdin, stdout, stderr, thread|
         stdin.close
         OUTPUT.new stdout.read, stderr.read, thread.value.exitstatus, thread.value.success?
       end
