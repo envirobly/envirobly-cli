@@ -38,6 +38,13 @@ class Envirobly::Git::Commit
     git(%(show #{@ref}:#{path})).stdout
   end
 
+  def object_tree
+    git(%{ls-tree -r #{@ref}}).stdout.lines.map do |line|
+      mode, type, hash, path = line.split /\s+/
+      { mode: mode.to_i, type:, hash:, path: }
+    end
+  end
+
   def objects_with_checksum_at(path)
     git(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).stdout.lines.map(&:chomp).
       reject { _1.split(" ").last == Envirobly::Config::DIR }
