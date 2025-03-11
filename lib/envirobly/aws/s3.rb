@@ -56,6 +56,13 @@ class Envirobly::Aws::S3
       puts "Commit #{ref} doesn't exist at s3://#{@bucket}"
       exit 1
     end
+
+    # TODO: Download manifest
+    # mkdir target path
+    # Download all blobs from manifest into their target location
+
+    # TODO: There can be a cache location specified, where blobs are kept,
+    # and only the ones not present are downloaded
   end
 
   private
