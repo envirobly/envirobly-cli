@@ -28,9 +28,7 @@ class Envirobly::Aws::S3
       Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
         Zlib::GzipWriter.open(tempfile.path) do |gz|
           Open3.popen3("git", "ls-tree", "-r", "HEAD") do |stdin, stdout, stderr, thread|
-            while line = stdout.gets
-              gz.write(line)
-            end
+            IO.copy_stream(stdout, gz)
 
             unless thread.value.success?
               raise "git ls-tree failed: #{stderr.read}"
