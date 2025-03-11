@@ -1,4 +1,5 @@
 require "zlib"
+require "json"
 require "open3"
 require "benchmark"
 require "concurrent"
@@ -15,21 +16,24 @@ class Envirobly::Aws::S3
   end
 
   def push(commit)
-    puts "Pushing commit #{commit.ref} to #{@bucket}"
+    if object_exists?(manifest_key(commit.ref))
+      puts "Commit #{commit.ref} is already uploaded."
+      return
+    end
 
-    # TODO: If remote manifest already exists, exit
+    puts "Pushing commit #{commit.ref} to #{@bucket}"
 
     remote_object_hashes = list_object_hashes
     # TODO: Distinguish between blob/symlink/commit types (if necessary)
     # TODO: Object tree map should do recursion for submodules (probably)
-    local_object_hashes = commit.object_tree.map { |object| object[:hash] }
+    manifest = commit.object_tree
+    local_object_hashes = manifest.map { |object| object[2] }
     object_hashes_to_upload = local_object_hashes - remote_object_hashes
 
     timings = Benchmark.measure do
       puts "Uploading #{object_hashes_to_upload.size} out of #{local_object_hashes.size}"
       upload_git_objects object_hashes_to_upload
-
-      # TODO: Push commit manifest
+      upload_manifest manifest_key(commit.ref), manifest
     end
 
     puts "Done in #{format_duration timings.real}"
@@ -47,8 +51,12 @@ class Envirobly::Aws::S3
       end.flatten
     end
 
-    def object_hash_to_key(object_hash)
+    def object_key(object_hash)
       "#{OBJECTS_PREFIX}/#{object_hash}.gz"
+    end
+
+    def manifest_key(commit_ref)
+      "#{MANIFESTS_PREFIX}/#{commit_ref}.gz"
     end
 
     def object_exists?(key)
@@ -59,17 +67,19 @@ class Envirobly::Aws::S3
     end
 
     def compress_and_upload_object(object_hash)
-      key = object_hash_to_key object_hash
+      key = object_key object_hash
 
       Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
-        Zlib::GzipWriter.new(tempfile) do |gz|
-          Open3.popen3("git", "cat-file", "-p", object_hash) do |_, stdout, stderr, thread|
-            IO.copy_stream(stdout, gz)
+        gz = Zlib::GzipWriter.new(tempfile)
 
-            unless thread.value.success?
-              raise "`git cat-file -p #{object_hash}` failed: #{stderr.read}"
-            end
+        Open3.popen3("git", "cat-file", "-p", object_hash) do |_, stdout, stderr, thread|
+          IO.copy_stream(stdout, gz)
+
+          unless thread.value.success?
+            raise "`git cat-file -p #{object_hash}` failed: #{stderr.read}"
           end
+        ensure
+          gz.close
         end
 
         @client.put_object(bucket: @bucket, body: tempfile, key:)
@@ -89,6 +99,18 @@ class Envirobly::Aws::S3
 
       pool.shutdown
       pool.wait_for_termination
+    end
+
+    def upload_manifest(key, content)
+      Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
+        gz = Zlib::GzipWriter.new(tempfile)
+        gz.write JSON.dump(content)
+        gz.close
+
+        @client.put_object(bucket: @bucket, body: tempfile, key:)
+
+        puts "⤴ #{key}"
+      end
     end
 
     def format_duration(duration)

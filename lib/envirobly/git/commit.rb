@@ -40,8 +40,8 @@ class Envirobly::Git::Commit
 
   def object_tree
     git(%{ls-tree -r #{@ref}}).stdout.lines.map do |line|
-      mode, type, hash, path = line.split /\s+/
-      { mode: mode.to_i, type:, hash:, path: }
+      # mode, type, hash, path
+      line.split /\s+/
     end
   end
 
