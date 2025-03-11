@@ -1,8 +1,8 @@
-require "aws-sdk-s3"
 require "zlib"
 require "open3"
-require "concurrent"
 require "benchmark"
+require "concurrent"
+require "aws-sdk-s3"
 
 class Envirobly::Aws::S3
   OBJECTS_PREFIX = "blobs"
