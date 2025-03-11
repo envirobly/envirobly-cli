@@ -12,7 +12,8 @@ class Envirobly::Aws::S3
   def push(commit)
     puts "Pushing #{commit.ref} to #{@bucket}"
     object_hashes = commit.object_tree.map { |object| object[:hash] }
-    upload_git_objects object_hashes
+    # upload_git_objects object_hashes
+    compress_and_upload_object object_hashes.first
   end
 
   private
@@ -21,6 +22,30 @@ class Envirobly::Aws::S3
       true
     rescue Aws::S3::Errors::NotFound
       false
+    end
+
+    def compress_and_upload_object(git_object_hash)
+      Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
+        Zlib::GzipWriter.open(tempfile.path) do |gz|
+          Open3.popen3("git", "ls-tree", "-r", "HEAD") do |stdin, stdout, stderr, thread|
+            while line = stdout.gets
+              gz.write(line)
+            end
+
+            unless thread.value.success?
+              raise "git ls-tree failed: #{stderr.read}"
+            end
+          end
+        end
+
+        # Print the path of the resulting file (optional)
+        puts "Compressed file created at: #{tempfile.path}"
+
+        key = "git-objects/#{git_object_hash}.gz"
+        resp = @client.put_object(bucket: @bucket, body: tempfile.path, key:)
+        puts resp.to_h
+        puts "Git object #{git_object_hash} uploaded as #{key} with gzip compression"
+      end
     end
 
     def upload_git_objects(object_hashes, thread_count: 6)
