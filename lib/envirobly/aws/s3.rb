@@ -57,9 +57,7 @@ class Envirobly::Aws::S3
         end
       end
 
-      # tell the pool to shutdown in an orderly fashion, allowing in progress work to complete
       pool.shutdown
-      # now wait for all work to complete, wait as long as it takes
       pool.wait_for_termination
     end
 
