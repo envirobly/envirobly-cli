@@ -27,11 +27,11 @@ class Envirobly::Aws::S3
     def compress_and_upload_object(git_object_hash)
       Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
         Zlib::GzipWriter.open(tempfile.path) do |gz|
-          Open3.popen3("git", "ls-tree", "-r", "HEAD") do |stdin, stdout, stderr, thread|
+          Open3.popen3("git", "cat-file", "-p", git_object_hash) do |stdin, stdout, stderr, thread|
             IO.copy_stream(stdout, gz)
 
             unless thread.value.success?
-              raise "git ls-tree failed: #{stderr.read}"
+              raise "`git cat-file -p #{git_object_hash}` failed: #{stderr.read}"
             end
           end
         end
@@ -40,7 +40,7 @@ class Envirobly::Aws::S3
         puts "Compressed file created at: #{tempfile.path}"
 
         key = "git-objects/#{git_object_hash}.gz"
-        resp = @client.put_object(bucket: @bucket, body: tempfile.path, key:)
+        resp = @client.put_object(bucket: @bucket, body: tempfile, key:)
         puts resp.to_h
         puts "Git object #{git_object_hash} uploaded as #{key} with gzip compression"
       end
