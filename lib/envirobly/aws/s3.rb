@@ -30,6 +30,13 @@ class Envirobly::Aws::S3
     end
 
     def compress_and_upload_object(git_object_hash)
+      key = "git-objects/#{git_object_hash}.gz"
+
+      if object_exists?(key)
+        puts "✔ #{key}"
+        return
+      end
+
       Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
         Zlib::GzipWriter.new(tempfile) do |gz|
           Open3.popen3("git", "cat-file", "-p", git_object_hash) do |_, stdout, stderr, thread|
@@ -41,7 +48,7 @@ class Envirobly::Aws::S3
           end
         end
 
-        key = "git-objects/#{git_object_hash}.gz"
+
         resp = @client.put_object(bucket: @bucket, body: tempfile, key:)
         # puts resp.to_h
         puts "⤴ #{key}"
