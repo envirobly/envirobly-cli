@@ -5,7 +5,8 @@ require "concurrent"
 require "benchmark"
 
 class Envirobly::Aws::S3
-  OBJECTS_PREFIX = "git-objects"
+  OBJECTS_PREFIX = "blobs"
+  MANIFESTS_PREFIX = "manifests"
 
   def initialize(bucket)
     @bucket = bucket
@@ -16,14 +17,18 @@ class Envirobly::Aws::S3
     puts "Pushing commit #{commit.ref} to #{@bucket}"
 
     remote_object_hashes = list_object_hashes
+    # TODO: Distinguish between blob/symlink/commit types (if necessary)
+    # TODO: Object tree map should do recursion for submodules (probably)
     local_object_hashes = commit.object_tree.map { |object| object[:hash] }
     object_hashes_to_upload = local_object_hashes - remote_object_hashes
 
-    puts "Uploading #{object_hashes_to_upload.size} out of #{local_object_hashes.size}"
-
     timings = Benchmark.measure do
+      puts "Uploading #{object_hashes_to_upload.size} out of #{local_object_hashes.size}"
       upload_git_objects object_hashes_to_upload
+
+      # TODO: Push commit manifest
     end
+
     puts "Done in #{format_duration timings.real}"
   end
 
