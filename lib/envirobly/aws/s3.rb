@@ -27,7 +27,7 @@ class Envirobly::Aws::S3
     timings = Benchmark.measure do
       manifest = []
       objects_count = 0
-      object_hashes_to_upload = []
+      objects_to_upload = []
       remote_object_hashes = list_object_hashes
 
       commit.object_tree.each do |chdir, objects|
@@ -37,13 +37,12 @@ class Envirobly::Aws::S3
           manifest << [ mode, type, object_hash, path.delete_prefix("/") ]
 
           next if remote_object_hashes.include?(object_hash)
-          object_hashes_to_upload << [ chdir, object_hash ]
+          objects_to_upload << [ chdir, object_hash ]
         end
       end
 
-      puts "Uploading #{object_hashes_to_upload.size} out of #{objects_count}"
-      upload_git_objects(object_hashes_to_upload)
-
+      puts "Uploading #{objects_to_upload.size} out of #{objects_count}"
+      upload_git_objects(objects_to_upload)
       upload_manifest manifest_key(commit.ref), manifest
     end
 
