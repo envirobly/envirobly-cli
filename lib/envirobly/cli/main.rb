@@ -44,6 +44,13 @@ class Envirobly::Cli::Main < Envirobly::Base
     Envirobly::AccessToken.new(token).save
   end
 
+  desc "push", "Push commit manifest and blobs to S3"
+  def push(bucket, ref = "HEAD")
+    commit = Envirobly::Git::Commit.new ref
+    s3 = Envirobly::Aws::S3.new bucket
+    s3.push commit
+  end
+
   private
     def abort_if_aws_cli_is_missing
       `which aws`

@@ -2,6 +2,8 @@ require "time"
 require "open3"
 
 class Envirobly::Git::Commit
+  OUTPUT = Struct.new :stdout, :stderr, :exit_code, :success?
+
   def initialize(ref, working_dir: Dir.getwd)
     @ref = ref
     @working_dir = working_dir
@@ -46,7 +48,6 @@ class Envirobly::Git::Commit
   end
 
   private
-    OUTPUT = Struct.new :stdout, :stderr, :exit_code, :success?
     def git(cmd)
       Open3.popen3("git #{cmd}", chdir: @working_dir) do |stdin, stdout, stderr, thread|
         stdin.close
