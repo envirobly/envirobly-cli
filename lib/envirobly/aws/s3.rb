@@ -116,7 +116,7 @@ class Envirobly::Aws::S3
     def compress_and_upload_object(object_hash, chdir:)
       key = object_key object_hash
 
-      Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
+      Tempfile.create([ "envirobly-push", ".gz" ]) do |tempfile|
         gz = Zlib::GzipWriter.new(tempfile)
 
         Open3.popen3("git", "cat-file", "-p", object_hash, chdir:) do |_, stdout, stderr, thread|
@@ -149,7 +149,7 @@ class Envirobly::Aws::S3
     end
 
     def upload_manifest(key, content)
-      Tempfile.create(["envirobly-push", ".gz"]) do |tempfile|
+      Tempfile.create([ "envirobly-push", ".gz" ]) do |tempfile|
         gz = Zlib::GzipWriter.new(tempfile)
         gz.write JSON.dump(content)
         gz.close

@@ -44,7 +44,7 @@ class Envirobly::Git::Commit
     objects = {}
     objects[chdir] = []
 
-    git(%{ls-tree -r #{ref}}, chdir:).stdout.lines.each do |line|
+    git(%(ls-tree -r #{ref}), chdir:).stdout.lines.each do |line|
       mode, type, object_hash, path = line.split /\s+/
 
       if type == "commit"
