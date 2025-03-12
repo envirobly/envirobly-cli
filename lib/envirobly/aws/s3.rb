@@ -49,8 +49,8 @@ class Envirobly::Aws::S3
     puts "Done in #{format_duration timings.real}"
   end
 
-  def pull(ref, path)
-    puts "Pulling #{ref} into #{path}"
+  def pull(ref, target_dir)
+    puts "Pulling #{ref} into #{target_dir}"
 
     s3 = Aws::S3::Resource.new # TODO: Provide credentials
     bucket = s3.bucket(@bucket)
@@ -63,14 +63,27 @@ class Envirobly::Aws::S3
       end
     manifest = JSON.parse Zlib::GzipReader.new(compressed_manifest_stream).read
 
-    pp manifest
+    FileUtils.mkdir_p(target_dir)
 
-    # TODO: Download manifest
-    # mkdir target path
-    # Download all blobs from manifest into their target location
+    # pp manifest
 
-    # TODO: There can be a cache location specified, where blobs are kept,
-    # and only the ones not present are downloaded
+    puts "Downloading #{manifest.size} files"
+
+    manifest.each do |(mode, type, object_hash, path)|
+      target_path = File.join target_dir, path
+      FileUtils.mkdir_p File.dirname(target_path)
+
+      key = object_key object_hash
+      body_stream = bucket.object(key).get.body
+
+      File.open(target_path, "wb") do |output_file|
+        gz = Zlib::GzipReader.new(body_stream)
+        IO.copy_stream(gz, output_file)
+        gz.close
+      end
+
+      return
+    end
   end
 
   private
