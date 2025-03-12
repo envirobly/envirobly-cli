@@ -52,10 +52,18 @@ class Envirobly::Aws::S3
   def pull(ref, path)
     puts "Pulling #{ref} into #{path}"
 
-    unless object_exists?(manifest_key(ref))
-      puts "Commit #{ref} doesn't exist at s3://#{@bucket}"
-      exit 1
-    end
+    s3 = Aws::S3::Resource.new # TODO: Provide credentials
+    bucket = s3.bucket(@bucket)
+    compressed_manifest_stream =
+      begin
+        bucket.object(manifest_key(ref)).get.body
+      rescue Aws::S3::Errors::NoSuchKey
+        puts "Commit #{ref} doesn't exist at s3://#{@bucket}"
+        exit 1
+      end
+    manifest = JSON.parse Zlib::GzipReader.new(compressed_manifest_stream).read
+
+    pp manifest
 
     # TODO: Download manifest
     # mkdir target path
