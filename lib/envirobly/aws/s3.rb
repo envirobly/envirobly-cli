@@ -8,7 +8,7 @@ require "aws-sdk-s3"
 class Envirobly::Aws::S3
   OBJECTS_PREFIX = "blobs"
   MANIFESTS_PREFIX = "manifests"
-  UPLOAD_CONCURRENCY = 6
+  CONCURRENCY = 6
 
   def initialize(bucket)
     @bucket = bucket
@@ -52,38 +52,48 @@ class Envirobly::Aws::S3
   def pull(ref, target_dir)
     puts "Pulling #{ref} into #{target_dir}"
 
-    s3 = Aws::S3::Resource.new # TODO: Provide credentials
-    bucket = s3.bucket(@bucket)
-    compressed_manifest_stream =
-      begin
-        bucket.object(manifest_key(ref)).get.body
-      rescue Aws::S3::Errors::NoSuchKey
-        puts "Commit #{ref} doesn't exist at s3://#{@bucket}"
-        exit 1
+    timings = Benchmark.measure do
+      s3 = Aws::S3::Resource.new # TODO: Provide credentials
+      bucket = s3.bucket(@bucket)
+      compressed_manifest_stream =
+        begin
+          bucket.object(manifest_key(ref)).get.body
+        rescue Aws::S3::Errors::NoSuchKey
+          puts "Commit #{ref} doesn't exist at s3://#{@bucket}"
+          exit 1
+        end
+
+      manifest = JSON.parse Zlib::GzipReader.new(compressed_manifest_stream).read
+
+      FileUtils.mkdir_p(target_dir)
+
+      puts "Downloading #{manifest.size} files"
+
+      pool = Concurrent::FixedThreadPool.new(CONCURRENCY)
+
+      manifest.each do |(mode, type, object_hash, path)|
+        pool.post do
+          target_path = File.join target_dir, path
+          FileUtils.mkdir_p File.dirname(target_path)
+
+          key = object_key object_hash
+          body_stream = bucket.object(key).get.body
+
+          File.open(target_path, "wb") do |output_file|
+            gz = Zlib::GzipReader.new(body_stream)
+            IO.copy_stream(gz, output_file)
+            gz.close
+          end
+
+          # TODO: Apply executable status
+        end
       end
-    manifest = JSON.parse Zlib::GzipReader.new(compressed_manifest_stream).read
 
-    FileUtils.mkdir_p(target_dir)
-
-    # pp manifest
-
-    puts "Downloading #{manifest.size} files"
-
-    manifest.each do |(mode, type, object_hash, path)|
-      target_path = File.join target_dir, path
-      FileUtils.mkdir_p File.dirname(target_path)
-
-      key = object_key object_hash
-      body_stream = bucket.object(key).get.body
-
-      File.open(target_path, "wb") do |output_file|
-        gz = Zlib::GzipReader.new(body_stream)
-        IO.copy_stream(gz, output_file)
-        gz.close
-      end
-
-      return
+      pool.shutdown
+      pool.wait_for_termination
     end
+
+    puts "Done in #{format_duration timings.real}"
   end
 
   private
@@ -136,7 +146,7 @@ class Envirobly::Aws::S3
     end
 
     def upload_git_objects(objects)
-      pool = Concurrent::FixedThreadPool.new(UPLOAD_CONCURRENCY)
+      pool = Concurrent::FixedThreadPool.new(CONCURRENCY)
 
       objects.each do |(chdir, object_hash)|
         pool.post do
