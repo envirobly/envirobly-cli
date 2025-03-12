@@ -24,8 +24,8 @@ class Envirobly::Deployment
     config.compile(environment)
     params = config.to_deployment_params
 
-    puts "Deployment config:"
-    puts params.to_yaml
+    # puts "Deployment config:"
+    # puts params.to_yaml
 
     exit if options.dry_run?
 
@@ -36,13 +36,16 @@ class Envirobly::Deployment
     credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
     bucket = response.object.fetch("bucket")
 
-    puts "Uploading build context, please wait..."
-    unless commit.archive_and_upload(bucket:, credentials:).success?
-      $stderr.puts "Error exporting build context. Aborting."
-      exit 1
-    end
+    # puts "Uploading build context, please wait..."
+    # unless commit.archive_and_upload(bucket:, credentials:).success?
+    #   $stderr.puts "Error exporting build context. Aborting."
+    #   exit 1
+    # end
 
-    puts "Build context uploaded."
+    s3 = Envirobly::Aws::S3.new bucket
+    s3.push commit
+
+    # puts "Build context uploaded."
     api.put_as_json deployment_url
 
     # TODO: Output URL to watch the deployment progress
