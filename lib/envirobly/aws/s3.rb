@@ -13,6 +13,8 @@ class Envirobly::Aws::S3
   def initialize(bucket)
     @bucket = bucket
     @client = Aws::S3::Client.new # TODO: region and creds should be passed
+    resource_client = Aws::S3::Resource.new # TODO: Provide credentials
+    @bucket_resource = resource_client.bucket(@bucket)
   end
 
   # TODO: Test symlink behavior
@@ -53,38 +55,16 @@ class Envirobly::Aws::S3
     puts "Pulling #{ref} into #{target_dir}"
 
     timings = Benchmark.measure do
-      s3 = Aws::S3::Resource.new # TODO: Provide credentials
-      bucket = s3.bucket(@bucket)
-      compressed_manifest_stream =
-        begin
-          bucket.object(manifest_key(ref)).get.body
-        rescue Aws::S3::Errors::NoSuchKey
-          puts "Commit #{ref} doesn't exist at s3://#{@bucket}"
-          exit 1
-        end
-
-      manifest = JSON.parse Zlib::GzipReader.new(compressed_manifest_stream).read
-
+      manifest = fetch_manifest(ref)
       FileUtils.mkdir_p(target_dir)
 
       puts "Downloading #{manifest.size} files"
-
       pool = Concurrent::FixedThreadPool.new(CONCURRENCY)
 
       manifest.each do |(mode, type, object_hash, path)|
         pool.post do
           target_path = File.join target_dir, path
-          FileUtils.mkdir_p File.dirname(target_path)
-
-          key = object_key object_hash
-          body_stream = bucket.object(key).get.body
-
-          File.open(target_path, "wb") do |output_file|
-            gz = Zlib::GzipReader.new(body_stream)
-            IO.copy_stream(gz, output_file)
-            gz.close
-          end
-
+          fetch_object(object_hash, target_path:)
           # TODO: Apply executable status
         end
       end
@@ -167,6 +147,27 @@ class Envirobly::Aws::S3
         @client.put_object(bucket: @bucket, body: tempfile, key:)
 
         puts "⤴ #{key}"
+      end
+    end
+
+    def fetch_manifest(ref)
+      stream = @bucket_resource.object(manifest_key(ref)).get.body
+      JSON.parse Zlib::GzipReader.new(stream).read
+    rescue Aws::S3::Errors::NoSuchKey
+      puts "Commit #{ref} doesn't exist at s3://#{@bucket}"
+      exit 1
+    end
+
+    def fetch_object(object_hash, target_path:)
+      FileUtils.mkdir_p File.dirname(target_path)
+
+      key = object_key object_hash
+      stream = @bucket_resource.object(key).get.body
+
+      File.open(target_path, "wb") do |target|
+        gz = Zlib::GzipReader.new(stream)
+        IO.copy_stream(gz, target)
+        gz.close
       end
     end
 
