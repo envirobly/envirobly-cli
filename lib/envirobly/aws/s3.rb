@@ -51,11 +51,11 @@ class Envirobly::Aws::S3
     puts "Done in #{format_duration timings.real}"
   end
 
-  def pull(ref, target_dir)
-    puts "Pulling #{ref} into #{target_dir}"
+  def pull(commit_ref, target_dir)
+    puts "Pulling #{commit_ref} into #{target_dir}"
 
     timings = Benchmark.measure do
-      manifest = fetch_manifest(ref)
+      manifest = fetch_manifest(commit_ref)
       FileUtils.mkdir_p(target_dir)
 
       puts "Downloading #{manifest.size} files"
