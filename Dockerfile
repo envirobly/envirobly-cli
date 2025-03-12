@@ -18,6 +18,8 @@ RUN gem install bundler && \
 
 # Final minimal image
 FROM ruby:3.4-slim
+RUN apt-get update && apt-get install -y git-core \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=builder /build/*.gem ./
 RUN gem install *.gem && \

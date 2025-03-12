@@ -30,6 +30,7 @@ docker build -t envirobly-cli .
 # Testing the build with some commands:
 docker run -it --rm envirobly-cli
 docker run -it --rm -v $(pwd):/app:ro envirobly-cli envirobly validate
+docker run -it --rm -v $(pwd):/app:ro -v ~/.aws:/root/.aws:ro envirobly-cli envirobly push <s3-bucket>
 ```
 
 ## Command examples
