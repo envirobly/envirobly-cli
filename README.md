@@ -22,6 +22,16 @@ gem install ./envirobly-$(ruby -Ilib/ bin/envirobly version).gem --no-document
 gem push envirobly-$(ruby -Ilib/ bin/envirobly version).gem
 ```
 
+## Docker build
+
+```sh
+docker build -t envirobly-cli .
+
+# Testing the build with some commands:
+docker run -it --rm envirobly-cli
+docker run -it --rm -v $(pwd):/app:ro envirobly-cli envirobly validate
+```
+
 ## Command examples
 
 ### Deploy
