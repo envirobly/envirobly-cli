@@ -33,7 +33,8 @@ class Envirobly::Deployment
     response = api.create_deployment params
     deployment_url = response.object.fetch("url")
     response = api.get_deployment_with_delay_and_retry deployment_url
-    credentials = Envirobly::Aws::Credentials.new response.object.fetch("credentials")
+    credentials = response.object.fetch("credentials")
+    region = response.object.fetch("region")
     bucket = response.object.fetch("bucket")
 
     # puts "Uploading build context, please wait..."
@@ -42,7 +43,7 @@ class Envirobly::Deployment
     #   exit 1
     # end
 
-    s3 = Envirobly::Aws::S3.new bucket
+    s3 = Envirobly::Aws::S3.new(bucket:, region:, credentials:)
     s3.push commit
 
     # puts "Build context uploaded."

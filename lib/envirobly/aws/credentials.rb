@@ -1,6 +1,11 @@
+# @deprecated
 class Envirobly::Aws::Credentials
   def initialize(params)
     @params = params
+  end
+
+  def to_h
+    @params
   end
 
   def as_env_vars

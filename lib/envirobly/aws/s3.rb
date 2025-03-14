@@ -10,11 +10,18 @@ class Envirobly::Aws::S3
   MANIFESTS_PREFIX = "manifests"
   CONCURRENCY = 6
 
-  def initialize(bucket)
+  def initialize(bucket:, region:, credentials: nil)
+    @region = region
     @bucket = bucket
-    @client = Aws::S3::Client.new # TODO: region and creds should be passed
-    resource_client = Aws::S3::Resource.new # TODO: Provide credentials
-    @bucket_resource = resource_client.bucket(@bucket)
+
+    client_options = { region: }
+    unless credentials.nil?
+      client_options.merge! credentials.transform_keys(&:to_sym)
+    end
+
+    @client = Aws::S3::Client.new(client_options)
+    resource = Aws::S3::Resource.new(client: @client)
+    @bucket_resource = resource.bucket(@bucket)
   end
 
   # TODO: Test symlink behavior

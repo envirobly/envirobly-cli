@@ -45,15 +45,15 @@ class Envirobly::Cli::Main < Envirobly::Base
   end
 
   desc "push", "Push commit manifest and blobs to S3"
-  def push(bucket, ref = "HEAD")
+  def push(region, bucket, ref = "HEAD")
     commit = Envirobly::Git::Commit.new ref
-    s3 = Envirobly::Aws::S3.new bucket
+    s3 = Envirobly::Aws::S3.new(region:, bucket:)
     s3.push commit
   end
 
   desc "pull", "Download working copy from S3"
-  def pull(bucket, ref, path)
-    s3 = Envirobly::Aws::S3.new bucket
+  def pull(region, bucket, ref, path)
+    s3 = Envirobly::Aws::S3.new(region:, bucket:)
     s3.pull ref, path
   end
 
