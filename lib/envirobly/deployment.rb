@@ -24,6 +24,8 @@ class Envirobly::Deployment
     config.compile(environment)
     params = config.to_deployment_params
 
+    puts "Deploying commit #{params[:commit][:ref]} to #{params[:environ][:name]}"
+
     # puts "Deployment config:"
     # puts params.to_yaml
 

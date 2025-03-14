@@ -27,7 +27,6 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
   def deploy(environment)
-    abort_if_aws_cli_is_missing
     Envirobly::Deployment.new environment, options
   end
 
@@ -56,13 +55,4 @@ class Envirobly::Cli::Main < Envirobly::Base
     s3 = Envirobly::Aws::S3.new(region:, bucket:)
     s3.pull ref, path
   end
-
-  private
-    def abort_if_aws_cli_is_missing
-      `which aws`
-      unless $?.success?
-        $stderr.puts "AWS CLI is missing. Please install it first: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html"
-        exit 1
-      end
-    end
 end

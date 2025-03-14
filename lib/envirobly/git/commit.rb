@@ -63,6 +63,7 @@ class Envirobly::Git::Commit
       reject { _1.split(" ").last == Envirobly::Config::DIR }
   end
 
+  # @deprecated
   def archive_and_upload(bucket:, credentials:)
     git(%(archive --format=tar.gz #{ref} | #{credentials.as_inline_env_vars} aws s3 cp - #{archive_uri(bucket)}))
   end
