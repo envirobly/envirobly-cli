@@ -24,7 +24,6 @@ class Envirobly::Aws::S3
     @bucket_resource = resource.bucket(@bucket)
   end
 
-  # TODO: Test symlink behavior
   def push(commit)
     if object_exists?(manifest_key(commit.ref))
       puts "Commit #{commit.ref} is already uploaded."
@@ -71,10 +70,15 @@ class Envirobly::Aws::S3
       manifest.each do |(mode, type, object_hash, path)|
         pool.post do
           target_path = File.join target_dir, path
-          fetch_object(object_hash, target_path:)
 
-          if mode == Envirobly::Git::Commit::EXECUTABLE_FILE_MODE
-            FileUtils.chmod("+x", target_path)
+          if mode == Envirobly::Git::Commit::SYMLINK_FILE_MODE
+            fetch_symlink(object_hash, target_path:)
+          else
+            fetch_object(object_hash, target_path:)
+
+            if mode == Envirobly::Git::Commit::EXECUTABLE_FILE_MODE
+              FileUtils.chmod("+x", target_path)
+            end
           end
         end
       end
@@ -179,6 +183,17 @@ class Envirobly::Aws::S3
         IO.copy_stream(gz, target)
         gz.close
       end
+    end
+
+    def fetch_symlink(object_hash, target_path:)
+      FileUtils.mkdir_p File.dirname(target_path)
+
+      key = object_key object_hash
+      gz = Zlib::GzipReader.new @bucket_resource.object(key).get.body
+      symlink_to = gz.read
+      gz.close
+
+      FileUtils.ln_s symlink_to, target_path
     end
 
     def format_duration(duration)

@@ -4,6 +4,7 @@ require "open3"
 class Envirobly::Git::Commit
   OUTPUT = Struct.new :stdout, :stderr, :exit_code, :success?
   EXECUTABLE_FILE_MODE = "100755"
+  SYMLINK_FILE_MODE = "120000"
 
   attr_reader :working_dir
 
