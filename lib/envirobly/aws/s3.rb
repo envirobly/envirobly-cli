@@ -65,7 +65,10 @@ class Envirobly::Aws::S3
         pool.post do
           target_path = File.join target_dir, path
           fetch_object(object_hash, target_path:)
-          # TODO: Apply executable status
+
+          if mode == Envirobly::Git::Commit::EXECUTABLE_FILE_MODE
+            FileUtils.chmod("+x", target_path)
+          end
         end
       end
 
