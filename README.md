@@ -29,8 +29,6 @@ docker build -t envirobly-cli .
 
 # Testing the build with some commands:
 docker run -it --rm envirobly-cli
-docker run -it --rm -v $(pwd):/app:ro envirobly-cli envirobly validate
-docker run -it --rm -v $(pwd):/app:ro -v ~/.aws:/root/.aws:ro envirobly-cli envirobly push <s3-bucket>
 ```
 
 ## Command examples
@@ -40,4 +38,11 @@ docker run -it --rm -v $(pwd):/app:ro -v ~/.aws:/root/.aws:ro envirobly-cli envi
 ```sh
 export ENVIROBLY_API_HOST=hostname # to override the default envirobly.com
 envirobly deploy <env-logical-id-or-url>
+```
+
+### With Docker
+
+```sh
+docker run -it --rm -v $(pwd):/app:ro envirobly-cli envirobly validate
+docker run -it --rm -v $(pwd):/app:ro -v ~/.aws:/root/.aws:ro envirobly-cli envirobly push <s3-region> <s3-bucket>
 ```
