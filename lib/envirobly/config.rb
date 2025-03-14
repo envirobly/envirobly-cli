@@ -115,7 +115,7 @@ class Envirobly::Config
 
       @project.keys.each do |key|
         unless VALID_TOP_LEVEL_KEYS.include?(key)
-          @errors << "Top level key `#{key}` is not allowed. Allowed keys: #{VALID_TOP_LEVEL_KEYS.map{ "`#{_1}`" }.join(", ")}."
+          @errors << "Top level key `#{key}` is not allowed. Allowed keys: #{VALID_TOP_LEVEL_KEYS.map { "`#{_1}`" }.join(", ")}."
         end
       end
     end
