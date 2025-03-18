@@ -60,6 +60,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "pull", "Download working copy from S3"
   def pull(region, bucket, ref, path)
+    # TODO: Work with existing target directory: a) download missing/changed files; b) delete removed files; c) apply executable status
     s3 = Envirobly::Aws::S3.new(region:, bucket:)
     s3.pull ref, path
   end
