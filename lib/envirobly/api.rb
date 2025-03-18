@@ -12,6 +12,15 @@ class Envirobly::Api
     @access_token = Envirobly::AccessToken.new
   end
 
+  def validate_shape(params)
+    post_as_json(api_v1_shape_validations_url, params:, headers: authorization_headers).tap do |response|
+      unless response.code.to_i == 200
+        $stderr.puts "Validation request responded with #{response.code}. Aborting."
+        exit 1
+      end
+    end
+  end
+
   def create_deployment(params)
     post_as_json(api_v1_deployments_url, params:, headers: authorization_headers).tap do |response|
       unless response.code.to_i == 200
@@ -55,6 +64,10 @@ class Envirobly::Api
   end
 
   private
+    def api_v1_shape_validations_url
+      URI::HTTPS.build(host: HOST, path: "/api/v1/shape_validations")
+    end
+
     def api_v1_deployments_url
       URI::HTTPS.build(host: HOST, path: "/api/v1/deployments")
     end

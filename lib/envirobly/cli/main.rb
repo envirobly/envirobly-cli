@@ -8,18 +8,26 @@ class Envirobly::Cli::Main < Envirobly::Base
   def validate
     commit = Envirobly::Git::Unstaged.new
     config = Envirobly::Config.new(commit)
-    config.validate
+    params = {
+      shape: {
+        content: config.raw,
+        file_secrets: [] # TODO
+      }
+    }
 
-    if config.errors.any?
-      puts "Issues found validating `#{Envirobly::Config::PATH}`:"
+    api = Envirobly::Api.new
+    response = api.validate_shape params
+
+    if response.object.fetch("valid")
+      puts "All checks pass."
+    else
+      puts "Issues found validating '#{Envirobly::Config::PATH}':"
       puts
-      config.errors.each_with_index do |error, index|
+      response.object.fetch("errors").each_with_index do |error, index|
         puts "  #{index + 1}. #{error}"
       end
       puts
       exit 1
-    else
-      puts "All checks pass."
     end
   end
 
