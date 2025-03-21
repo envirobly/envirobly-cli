@@ -38,6 +38,13 @@ class Envirobly::Cli::Main < Envirobly::Base
     Envirobly::Deployment.new environment, options
   end
 
+  desc "deploy2", "Dev version of deploy with env file parsing"
+  def deploy2
+    require "dotenv"
+    env_vars = Dotenv.parse(".envirobly/env")
+    puts env_vars.inspect
+  end
+
   desc "set_access_token TOKEN", "Save and use an access token generated at Envirobly"
   def set_access_token
     token = ask("Access Token:", echo: false).strip
