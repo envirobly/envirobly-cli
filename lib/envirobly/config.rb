@@ -1,10 +1,12 @@
 require "yaml"
 require "json"
 require "digest"
+require "dotenv"
 
 class Envirobly::Config
   DIR = ".envirobly"
   PATH = "#{DIR}/project.yml"
+  ENV_PATH = "#{DIR}/env"
 
   attr_reader :errors, :result, :raw
 
@@ -15,6 +17,10 @@ class Envirobly::Config
     @project_url = nil
     @raw = @commit.file_content PATH
     @project = parse
+  end
+
+  def env_vars
+    @env_vars ||= Dotenv.parse(ENV_PATH)
   end
 
   def dig(*args)

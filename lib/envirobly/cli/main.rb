@@ -11,7 +11,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     params = {
       shape: {
         content: config.raw,
-        file_secrets: [] # TODO
+        env_vars: config.env_vars
       }
     }
 
@@ -36,13 +36,6 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :dry_run, type: :boolean, default: false
   def deploy(environment)
     Envirobly::Deployment.new environment, options
-  end
-
-  desc "deploy2", "Dev version of deploy with env file parsing"
-  def deploy2
-    require "dotenv"
-    env_vars = Dotenv.parse(".envirobly/env")
-    puts env_vars.inspect
   end
 
   desc "set_access_token TOKEN", "Save and use an access token generated at Envirobly"
