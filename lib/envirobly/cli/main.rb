@@ -10,7 +10,10 @@ class Envirobly::Cli::Main < Envirobly::Base
     config = Envirobly::Config.new(commit)
     params = {
       shape: {
-        content: config.raw,
+        # TODO: Iterate over all deploy.<name>.yml configs
+        configs: {
+          Envirobly::Config::PATH => config.raw
+        },
         env_vars: config.env_vars
       }
     }
@@ -21,12 +24,15 @@ class Envirobly::Cli::Main < Envirobly::Base
     if response.object.fetch("valid")
       puts "All checks pass."
     else
-      puts "Issues found validating '#{Envirobly::Config::PATH}':"
-      puts
-      response.object.fetch("errors").each_with_index do |error, index|
-        puts "  #{index + 1}. #{error}"
+      puts "Validation failed"
+
+      response.object.fetch("errors").each do |config_path, messages|
+        puts "  in '#{config_path}':"
+        messages.each_with_index do |message, index|
+          puts "    #{index + 1}. #{message}"
+        end
       end
-      puts
+
       exit 1
     end
   end
