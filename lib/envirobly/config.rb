@@ -5,7 +5,7 @@ require "dotenv"
 
 class Envirobly::Config
   DIR = ".envirobly"
-  PATH = "#{DIR}/project.yml"
+  PATH = "#{DIR}/deploy.yml"
   ENV_PATH = "#{DIR}/env"
 
   attr_reader :errors, :result, :raw
