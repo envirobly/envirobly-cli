@@ -14,7 +14,7 @@ class Envirobly::Api
 
   def validate_shape(params)
     post_as_json(api_v1_shape_validations_url, params:, headers: authorization_headers).tap do |response|
-      unless response.code.to_i == 200
+      unless successful_response?(response)
         $stderr.puts "Validation request responded with #{response.code}. Aborting."
         exit 1
       end
@@ -23,7 +23,7 @@ class Envirobly::Api
 
   def create_deployment(params)
     post_as_json(api_v1_deployments_url, params:, headers: authorization_headers).tap do |response|
-      unless response.code.to_i == 200
+      unless successful_response?(response)
         $stderr.puts "Deployment creation request responded with #{response.code}. Aborting."
         exit 1
       end
@@ -36,7 +36,7 @@ class Envirobly::Api
     sleep RETRY_INTERVAL_SECONDS * tries
     response = get_as_json URI(url)
 
-    if response.code.to_i == 200
+    if successful_response?(response)
       response
     elsif MAX_RETRIES <= tries
       $stderr.puts "Max retries exhausted while waiting for deployment credentials. Aborting."
@@ -87,7 +87,7 @@ class Envirobly::Api
 
       http.request(request).tap do |response|
         def response.object
-          @json_parsed_body ||= JSON.parse body
+          @json_parsed_body ||= JSON.parse(body)
         end
       end
     end
@@ -98,5 +98,9 @@ class Envirobly::Api
 
     def authorization_headers
       { "Authorization" => @access_token.as_http_bearer }
+    end
+
+    def successful_response?(response)
+      (200..299).include?(response.code.to_i)
     end
 end

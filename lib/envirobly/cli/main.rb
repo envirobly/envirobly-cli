@@ -22,7 +22,7 @@ class Envirobly::Cli::Main < Envirobly::Base
         puts "#{config_path}:"
         puts
         messages.each_with_index do |message, index|
-          puts "\t#{message}"
+          puts "    #{message}"
           puts
         end
       end
@@ -31,11 +31,11 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "deploy ENVIRONMENT", "Deploy to environment identified by name or URL"
+  desc "deploy ENVIRON_NAME", "Deploy to environment identified by name"
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
-  def deploy(environment)
-    Envirobly::Deployment.new environment, options
+  def deploy(environ_name)
+    Envirobly::Deployment.new environ_name, options
   end
 
   desc "set_access_token TOKEN", "Save and use an access token generated at Envirobly"

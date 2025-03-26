@@ -26,11 +26,11 @@ class Envirobly::Aws::S3
 
   def push(commit)
     if object_exists?(manifest_key(commit.ref))
-      puts "Commit #{commit.ref} is already uploaded."
+      # puts "Commit #{commit.ref} build context is already uploaded."
       return
     end
 
-    puts "Pushing commit #{commit.ref} to #{@bucket}"
+    # puts "Pushing commit #{commit.ref} to #{@bucket}"
 
     timings = Benchmark.measure do
       manifest = []
@@ -49,12 +49,12 @@ class Envirobly::Aws::S3
         end
       end
 
-      puts "Uploading #{objects_to_upload.size} out of #{objects_count}"
+      puts "Uploading #{objects_to_upload.size} out of #{objects_count} build context files"
       upload_git_objects(objects_to_upload)
       upload_manifest manifest_key(commit.ref), manifest
     end
 
-    puts "Done in #{format_duration timings.real}"
+    puts "Upload done in #{format_duration timings.real}"
   end
 
   def pull(commit_ref, target_dir)
