@@ -10,8 +10,9 @@ class Envirobly::ConfigsTest < ActiveSupport::TestCase
         "deploy.staging.yml" => File.read("test/fixtures/configs/deploy.staging.yml")
       },
       env_vars: {
-        "SOME_ENV_VAR" => "1",
-        "POEM" => "some multiline\ntext with an emoji: 🦄"
+        "JUST_A_NUMBER" => "1",
+        "POEM" => "some multiline\ntext with an emoji: 🦄",
+        "INTERPOLATED_COMMAND" => "interpolated"
       }
     }
     assert_equal expected, configs.to_params

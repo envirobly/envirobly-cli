@@ -1,3 +1,4 @@
-SOME_ENV_VAR=1
+JUST_A_NUMBER=1
 POEM="some multiline
 text with an emoji: 🦄"
+INTERPOLATED_COMMAND=$(echo "interpolated")
