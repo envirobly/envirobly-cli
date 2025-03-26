@@ -37,7 +37,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   TXT
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
-  def deploy(environ_name)
+  def deploy(environ_name = Envirobly::Git.new.current_branch)
     Envirobly::Deployment.new environ_name, options
   end
 
