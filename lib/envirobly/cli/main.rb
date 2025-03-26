@@ -31,7 +31,10 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "deploy ENVIRON_NAME", "Deploy to environment identified by name"
+  desc "deploy [ENVIRON_NAME]", <<~TXT
+    Deploy to environment identified by name.
+    When name is empty, current git branch name is used.
+  TXT
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
   def deploy(environ_name)
