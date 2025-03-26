@@ -3,6 +3,7 @@ require "json"
 require "digest"
 require "dotenv"
 
+# @deprecated
 class Envirobly::Config
   DIR = ".envirobly"
   PATH = "#{DIR}/deploy.yml"
