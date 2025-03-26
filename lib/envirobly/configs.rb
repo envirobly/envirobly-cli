@@ -24,7 +24,7 @@ class Envirobly::Configs
 
         next unless File.file?(path) && config_file?(file)
 
-        [ file, File.read(path) ]
+        [ "#{DIR}/#{file}", File.read(path) ]
       end.compact.to_h
     end
 

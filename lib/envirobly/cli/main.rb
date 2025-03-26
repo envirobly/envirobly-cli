@@ -6,16 +6,10 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "validate", "Validates config"
   def validate
-    commit = Envirobly::Git::Unstaged.new
-    config = Envirobly::Config.new(commit)
+    configs = Envirobly::Configs.new
+
     params = {
-      shape: {
-        # TODO: Iterate over all deploy.<name>.yml configs
-        configs: {
-          Envirobly::Config::PATH => config.raw
-        },
-        env_vars: config.env_vars
-      }
+      shape: configs.to_params
     }
 
     api = Envirobly::Api.new

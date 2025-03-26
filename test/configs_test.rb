@@ -6,8 +6,8 @@ class Envirobly::ConfigsTest < ActiveSupport::TestCase
 
     expected = {
       configs: {
-        "deploy.yml" => File.read("test/fixtures/configs/deploy.yml"),
-        "deploy.staging.yml" => File.read("test/fixtures/configs/deploy.staging.yml")
+        ".envirobly/deploy.yml" => File.read("test/fixtures/configs/deploy.yml"),
+        ".envirobly/deploy.staging.yml" => File.read("test/fixtures/configs/deploy.staging.yml")
       },
       env_vars: {
         "JUST_A_NUMBER" => "1",
