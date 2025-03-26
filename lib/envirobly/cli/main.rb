@@ -19,9 +19,11 @@ class Envirobly::Cli::Main < Envirobly::Base
       puts "All checks pass."
     else
       response.object.fetch("errors").each do |config_path, messages|
-        puts "'#{config_path}' failed validation:\n\n"
+        puts "#{config_path}:"
+        puts
         messages.each_with_index do |message, index|
-          puts "\t#{message}\n\n"
+          puts "\t#{message}"
+          puts
         end
       end
 
