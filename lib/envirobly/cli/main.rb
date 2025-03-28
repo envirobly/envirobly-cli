@@ -6,28 +6,39 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "validate", "Validates config"
   def validate
-    commit = Envirobly::Git::Unstaged.new
-    config = Envirobly::Config.new(commit)
-    config.validate
+    configs = Envirobly::Configs.new
 
-    if config.errors.any?
-      puts "Issues found validating `#{Envirobly::Config::PATH}`:"
-      puts
-      config.errors.each_with_index do |error, index|
-        puts "  #{index + 1}. #{error}"
-      end
-      puts
-      exit 1
-    else
+    params = {
+      shape: configs.to_params
+    }
+
+    api = Envirobly::Api.new
+    response = api.validate_shape params
+
+    if response.object.fetch("valid")
       puts "All checks pass."
+    else
+      response.object.fetch("errors").each do |config_path, messages|
+        puts "#{config_path}:"
+        puts
+        messages.each_with_index do |message, index|
+          puts "    #{message}"
+          puts
+        end
+      end
+
+      exit 1
     end
   end
 
-  desc "deploy ENVIRONMENT", "Deploy to environment identified by name or URL"
+  desc "deploy [ENVIRON_NAME]", <<~TXT
+    Deploy to environment identified by name.
+    When name is empty, current git branch name is used.
+  TXT
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
-  def deploy(environment)
-    Envirobly::Deployment.new environment, options
+  def deploy(environ_name = Envirobly::Git.new.current_branch)
+    Envirobly::Deployment.new environ_name, options
   end
 
   desc "set_access_token TOKEN", "Save and use an access token generated at Envirobly"
@@ -52,6 +63,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "pull", "Download working copy from S3"
   def pull(region, bucket, ref, path)
+    # TODO: Work with existing target directory: a) download missing/changed files; b) delete removed files; c) apply executable status
     s3 = Envirobly::Aws::S3.new(region:, bucket:)
     s3.pull ref, path
   end

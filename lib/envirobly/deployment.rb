@@ -1,5 +1,5 @@
 class Envirobly::Deployment
-  def initialize(environment, options)
+  def initialize(environ_name, options)
     commit = Envirobly::Git::Commit.new options.commit
 
     unless commit.exists?
@@ -7,50 +7,53 @@ class Envirobly::Deployment
       exit 1
     end
 
-    config = Envirobly::Config.new(commit)
-    config.validate
+    configs = Envirobly::Configs.new
 
-    if config.errors.any?
-      $stderr.puts "Errors found while parsing #{Envirobly::Config::PATH}:"
-      $stderr.puts
-      config.errors.each do |error|
-        $stderr.puts "  - #{error}"
-      end
-      $stderr.puts
-      $stderr.puts "Please fix these, commit the changes and try again."
-      exit 1
+    params = {
+      environ: {
+        name: environ_name
+      },
+      deployment: {
+        commit_ref: commit.ref,
+        commit_time: commit.time,
+        commit_message: commit.message,
+        **configs.to_params
+      }
+    }
+
+    puts "Deploying commit #{commit.ref} to '#{environ_name}'"
+    puts
+    puts "    #{commit.message}"
+    puts
+
+    if options.dry_run?
+      puts
+      puts params.to_yaml
+      return
     end
 
-    config.compile(environment)
-    params = config.to_deployment_params
-
-    puts "Deploying commit #{params[:commit][:ref]} to #{params[:environ][:name]}"
-
-    # puts "Deployment config:"
-    # puts params.to_yaml
-
-    exit if options.dry_run?
-
+    # Create deployment
     api = Envirobly::Api.new
     response = api.create_deployment params
+
+    # Fetch credentials for build context upload
     deployment_url = response.object.fetch("url")
     response = api.get_deployment_with_delay_and_retry deployment_url
+
     credentials = response.object.fetch("credentials")
     region = response.object.fetch("region")
     bucket = response.object.fetch("bucket")
 
-    # puts "Uploading build context, please wait..."
-    # unless commit.archive_and_upload(bucket:, credentials:).success?
-    #   $stderr.puts "Error exporting build context. Aborting."
-    #   exit 1
-    # end
-
+    # Upload build context
     s3 = Envirobly::Aws::S3.new(bucket:, region:, credentials:)
     s3.push commit
 
-    # puts "Build context uploaded."
+    # Perform deployment
     api.put_as_json deployment_url
-
+    puts "Deployment in progress, follow at:"
+    puts
+    puts "    TODO"
+    puts
     # TODO: Output URL to watch the deployment progress
   end
 end

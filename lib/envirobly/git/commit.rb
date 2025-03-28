@@ -1,8 +1,7 @@
 require "time"
 require "open3"
 
-class Envirobly::Git::Commit
-  OUTPUT = Struct.new :stdout, :stderr, :exit_code, :success?
+class Envirobly::Git::Commit < Envirobly::Git
   EXECUTABLE_FILE_MODE = "100755"
   SYMLINK_FILE_MODE = "120000"
 
@@ -10,7 +9,7 @@ class Envirobly::Git::Commit
 
   def initialize(ref, working_dir: Dir.getwd)
     @ref = ref
-    @working_dir = working_dir
+    super working_dir
   end
 
   def exists?
@@ -70,13 +69,6 @@ class Envirobly::Git::Commit
   end
 
   private
-    def git(cmd, chdir: @working_dir)
-      Open3.popen3("git #{cmd}", chdir:) do |stdin, stdout, stderr, thread|
-        stdin.close
-        OUTPUT.new stdout.read, stderr.read, thread.value.exitstatus, thread.value.success?
-      end
-    end
-
     def archive_uri(bucket)
       "s3://#{bucket}/#{ref}.tar.gz"
     end
