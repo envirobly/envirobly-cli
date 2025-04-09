@@ -43,6 +43,7 @@ class Envirobly::Deployment
     credentials = response.object.fetch("credentials")
     region = response.object.fetch("region")
     bucket = response.object.fetch("bucket")
+    deployment_url = response.object.fetch("deployment_url")
 
     # Upload build context
     s3 = Envirobly::Aws::S3.new(bucket:, region:, credentials:)
@@ -50,10 +51,6 @@ class Envirobly::Deployment
 
     # Perform deployment
     api.put_as_json deployment_url
-    puts "Deployment in progress, follow at:"
-    puts
-    puts "    TODO"
-    puts
-    # TODO: Output URL to watch the deployment progress
+    puts "Deployment in progress: #{deployment_url}"
   end
 end
