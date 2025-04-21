@@ -48,6 +48,8 @@ class Envirobly::Git::Commit < Envirobly::Git
     git(%(ls-tree -r #{ref}), chdir:).stdout.lines.each do |line|
       mode, type, object_hash, path = line.split(/\s+/)
 
+      next if path.start_with?("#{Envirobly::Configs::DIR}/")
+
       if type == "commit"
         objects.merge! object_tree(ref: object_hash, chdir: File.join(chdir, path))
       else

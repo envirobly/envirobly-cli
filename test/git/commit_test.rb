@@ -79,6 +79,15 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
     assert_equal "a\n", commit.file_content("a.txt")
   end
 
+  test "object_tree doesn't list envirobly config" do
+    commit = Envirobly::Git::Commit.new(repo1_commits.second, working_dir:)
+    expected = {}
+    expected[working_dir] = [
+      [ "100644", "blob", "78981922613b2afb6025042ff6bd878ac1994e85", "a.txt" ]
+    ]
+    assert_equal expected, commit.object_tree
+  end
+
   test "objects_with_checksum at root dir does not contain config dir" do
     commit = Envirobly::Git::Commit.new(repo1_commits.second, working_dir:)
     expected = [ "78981922613b2afb6025042ff6bd878ac1994e85 a.txt" ]
