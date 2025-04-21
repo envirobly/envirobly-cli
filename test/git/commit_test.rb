@@ -88,6 +88,11 @@ class Envirobly::Git::CommitTest < ActiveSupport::TestCase
     assert_equal expected, commit.object_tree
   end
 
+  test "object_tree_checksum" do
+    commit = Envirobly::Git::Commit.new(repo1_commits.second, working_dir:)
+    assert_equal "3a5d404b7385a35a61e507e6fd782d0a48d34f82ca2d071cad1600063c4bf46a", commit.object_tree_checksum
+  end
+
   test "objects_with_checksum at root dir does not contain config dir" do
     commit = Envirobly::Git::Commit.new(repo1_commits.second, working_dir:)
     expected = [ "78981922613b2afb6025042ff6bd878ac1994e85 a.txt" ]

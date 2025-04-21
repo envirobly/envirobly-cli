@@ -72,6 +72,8 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :commit, type: :string, default: "HEAD"
   def object_tree
     commit = Envirobly::Git::Commit.new options.commit
+    puts "Commit: #{commit.ref}"
     pp commit.object_tree
+    puts "SHA256: #{commit.object_tree_checksum}"
   end
 end
