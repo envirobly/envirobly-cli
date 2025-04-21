@@ -17,6 +17,7 @@ class Envirobly::Deployment
         commit_ref: commit.ref,
         commit_time: commit.time,
         commit_message: commit.message,
+        object_tree_checksum: commit.object_tree_checksum,
         **configs.to_params
       }
     }
