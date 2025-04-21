@@ -58,6 +58,7 @@ class Envirobly::Git::Commit < Envirobly::Git
     objects
   end
 
+  # @deprecated
   def objects_with_checksum_at(path)
     git(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).stdout.lines.map(&:chomp).
       reject { _1.split(" ").last == Envirobly::Configs::DIR }
