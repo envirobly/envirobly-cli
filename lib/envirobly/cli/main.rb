@@ -67,4 +67,11 @@ class Envirobly::Cli::Main < Envirobly::Base
     s3 = Envirobly::Aws::S3.new(region:, bucket:)
     s3.pull ref, path
   end
+
+  desc "object_tree", "Show object tree used for deployments"
+  method_option :commit, type: :string, default: "HEAD"
+  def object_tree
+    commit = Envirobly::Git::Commit.new options.commit
+    pp commit.object_tree
+  end
 end
