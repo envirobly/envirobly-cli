@@ -46,7 +46,7 @@ class Envirobly::Git::Commit < Envirobly::Git
     objects[chdir] = []
 
     git(%(ls-tree -r #{ref}), chdir:).stdout.lines.each do |line|
-      mode, type, object_hash, path = line.split /\s+/
+      mode, type, object_hash, path = line.split(/\s+/)
 
       if type == "commit"
         objects.merge! object_tree(ref: object_hash, chdir: File.join(chdir, path))
@@ -58,18 +58,9 @@ class Envirobly::Git::Commit < Envirobly::Git
     objects
   end
 
+  # @deprecated
   def objects_with_checksum_at(path)
     git(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).stdout.lines.map(&:chomp).
-      reject { _1.split(" ").last == Envirobly::Config::DIR }
+      reject { _1.split(" ").last == Envirobly::Configs::DIR }
   end
-
-  # @deprecated
-  def archive_and_upload(bucket:, credentials:)
-    git(%(archive --format=tar.gz #{ref} | #{credentials.as_inline_env_vars} aws s3 cp - #{archive_uri(bucket)}))
-  end
-
-  private
-    def archive_uri(bucket)
-      "s3://#{bucket}/#{ref}.tar.gz"
-    end
 end
