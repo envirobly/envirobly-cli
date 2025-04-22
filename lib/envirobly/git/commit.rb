@@ -63,7 +63,8 @@ class Envirobly::Git::Commit < Envirobly::Git
   end
 
   def object_tree_checksum
-    @object_tree_checksum ||= Digest::SHA256.hexdigest(object_tree.to_json)
+    digestable = object_tree.values.flatten.to_json
+    @object_tree_checksum ||= Digest::SHA256.hexdigest(digestable)
   end
 
   # @deprecated
