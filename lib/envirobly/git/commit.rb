@@ -42,20 +42,29 @@ class Envirobly::Git::Commit < Envirobly::Git
   end
 
   def object_tree(ref: @ref, chdir: @working_dir)
-    objects = {}
-    objects[chdir] = []
+    @object_tree ||= begin
+      objects = {}
+      objects[chdir] = []
 
-    git(%(ls-tree -r #{ref}), chdir:).stdout.lines.each do |line|
-      mode, type, object_hash, path = line.split(/\s+/)
+      git(%(ls-tree -r #{ref}), chdir:).stdout.lines.each do |line|
+        mode, type, object_hash, path = line.split(/\s+/)
 
-      if type == "commit"
-        objects.merge! object_tree(ref: object_hash, chdir: File.join(chdir, path))
-      else
-        objects[chdir] << [ mode, type, object_hash, path ]
+        next if path.start_with?("#{Envirobly::Configs::DIR}/")
+
+        if type == "commit"
+          objects.merge! object_tree(ref: object_hash, chdir: File.join(chdir, path))
+        else
+          objects[chdir] << [ mode, type, object_hash, path ]
+        end
       end
-    end
 
-    objects
+      objects
+    end
+  end
+
+  def object_tree_checksum
+    digestable = object_tree.values.flatten.to_json
+    @object_tree_checksum ||= Digest::SHA256.hexdigest(digestable)
   end
 
   # @deprecated
