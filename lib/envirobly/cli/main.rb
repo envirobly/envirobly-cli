@@ -76,4 +76,19 @@ class Envirobly::Cli::Main < Envirobly::Base
     pp commit.object_tree
     puts "SHA256: #{commit.object_tree_checksum}"
   end
+
+  desc "counter", "Proof of concept of inline counter"
+  def counter
+    puts "Starting"
+    total = 100
+    uploaded = 0
+    total.times do
+      print "\rUploaded #{uploaded}/#{total} files"
+      $stdout.flush
+
+      sleep 1
+      uploaded += 1
+    end
+    puts "Done."
+  end
 end
