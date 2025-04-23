@@ -46,6 +46,7 @@ envirobly deploy <env-logical-id-or-url>
 docker run -it --rm -v $(pwd):/app:ro envirobly-cli envirobly validate
 docker run -it --rm -v $(pwd):/app:ro -v ~/.aws:/root/.aws:ro envirobly-cli envirobly push <s3-region> <s3-bucket>
 ```
+
 ## Ways to deploy
 
 ```sh
