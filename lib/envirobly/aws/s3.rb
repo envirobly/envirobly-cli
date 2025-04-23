@@ -49,12 +49,11 @@ class Envirobly::Aws::S3
         end
       end
 
-      puts "Uploading #{objects_to_upload.size} out of #{objects_count} build context files"
       upload_git_objects(objects_to_upload)
       upload_manifest manifest_key(commit.ref), manifest
     end
 
-    puts "Upload done in #{format_duration timings.real}"
+    puts "(took #{format_duration timings.real})"
   end
 
   def pull(commit_ref, target_dir)
@@ -135,21 +134,44 @@ class Envirobly::Aws::S3
 
         @client.put_object(bucket: @bucket, body: tempfile, key:)
 
-        puts "⤴ #{key}"
+        # puts "⤴ #{key}"
       end
     end
 
     def upload_git_objects(objects)
       pool = Concurrent::FixedThreadPool.new(CONCURRENCY)
+      uploaded = Concurrent::AtomicFixnum.new
+      objects_count = objects.count
+
+      notifier = Thread.new do
+        next unless objects_count > 0
+
+        # Hide cursor
+        # print "\e[?25l"
+        # $stdout.flush
+
+        loop do
+          value = uploaded.value
+          print "\rUploading build context files: #{value}/#{objects_count} "
+          $stdout.flush
+          sleep 0.5
+          break if value >= objects_count
+        end
+
+        # Show cursor again
+        # print "\e[?25h\n"
+      end
 
       objects.each do |(chdir, object_hash)|
         pool.post do
           compress_and_upload_object(object_hash, chdir:)
+          uploaded.increment
         end
       end
 
       pool.shutdown
       pool.wait_for_termination
+      notifier.join
     end
 
     def upload_manifest(key, content)
@@ -160,7 +182,7 @@ class Envirobly::Aws::S3
 
         @client.put_object(bucket: @bucket, body: tempfile, key:)
 
-        puts "⤴ #{key}"
+        # puts "⤴ #{key}"
       end
     end
 

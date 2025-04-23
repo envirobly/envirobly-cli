@@ -20,6 +20,10 @@ class Envirobly::Git::Commit < Envirobly::Git
     @normalized_ref ||= git(%(rev-parse #{@ref})).stdout.strip
   end
 
+  def short_ref
+    @short_ref ||= ref[0..7]
+  end
+
   def message
     git(%(log #{@ref} -n1 --pretty=%B)).stdout.strip
   end

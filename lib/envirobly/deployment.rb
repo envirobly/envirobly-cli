@@ -22,7 +22,7 @@ class Envirobly::Deployment
       }
     }
 
-    puts "Deploying commit #{commit.ref} to '#{environ_name}'"
+    puts "Deploying commit #{commit.short_ref} ⇢ #{environ_name}"
     puts
     puts "    #{commit.message}"
     puts
@@ -52,6 +52,6 @@ class Envirobly::Deployment
 
     # Perform deployment
     api.put_as_json deployment_url
-    puts "Deployment in progress: #{watch_deployment_url}"
+    puts "Follow at #{watch_deployment_url}"
   end
 end
