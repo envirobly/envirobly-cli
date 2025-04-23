@@ -53,7 +53,7 @@ class Envirobly::Aws::S3
       upload_manifest manifest_key(commit.ref), manifest
     end
 
-    puts "Upload done in #{format_duration timings.real}"
+    puts "(took #{format_duration timings.real})"
   end
 
   def pull(commit_ref, target_dir)
@@ -147,19 +147,19 @@ class Envirobly::Aws::S3
         next unless objects_count > 0
 
         # Hide cursor
-        print "\e[?25l"
-        $stdout.flush
+        # print "\e[?25l"
+        # $stdout.flush
 
         loop do
           value = uploaded.value
-          print "\rUploading build context files: #{value}/#{objects_count}"
+          print "\rUploading build context files: #{value}/#{objects_count} "
           $stdout.flush
           sleep 0.5
           break if value >= objects_count
         end
 
         # Show cursor again
-        print "\e[?25h\n"
+        # print "\e[?25h\n"
       end
 
       objects.each do |(chdir, object_hash)|
