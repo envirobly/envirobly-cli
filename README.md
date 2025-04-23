@@ -50,9 +50,10 @@ docker run -it --rm -v $(pwd):/app:ro -v ~/.aws:/root/.aws:ro envirobly-cli envi
 ## Ways to deploy
 
 ```sh
-# Deploy to default project and environment named after the current branch.
+# Deploy to default account and project and environment named after the current branch.
 # If default project is not set (.envirobly/projects/default.yml), ask to
 # fill in project name (defaults to current directory name) and region.
+# If user has access to multiple accounts, ask which account to use.
 envirobly deploy
 
 # Deploy to environment named as the first argument, to the default project.
@@ -63,7 +64,7 @@ envirobly deploy staging
 envirobly deploy beta/staging
 
 # Questions can be skipped by specifying answers as arguments.
-envirobly deploy --project=foo --region=eu-north-1
+envirobly deploy --account=1 --project=foo --region=eu-north-1
 
 # Use defaults (us-east-1, dir and branch names) and don't ask any questions (for CIs).
 envirobly deploy --unattended
