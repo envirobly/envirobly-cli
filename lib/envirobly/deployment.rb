@@ -1,3 +1,5 @@
+require "yaml"
+
 class Envirobly::Deployment
   def initialize(environ_name, options)
     commit = Envirobly::Git::Commit.new options.commit
@@ -10,14 +12,16 @@ class Envirobly::Deployment
     configs = Envirobly::Configs.new
 
     params = {
-      environ: {
-        name: environ_name
-      },
       deployment: {
-        commit_ref: commit.ref,
-        commit_time: commit.time,
-        commit_message: commit.message,
-        object_tree_checksum: commit.object_tree_checksum,
+        environ: {
+          name: environ_name
+        },
+        commit: {
+          ref: commit.ref,
+          time: commit.time,
+          message: commit.message,
+          object_tree_checksum: commit.object_tree_checksum
+        },
         **configs.to_params
       }
     }
@@ -29,7 +33,7 @@ class Envirobly::Deployment
 
     if options.dry_run?
       puts
-      puts params.to_yaml
+      puts YAML.dump(params)
       return
     end
 
