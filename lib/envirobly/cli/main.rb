@@ -7,13 +7,9 @@ class Envirobly::Cli::Main < Envirobly::Base
   desc "validate", "Validates config"
   def validate
     configs = Envirobly::Configs.new
-
-    params = {
-      shape: configs.to_params
-    }
-
     api = Envirobly::Api.new
-    response = api.validate_shape params
+
+    response = api.validate_shape configs.to_params
 
     if response.object.fetch("valid")
       puts "All checks pass."
