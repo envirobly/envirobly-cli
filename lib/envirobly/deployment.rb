@@ -12,16 +12,18 @@ class Envirobly::Deployment
     configs = Envirobly::Configs.new
 
     params = {
-      environ: {
-        name: environ_name
-      },
-      commit: {
-        ref: commit.ref,
-        time: commit.time,
-        message: commit.message,
-        object_tree_checksum: commit.object_tree_checksum
-      },
-      **configs.to_params
+      deployment: {
+        environ: {
+          name: environ_name
+        },
+        commit: {
+          ref: commit.ref,
+          time: commit.time,
+          message: commit.message,
+          object_tree_checksum: commit.object_tree_checksum
+        },
+        **configs.to_params
+      }
     }
 
     puts "Deploying commit #{commit.short_ref} ⇢ #{environ_name}"

@@ -9,7 +9,8 @@ class Envirobly::Cli::Main < Envirobly::Base
     configs = Envirobly::Configs.new
     api = Envirobly::Api.new
 
-    response = api.validate_shape configs.to_params
+    params = { validation: configs.to_params }
+    response = api.validate_shape params
 
     if response.object.fetch("valid")
       puts "All checks pass."
