@@ -19,7 +19,7 @@ class Envirobly::Deployment
         project: {
           id: options.project_id,
           name: options.project_name,
-          region: options.region
+          region: options.project_region
         },
         environ: {
           name: environ_name
