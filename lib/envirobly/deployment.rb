@@ -13,6 +13,14 @@ class Envirobly::Deployment
 
     params = {
       deployment: {
+        account: {
+          id: options.account_id
+        },
+        project: {
+          id: options.project_id,
+          name: options.project_name,
+          region: options.region
+        },
         environ: {
           name: environ_name
         },
