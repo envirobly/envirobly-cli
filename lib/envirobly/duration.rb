@@ -10,12 +10,18 @@ class Envirobly::Duration
   FAINT  = "\e[2m"
 
   class << self
-    def measure
+    def measure(message = nil)
       measurement = Benchmark.measure do
         yield
       end
 
-      puts " #{GREEN}✔#{RESET} #{FAINT}#{format_duration(measurement)}#{RESET}"
+      duration = format_duration(measurement)
+
+      if message.nil?
+        puts " #{GREEN}✔#{RESET} #{FAINT}#{duration}#{RESET}"
+      else
+        puts sprintf(message, duration)
+      end
     end
 
     def format_duration(tms)

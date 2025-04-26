@@ -64,9 +64,10 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "pull", "Download working copy from S3"
   def pull(region, bucket, ref, path)
-    # TODO: Work with existing target directory: a) download missing/changed files; b) delete removed files; c) apply executable status
-    s3 = Envirobly::Aws::S3.new(region:, bucket:)
-    s3.pull ref, path
+    Envirobly::Duration.measure("Build context download took %s") do
+      s3 = Envirobly::Aws::S3.new(region:, bucket:)
+      s3.pull ref, path
+    end
   end
 
   desc "object_tree", "Show object tree used for deployments"
@@ -88,6 +89,11 @@ class Envirobly::Cli::Main < Envirobly::Base
     Envirobly::Duration.measure do
       print "Doing something else for 100ms"
       sleep 0.1
+    end
+
+    Envirobly::Duration.measure("Custom message, took %s") do
+      puts "Sleeping 2.5s with custom message"
+      sleep 2.5
     end
 
     puts "Done."
