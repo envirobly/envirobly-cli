@@ -3,47 +3,48 @@ require "yaml"
 class Envirobly::Deployment
   include Envirobly::Colorize
 
-  def initialize(environ_name, options)
-    commit = Envirobly::Git::Commit.new options.commit
+  def initialize(environ_name:, commit_ref:, account_id:, project_name:, project_region:)
+    @environ_name = environ_name
+    @commit = Envirobly::Git::Commit.new commit_ref
 
-    unless commit.exists?
-      $stderr.puts "Commit #{options.commit} doesn't exist in this repository. Aborting."
+    unless @commit.exists?
+      $stderr.puts "Commit #{commit_ref} doesn't exist in this repository. Aborting."
       exit 1
     end
 
     configs = Envirobly::Configs.new
 
-    params = {
+    @params = {
       deployment: {
         account: {
-          id: options.account_id
+          id: account_id
         },
         project: {
-          id: options.project_id,
-          name: options.project_name,
-          region: options.project_region
+          name: project_name,
+          region: project_region
         },
         environ: {
           name: environ_name
         },
         commit: {
-          ref: commit.ref,
-          time: commit.time,
-          message: commit.message,
-          object_tree_checksum: commit.object_tree_checksum
+          ref: @commit.ref,
+          time: @commit.time,
+          message: @commit.message,
+          object_tree_checksum: @commit.object_tree_checksum
         },
         **configs.to_params
       }
     }
+  end
 
-    puts [ "Deploying commit", yellow(commit.short_ref), faint("→"), green(environ_name) ].join(" ")
+  def perform(dry_run:)
+    puts [ "Deploying commit", yellow(@commit.short_ref), faint("→"), green(@environ_name) ].join(" ")
     puts
-    puts "    #{commit.message}"
+    puts "    #{@commit.message}"
     puts
 
-    if options.dry_run?
-      puts
-      puts YAML.dump(params)
+    if dry_run
+      puts YAML.dump(@params)
       return
     end
 
@@ -51,8 +52,8 @@ class Envirobly::Deployment
     api = Envirobly::Api.new
 
     Envirobly::Duration.measure do
-      print "Preparing project"
-      response = api.create_deployment params
+      print "Preparing project..."
+      response = api.create_deployment @params
 
       # Fetch credentials for build context upload
       @deployment_url = response.object.fetch("url")
@@ -67,7 +68,7 @@ class Envirobly::Deployment
     Envirobly::Duration.measure do
       # Upload build context
       s3 = Envirobly::Aws::S3.new(bucket:, region:, credentials:)
-      s3.push commit
+      s3.push @commit
 
       # Perform deployment
       api.put_as_json @deployment_url
