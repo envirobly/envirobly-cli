@@ -1,6 +1,8 @@
 require "yaml"
 
 class Envirobly::Deployment
+  include Envirobly::Colorize
+
   def initialize(environ_name, options)
     commit = Envirobly::Git::Commit.new options.commit
 
@@ -34,7 +36,7 @@ class Envirobly::Deployment
       }
     }
 
-    puts "Deploying commit #{commit.short_ref} → #{environ_name}"
+    puts [ "Deploying commit", yellow(commit.short_ref), faint("→"), green(environ_name) ].join(" ")
     puts
     puts "    #{commit.message}"
     puts

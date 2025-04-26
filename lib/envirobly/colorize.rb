@@ -14,4 +14,8 @@ module Envirobly::Colorize
   def green(text)
     [ GREEN, text, RESET ].join
   end
+
+  def yellow(text)
+    [ YELLOW, text, RESET ].join
+  end
 end
