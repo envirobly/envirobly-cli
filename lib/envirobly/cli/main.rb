@@ -77,4 +77,19 @@ class Envirobly::Cli::Main < Envirobly::Base
     pp commit.object_tree
     puts "SHA256: #{commit.object_tree_checksum}"
   end
+
+  desc "measure", "POC of Envirobly::Duration"
+  def measure
+    Envirobly::Duration.measure do
+      print "Doing something for 2s"
+      sleep 2
+    end
+
+    Envirobly::Duration.measure do
+      print "Doing something else for 2s"
+      sleep 2
+    end
+
+    puts "Done."
+  end
 end

@@ -26,7 +26,7 @@ class Envirobly::Aws::S3
 
   def push(commit)
     if object_exists?(manifest_key(commit.ref))
-      # puts "Commit #{commit.ref} build context is already uploaded."
+      print "Build context is already uploaded"
       return
     end
 
@@ -152,7 +152,7 @@ class Envirobly::Aws::S3
 
         loop do
           value = uploaded.value
-          print "\rUploading build context files: #{value}/#{objects_count} "
+          print "\rUploading build context files: #{value}/#{objects_count}"
           $stdout.flush
           sleep 0.5
           break if value >= objects_count
