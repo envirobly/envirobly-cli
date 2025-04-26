@@ -1,13 +1,21 @@
 require "benchmark"
 
 class Envirobly::Duration
+  GREEN  = "\e[32m"
+  RED    = "\e[31m"
+  YELLOW = "\e[33m"
+  BLUE   = "\e[34m"
+  RESET  = "\e[0m"
+  BOLD   = "\e[1m"
+  FAINT  = "\e[2m"
+
   class << self
     def measure
       duration = Benchmark.measure do
         yield
       end
 
-      puts " OK #{format_duration duration.real}"
+      puts " #{GREEN}OK#{RESET} #{FAINT}#{format_duration duration.real}#{RESET}"
     end
 
     def format_duration(duration)
