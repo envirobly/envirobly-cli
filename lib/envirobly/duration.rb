@@ -1,15 +1,9 @@
 require "benchmark"
 
 class Envirobly::Duration
-  GREEN  = "\e[32m"
-  RED    = "\e[31m"
-  YELLOW = "\e[33m"
-  BLUE   = "\e[34m"
-  RESET  = "\e[0m"
-  BOLD   = "\e[1m"
-  FAINT  = "\e[2m"
-
   class << self
+    include Envirobly::Colorize
+
     def measure(message = nil)
       measurement = Benchmark.measure do
         yield
@@ -18,7 +12,7 @@ class Envirobly::Duration
       duration = format_duration(measurement)
 
       if message.nil?
-        puts " #{GREEN}✔#{RESET} #{FAINT}#{duration}#{RESET}"
+        puts [ "", green("✔"), faint(duration) ].join(" ")
       else
         puts sprintf(message, duration)
       end
