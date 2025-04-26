@@ -86,8 +86,8 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
 
     Envirobly::Duration.measure do
-      print "Doing something else for 2s"
-      sleep 2
+      print "Doing something else for 100ms"
+      sleep 0.1
     end
 
     puts "Done."

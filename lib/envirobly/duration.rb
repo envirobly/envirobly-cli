@@ -11,20 +11,26 @@ class Envirobly::Duration
 
   class << self
     def measure
-      duration = Benchmark.measure do
+      measurement = Benchmark.measure do
         yield
       end
 
-      puts " #{GREEN}✔#{RESET} #{FAINT}#{format_duration duration.real}#{RESET}"
+      puts " #{GREEN}✔#{RESET} #{FAINT}#{format_duration(measurement)}#{RESET}"
     end
 
-    def format_duration(duration)
-      total_seconds = duration.to_i
-      minutes = (total_seconds / 60).floor
-      seconds = (total_seconds % 60).ceil
-      result = [ "#{seconds}s" ]
-      result.prepend "#{minutes}m" if minutes > 0
-      result.join
+    def format_duration(tms)
+      ms = (tms.real * 1000).to_i
+
+      if ms >= 60_000
+        minutes = ms / 60_000
+        seconds = (ms % 60_000) / 1000
+        sprintf("%dm%ds", minutes, seconds)
+      elsif ms >= 1000
+        seconds = ms / 1000
+        sprintf("%ds", seconds)
+      else
+        sprintf("%dms", ms)
+      end
     end
   end
 end
