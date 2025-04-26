@@ -47,23 +47,30 @@ class Envirobly::Deployment
 
     # Create deployment
     api = Envirobly::Api.new
-    response = api.create_deployment params
 
-    # Fetch credentials for build context upload
-    deployment_url = response.object.fetch("url")
-    response = api.get_deployment_with_delay_and_retry deployment_url
+    Envirobly::Duration.measure do
+      print "Preparing project"
+      response = api.create_deployment params
 
-    credentials = response.object.fetch("credentials")
-    region = response.object.fetch("region")
-    bucket = response.object.fetch("bucket")
-    watch_deployment_url = response.object.fetch("deployment_url")
+      # Fetch credentials for build context upload
+      @deployment_url = response.object.fetch("url")
+      @credentials_response = api.get_deployment_with_delay_and_retry @deployment_url
+    end
 
-    # Upload build context
-    s3 = Envirobly::Aws::S3.new(bucket:, region:, credentials:)
-    s3.push commit
+    credentials = @credentials_response.object.fetch("credentials")
+    region = @credentials_response.object.fetch("region")
+    bucket = @credentials_response.object.fetch("bucket")
+    watch_deployment_url = @credentials_response.object.fetch("deployment_url")
 
-    # Perform deployment
-    api.put_as_json deployment_url
+    Envirobly::Duration.measure do
+      # Upload build context
+      s3 = Envirobly::Aws::S3.new(bucket:, region:, credentials:)
+      s3.push commit
+
+      # Perform deployment
+      api.put_as_json @deployment_url
+    end
+
     puts "Follow at #{watch_deployment_url}"
   end
 end

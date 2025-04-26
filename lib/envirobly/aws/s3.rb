@@ -1,7 +1,6 @@
 require "zlib"
 require "json"
 require "open3"
-require "benchmark"
 require "concurrent"
 require "aws-sdk-s3"
 
@@ -32,61 +31,53 @@ class Envirobly::Aws::S3
 
     # puts "Pushing commit #{commit.ref} to #{@bucket}"
 
-    timings = Benchmark.measure do
-      manifest = []
-      objects_count = 0
-      objects_to_upload = []
-      remote_object_hashes = list_object_hashes
+    manifest = []
+    objects_count = 0
+    objects_to_upload = []
+    remote_object_hashes = list_object_hashes
 
-      commit.object_tree.each do |chdir, objects|
-        objects.each do |(mode, type, object_hash, path)|
-          objects_count += 1
-          path = File.join chdir.delete_prefix(commit.working_dir), path
-          manifest << [ mode, type, object_hash, path.delete_prefix("/") ]
+    commit.object_tree.each do |chdir, objects|
+      objects.each do |(mode, type, object_hash, path)|
+        objects_count += 1
+        path = File.join chdir.delete_prefix(commit.working_dir), path
+        manifest << [ mode, type, object_hash, path.delete_prefix("/") ]
 
-          next if remote_object_hashes.include?(object_hash)
-          objects_to_upload << [ chdir, object_hash ]
-        end
+        next if remote_object_hashes.include?(object_hash)
+        objects_to_upload << [ chdir, object_hash ]
       end
-
-      upload_git_objects(objects_to_upload)
-      upload_manifest manifest_key(commit.ref), manifest
     end
 
-    puts "(took #{format_duration timings.real})"
+    upload_git_objects(objects_to_upload)
+    upload_manifest manifest_key(commit.ref), manifest
   end
 
   def pull(commit_ref, target_dir)
     puts "Pulling #{commit_ref} into #{target_dir}"
 
-    timings = Benchmark.measure do
-      manifest = fetch_manifest(commit_ref)
-      FileUtils.mkdir_p(target_dir)
+    manifest = fetch_manifest(commit_ref)
+    FileUtils.mkdir_p(target_dir)
 
-      puts "Downloading #{manifest.size} files"
-      pool = Concurrent::FixedThreadPool.new(CONCURRENCY)
+    puts "Downloading #{manifest.size} files"
+    pool = Concurrent::FixedThreadPool.new(CONCURRENCY)
 
-      manifest.each do |(mode, type, object_hash, path)|
-        pool.post do
-          target_path = File.join target_dir, path
+    manifest.each do |(mode, type, object_hash, path)|
+      pool.post do
+        target_path = File.join target_dir, path
 
-          if mode == Envirobly::Git::Commit::SYMLINK_FILE_MODE
-            fetch_symlink(object_hash, target_path:)
-          else
-            fetch_object(object_hash, target_path:)
+        if mode == Envirobly::Git::Commit::SYMLINK_FILE_MODE
+          fetch_symlink(object_hash, target_path:)
+        else
+          fetch_object(object_hash, target_path:)
 
-            if mode == Envirobly::Git::Commit::EXECUTABLE_FILE_MODE
-              FileUtils.chmod("+x", target_path)
-            end
+          if mode == Envirobly::Git::Commit::EXECUTABLE_FILE_MODE
+            FileUtils.chmod("+x", target_path)
           end
         end
       end
-
-      pool.shutdown
-      pool.wait_for_termination
     end
 
-    puts "Done in #{format_duration timings.real}"
+    pool.shutdown
+    pool.wait_for_termination
   end
 
   private
