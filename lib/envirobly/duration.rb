@@ -15,7 +15,7 @@ class Envirobly::Duration
         yield
       end
 
-      puts " #{GREEN}OK#{RESET} #{FAINT}#{format_duration duration.real}#{RESET}"
+      puts " #{GREEN}✔#{RESET} #{FAINT}#{format_duration duration.real}#{RESET}"
     end
 
     def format_duration(duration)
