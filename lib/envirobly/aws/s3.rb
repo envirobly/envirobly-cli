@@ -26,6 +26,7 @@ class Envirobly::Aws::S3
   def push(commit)
     if object_exists?(manifest_key(commit.ref))
       print "Build context is already uploaded"
+      $stdout.flush
       return
     end
 

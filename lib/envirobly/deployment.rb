@@ -34,7 +34,7 @@ class Envirobly::Deployment
       }
     }
 
-    puts "Deploying commit #{commit.short_ref} ⇢ #{environ_name}"
+    puts "Deploying commit #{commit.short_ref} → #{environ_name}"
     puts
     puts "    #{commit.message}"
     puts
