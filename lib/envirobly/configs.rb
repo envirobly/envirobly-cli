@@ -21,7 +21,7 @@ class Envirobly::Configs
 
   def default_project_id
     if File.exist?(DEFAULT_PROJECT_PATH)
-      content = YAML.load_file(DEFAULT_PROJECT_PATH)
+      content = YAML.safe_load_file(DEFAULT_PROJECT_PATH)
       if content["url"] =~ /projects\/(\d+)/
         return $1.to_i
       end
@@ -32,7 +32,7 @@ class Envirobly::Configs
 
   def default_account_id
     if File.exist?(DEFAULT_ACCOUNT_PATH)
-      content = YAML.load_file(DEFAULT_ACCOUNT_PATH)
+      content = YAML.safe_load_file(DEFAULT_ACCOUNT_PATH)
       if content["url"] =~ /accounts\/(\d+)/
         return $1.to_i
       end
