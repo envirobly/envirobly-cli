@@ -41,6 +41,20 @@ class Envirobly::Configs
     nil
   end
 
+  def save_default_account(url)
+    return if File.exist?(DEFAULT_ACCOUNT_PATH)
+
+    content = YAML.dump({ url: })
+    File.write(DEFAULT_ACCOUNT_PATH, content)
+  end
+
+  def save_default_project(url)
+    return if File.exist?(DEFAULT_PROJECT_PATH)
+
+    content = YAML.dump({ url: })
+    File.write(DEFAULT_PROJECT_PATH, content)
+  end
+
   private
     def configs
       Dir.entries(@dir).map do |file|
