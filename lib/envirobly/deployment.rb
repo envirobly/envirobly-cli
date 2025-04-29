@@ -18,9 +18,10 @@ class Envirobly::Deployment
       account_id = configs.default_account_id
     end
 
-    # if project_name.nil?
-    #   project_name = configs.default_project_name
-    # end
+    project_id = nil
+    if project_name.nil?
+      project_id = configs.default_project_id
+    end
 
     @params = {
       deployment: {
@@ -28,6 +29,7 @@ class Envirobly::Deployment
           id: account_id
         },
         project: {
+          id: project_id,
           name: project_name,
           region: project_region
         },
