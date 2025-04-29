@@ -12,15 +12,15 @@ class Envirobly::Deployment
       exit 1
     end
 
-    configs = Envirobly::Configs.new
+    @configs = Envirobly::Configs.new
 
     if account_id.nil?
-      account_id = configs.default_account_id
+      account_id = @configs.default_account_id
     end
 
     project_id = nil
     if project_name.nil?
-      project_id = configs.default_project_id
+      project_id = @configs.default_project_id
     end
 
     @params = {
@@ -42,7 +42,7 @@ class Envirobly::Deployment
           message: @commit.message,
           object_tree_checksum: @commit.object_tree_checksum
         },
-        **configs.to_params
+        **@configs.to_params
       }
     }
   end
@@ -64,6 +64,9 @@ class Envirobly::Deployment
     Envirobly::Duration.measure do
       print "Preparing project..."
       response = api.create_deployment @params
+
+      @configs.save_default_account(response.object.fetch("account_url"))
+      @configs.save_default_project(response.object.fetch("project_url"))
 
       # Fetch credentials for build context upload
       @deployment_url = response.object.fetch("url")

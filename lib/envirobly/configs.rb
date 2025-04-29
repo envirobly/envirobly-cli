@@ -5,8 +5,9 @@ class Envirobly::Configs
   ENV = "env"
   BASE = "deploy.yml"
   OVERRIDES_PATTERN = /deploy\.([a-z0-9\-_]+)\.yml/i
-  DEFAULT_ACCOUNT_PATH = File.join(DIR, "defaults", "account.yml")
-  DEFAULT_PROJECT_PATH = File.join(DIR, "defaults", "project.yml")
+  DEFAULTS_DIR = File.join DIR, "defaults"
+  DEFAULT_ACCOUNT_PATH = File.join(DEFAULTS_DIR, "account.yml")
+  DEFAULT_PROJECT_PATH = File.join(DEFAULTS_DIR, "project.yml")
 
   def initialize(dir = DIR)
     @dir = Pathname.new dir
@@ -44,14 +45,16 @@ class Envirobly::Configs
   def save_default_account(url)
     return if File.exist?(DEFAULT_ACCOUNT_PATH)
 
-    content = YAML.dump({ url: })
+    FileUtils.mkdir_p(DEFAULTS_DIR)
+    content = YAML.dump({ "url" => url })
     File.write(DEFAULT_ACCOUNT_PATH, content)
   end
 
   def save_default_project(url)
     return if File.exist?(DEFAULT_PROJECT_PATH)
 
-    content = YAML.dump({ url: })
+    FileUtils.mkdir_p(DEFAULTS_DIR)
+    content = YAML.dump({ "url" => url })
     File.write(DEFAULT_PROJECT_PATH, content)
   end
 
