@@ -5,6 +5,7 @@ class Envirobly::Configs
   ENV = "env"
   BASE = "deploy.yml"
   OVERRIDES_PATTERN = /deploy\.([a-z0-9\-_]+)\.yml/i
+  DEFAULT_ACCOUNT_PATH = File.join(DIR, "defaults", "account.yml")
 
   def initialize(dir = DIR)
     @dir = Pathname.new dir
@@ -15,6 +16,20 @@ class Envirobly::Configs
       configs:,
       env_vars:
     }
+  end
+
+  def default_project_name
+  end
+
+  def default_account_id
+    if File.exist?(DEFAULT_ACCOUNT_PATH)
+      content = YAML.load_file(DEFAULT_ACCOUNT_PATH)
+      if content["url"] =~ /accounts\/(\d+)/
+        return $1.to_i
+      end
+    end
+
+    nil
   end
 
   private

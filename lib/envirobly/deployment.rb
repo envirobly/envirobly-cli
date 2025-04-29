@@ -14,6 +14,14 @@ class Envirobly::Deployment
 
     configs = Envirobly::Configs.new
 
+    if account_id.nil?
+      account_id = configs.default_account_id
+    end
+
+    # if project_name.nil?
+    #   project_name = configs.default_project_name
+    # end
+
     @params = {
       deployment: {
         account: {
