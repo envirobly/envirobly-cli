@@ -24,24 +24,20 @@ class Envirobly::Deployment
     end
 
     @params = {
+      account: {
+        id: account_id
+      },
+      project: {
+        id: project_id,
+        name: project_name,
+        region: project_region
+      },
       deployment: {
-        account: {
-          id: account_id
-        },
-        project: {
-          id: project_id,
-          name: project_name,
-          region: project_region
-        },
-        environ: {
-          name: environ_name
-        },
-        commit: {
-          ref: @commit.ref,
-          time: @commit.time,
-          message: @commit.message,
-          object_tree_checksum: @commit.object_tree_checksum
-        },
+        environ_name:,
+        commit_ref: @commit.ref,
+        commit_time: @commit.time,
+        commit_message: @commit.message,
+        object_tree_checksum: @commit.object_tree_checksum,
         **@configs.to_params
       }
     }
