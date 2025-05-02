@@ -21,7 +21,7 @@ class Envirobly::Git::Commit < Envirobly::Git
   end
 
   def short_ref
-    @short_ref ||= ref[0..7]
+    @short_ref ||= ref[0..6]
   end
 
   def message

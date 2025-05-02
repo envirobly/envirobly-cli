@@ -34,8 +34,18 @@ class Envirobly::Cli::Main < Envirobly::Base
   TXT
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
+  method_option :account_id, type: :numeric
+  method_option :project_name, type: :string
+  method_option :project_region, type: :string
   def deploy(environ_name = Envirobly::Git.new.current_branch)
-    Envirobly::Deployment.new environ_name, options
+    deployment = Envirobly::Deployment.new(
+      environ_name:,
+      commit_ref: options.commit,
+      account_id: options.account_id,
+      project_name: options.project_name,
+      project_region: options.project_region
+    )
+    deployment.perform(dry_run: options.dry_run)
   end
 
   desc "set_access_token TOKEN", "Save and use an access token generated at Envirobly"
@@ -60,9 +70,10 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "pull", "Download working copy from S3"
   def pull(region, bucket, ref, path)
-    # TODO: Work with existing target directory: a) download missing/changed files; b) delete removed files; c) apply executable status
-    s3 = Envirobly::Aws::S3.new(region:, bucket:)
-    s3.pull ref, path
+    Envirobly::Duration.measure("Build context download took %s") do
+      s3 = Envirobly::Aws::S3.new(region:, bucket:)
+      s3.pull ref, path
+    end
   end
 
   desc "object_tree", "Show object tree used for deployments"
@@ -72,5 +83,25 @@ class Envirobly::Cli::Main < Envirobly::Base
     puts "Commit: #{commit.ref}"
     pp commit.object_tree
     puts "SHA256: #{commit.object_tree_checksum}"
+  end
+
+  desc "measure", "POC of Envirobly::Duration"
+  def measure
+    Envirobly::Duration.measure do
+      print "Doing something for 2s"
+      sleep 2
+    end
+
+    Envirobly::Duration.measure do
+      print "Doing something else for 100ms"
+      sleep 0.1
+    end
+
+    Envirobly::Duration.measure("Custom message, took %s") do
+      puts "Sleeping 2.5s with custom message"
+      sleep 2.5
+    end
+
+    puts "Done."
   end
 end
