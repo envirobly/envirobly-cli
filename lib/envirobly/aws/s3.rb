@@ -24,13 +24,13 @@ class Envirobly::Aws::S3
   end
 
   def push(commit)
-    if object_exists?(manifest_key(commit.ref))
+    if object_exists?(manifest_key(commit.object_tree_checksum))
       print "Build context is already uploaded"
       $stdout.flush
       return
     end
 
-    # puts "Pushing commit #{commit.ref} to #{@bucket}"
+    # puts "Pushing #{commit.object_tree_checksum} to #{@bucket}"
 
     manifest = []
     objects_count = 0
@@ -49,13 +49,13 @@ class Envirobly::Aws::S3
     end
 
     upload_git_objects(objects_to_upload)
-    upload_manifest manifest_key(commit.ref), manifest
+    upload_manifest manifest_key(commit.object_tree_checksum), manifest
   end
 
-  def pull(commit_ref, target_dir)
-    puts "Pulling #{commit_ref} into #{target_dir}"
+  def pull(object_tree_checksum, target_dir)
+    puts "Pulling #{object_tree_checksum} into #{target_dir}"
 
-    manifest = fetch_manifest(commit_ref)
+    manifest = fetch_manifest(object_tree_checksum)
     FileUtils.mkdir_p(target_dir)
 
     puts "Downloading #{manifest.size} files"
@@ -97,8 +97,8 @@ class Envirobly::Aws::S3
       "#{OBJECTS_PREFIX}/#{object_hash}.gz"
     end
 
-    def manifest_key(commit_ref)
-      "#{MANIFESTS_PREFIX}/#{commit_ref}.gz"
+    def manifest_key(object_tree_checksum)
+      "#{MANIFESTS_PREFIX}/#{object_tree_checksum}.gz"
     end
 
     def object_exists?(key)
