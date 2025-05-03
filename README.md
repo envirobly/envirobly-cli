@@ -18,8 +18,8 @@ alias envirobly="ruby -I$HOME/envirobly/envirobly-cli/lib/ $HOME/envirobly/envir
 
 ```sh
 gem build envirobly.gemspec
-gem install ./envirobly-$(ruby -Ilib/ bin/envirobly version).gem --no-document
-gem push envirobly-$(ruby -Ilib/ bin/envirobly version).gem
+gem install ./envirobly-$(ruby -Ilib/ bin/envirobly version --pure).gem --no-document
+gem push envirobly-$(ruby -Ilib/ bin/envirobly version --pure).gem
 ```
 
 ## Docker build
