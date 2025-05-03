@@ -1,7 +1,12 @@
 class Envirobly::Cli::Main < Envirobly::Base
   desc "version", "Show Envirobly CLI version"
+  method_option :pure, type: :boolean, default: false
   def version
-    puts Envirobly::VERSION
+    if options.pure
+      puts Envirobly::VERSION
+    else
+      puts "envirobly CLI v#{Envirobly::VERSION}"
+    end
   end
 
   desc "validate", "Validates config"
