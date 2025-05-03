@@ -1,7 +1,7 @@
 class Envirobly::Cli::Main < Envirobly::Base
   desc "version", "Show Envirobly CLI version"
   def version
-    puts Envirobly::VERSION
+    puts "envirobly CLI #{Envirobly::VERSION}"
   end
 
   desc "validate", "Validates config"
