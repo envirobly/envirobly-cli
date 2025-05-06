@@ -22,14 +22,7 @@ class Envirobly::Api
   end
 
   def create_deployment(params)
-    post_as_json(api_v1_deployments_url, params:, headers: authorization_headers).tap do |response|
-      unless response.success?
-        $stderr.puts "Deployment creation request responded with #{response.code}. Aborting."
-        # TODO: render 422 validation failed nicely
-        $stderr.puts response.object
-        exit 1
-      end
-    end
+    post_as_json(api_v1_deployments_url, params:, headers: authorization_headers)
   end
 
   MAX_RETRIES = 20
