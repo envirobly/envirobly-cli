@@ -12,7 +12,7 @@ class Envirobly::Duration
       duration = format_duration(measurement)
 
       if message.nil?
-        puts [ "", green("✔"), faint(duration) ].join(" ")
+        puts [ "", green_check, faint(duration) ].join(" ")
       else
         puts sprintf(message, duration)
       end

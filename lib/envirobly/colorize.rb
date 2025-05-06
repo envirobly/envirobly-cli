@@ -18,4 +18,20 @@ module Envirobly::Colorize
   def yellow(text)
     [ YELLOW, text, RESET ].join
   end
+
+  def red(text)
+    [ RED, text, RESET ].join
+  end
+
+  def green_check
+    green("✔")
+  end
+
+  def downwards_arrow_to_right
+    "↳"
+  end
+
+  def cross
+    "✖"
+  end
 end

@@ -1,4 +1,6 @@
 class Envirobly::Cli::Main < Envirobly::Base
+  include Envirobly::Colorize
+
   desc "version", "Show Envirobly CLI version"
   method_option :pure, type: :boolean, default: false
   def version
@@ -18,16 +20,16 @@ class Envirobly::Cli::Main < Envirobly::Base
     response = api.validate_shape params
 
     if response.object.fetch("valid")
-      puts "All checks pass."
+      puts "Config is valid #{green_check}"
     else
-      puts "Validation failed:"
+      puts "#{red(cross)} Config contains the following issues:"
 
       response.object.fetch("errors").each do |error|
         puts
         puts "  #{error["message"]}"
 
         if error["path"]
-          puts "   #{error["path"]}"
+          puts faint("  #{downwards_arrow_to_right} #{error["path"]}")
         end
       end
 
