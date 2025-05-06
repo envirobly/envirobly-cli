@@ -34,7 +34,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
   method_option :account_id, type: :numeric
-  method_option :project_name, type: :string, default: File.basename(Dir.pwd)
+  method_option :project_name, type: :string
   method_option :project_region, type: :string
   def deploy(environ_name = Envirobly::Git.new.current_branch)
     deployment = Envirobly::Deployment.new(

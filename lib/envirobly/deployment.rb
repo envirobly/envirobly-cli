@@ -19,8 +19,13 @@ class Envirobly::Deployment
     end
 
     project_id = nil
+
     if project_name.nil?
       project_id = @configs.default_project_id
+
+      if project_id.nil?
+        project_name = File.basename(Dir.pwd)
+      end
     end
 
     @params = {
