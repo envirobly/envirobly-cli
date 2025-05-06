@@ -58,8 +58,14 @@ class Envirobly::Deployment
     api = Envirobly::Api.new
 
     Envirobly::Duration.measure do
-      print "Preparing project..."
       response = api.create_deployment @params
+
+      unless response.success?
+        display_config_errors response.object.fetch("errors")
+        exit 1
+      end
+
+      print "Preparing project..."
 
       @configs.save_default_account(response.object.fetch("account_url"))
       @configs.save_default_project(response.object.fetch("project_url"))

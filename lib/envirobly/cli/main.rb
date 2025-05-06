@@ -1,4 +1,6 @@
 class Envirobly::Cli::Main < Envirobly::Base
+  include Envirobly::Colorize
+
   desc "version", "Show Envirobly CLI version"
   method_option :pure, type: :boolean, default: false
   def version
@@ -18,17 +20,9 @@ class Envirobly::Cli::Main < Envirobly::Base
     response = api.validate_shape params
 
     if response.object.fetch("valid")
-      puts "All checks pass."
+      puts "Config is valid #{green_check}"
     else
-      response.object.fetch("errors").each do |config_path, messages|
-        puts "#{config_path}:"
-        puts
-        messages.each_with_index do |message, index|
-          puts "    #{message}"
-          puts
-        end
-      end
-
+      display_config_errors response.object.fetch("errors")
       exit 1
     end
   end
@@ -40,7 +34,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
   method_option :account_id, type: :numeric
-  method_option :project_name, type: :string
+  method_option :project_name, type: :string, default: File.basename(Dir.pwd)
   method_option :project_region, type: :string
   def deploy(environ_name = Envirobly::Git.new.current_branch)
     deployment = Envirobly::Deployment.new(
