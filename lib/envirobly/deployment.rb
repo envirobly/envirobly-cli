@@ -61,7 +61,7 @@ class Envirobly::Deployment
       response = api.create_deployment @params
 
       unless response.success?
-        puts response.object["errors"]
+        display_config_errors response.object.fetch("errors")
         exit 1
       end
 

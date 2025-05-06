@@ -22,17 +22,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     if response.object.fetch("valid")
       puts "Config is valid #{green_check}"
     else
-      puts "#{red(cross)} Config contains the following issues:"
-
-      response.object.fetch("errors").each do |error|
-        puts
-        puts "  #{error["message"]}"
-
-        if error["path"]
-          puts faint("  #{downwards_arrow_to_right} #{error["path"]}")
-        end
-      end
-
+      display_config_errors response.object.fetch("errors")
       exit 1
     end
   end
