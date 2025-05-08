@@ -109,12 +109,21 @@ class Envirobly::Cli::Main < Envirobly::Base
     api = Envirobly::Api.new
     accounts = api.list_accounts
 
-    puts "Choose default account to deploy to:"
+    puts "Choose default account to deploy this project to:"
 
     accounts.object.each do |account|
       puts
       puts "    ##{account["id"]} #{account["name"]}"
       puts faint("    #{downwards_arrow_to_right} #{account["url"]}")
     end
+
+    puts
+
+    id = nil
+    id = ask "Type in the account ID:", limited_to: accounts.object.map { it["id"].to_s }
+    puts "Chosen: #{id}"
+
+  rescue Interrupt
+    puts "Cancelled"
   end
 end
