@@ -103,4 +103,12 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     puts "Done."
   end
+
+  desc "set_default_account", "Choose default account to deploy to"
+  def set_default_account
+    api = Envirobly::Api.new
+    accounts = api.list_accounts
+
+    pp accounts.object
+  end
 end
