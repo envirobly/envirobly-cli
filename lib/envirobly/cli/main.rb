@@ -109,6 +109,12 @@ class Envirobly::Cli::Main < Envirobly::Base
     api = Envirobly::Api.new
     accounts = api.list_accounts
 
-    pp accounts.object
+    puts "Choose default account to deploy to:"
+
+    accounts.object.each do |account|
+      puts
+      puts "    ##{account["id"]} #{account["name"]}"
+      puts faint("    #{downwards_arrow_to_right} #{account["url"]}")
+    end
   end
 end
