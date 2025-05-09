@@ -13,7 +13,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "validate", "Validates config"
   def validate
-    configs = Envirobly::Configs.new
+    configs = Envirobly::Config.new
     api = Envirobly::Api.new
 
     params = { validation: configs.to_params }
@@ -133,7 +133,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       end
     end
 
-    configs = Envirobly::Configs.new
+    configs = Envirobly::Config.new
     configs.save_default_account account["url"], force: true
 
     say "Account ##{account["id"]} set as project default "

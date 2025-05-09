@@ -1,6 +1,6 @@
 require "dotenv"
 
-class Envirobly::Configs
+class Envirobly::Config
   DIR = ".envirobly"
   ENV = "env"
   BASE = "deploy.yml"

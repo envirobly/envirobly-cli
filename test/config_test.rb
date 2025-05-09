@@ -1,8 +1,8 @@
 require "test_helper"
 
-class Envirobly::ConfigsTest < ActiveSupport::TestCase
+class Envirobly::ConfigTest < ActiveSupport::TestCase
   test "load" do
-    configs = Envirobly::Configs.new("test/fixtures/configs")
+    configs = Envirobly::Config.new("test/fixtures/configs")
 
     expected = {
       configs: {

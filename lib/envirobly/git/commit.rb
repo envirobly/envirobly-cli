@@ -53,7 +53,7 @@ class Envirobly::Git::Commit < Envirobly::Git
       git(%(ls-tree -r #{ref}), chdir:).stdout.lines.each do |line|
         mode, type, object_hash, path = line.split(/\s+/)
 
-        next if path.start_with?("#{Envirobly::Configs::DIR}/")
+        next if path.start_with?("#{Envirobly::Config::DIR}/")
 
         if type == "commit"
           objects.merge! object_tree(ref: object_hash, chdir: File.join(chdir, path))
@@ -74,6 +74,6 @@ class Envirobly::Git::Commit < Envirobly::Git
   # @deprecated
   def objects_with_checksum_at(path)
     git(%{ls-tree #{@ref} --format='%(objectname) %(path)' #{path}}).stdout.lines.map(&:chomp).
-      reject { _1.split(" ").last == Envirobly::Configs::DIR }
+      reject { _1.split(" ").last == Envirobly::Config::DIR }
   end
 end

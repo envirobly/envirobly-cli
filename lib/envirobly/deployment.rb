@@ -12,7 +12,7 @@ class Envirobly::Deployment
       exit 1
     end
 
-    @configs = Envirobly::Configs.new
+    @configs = Envirobly::Config.new
 
     if account_id.nil?
       account_id = @configs.default_account_id
