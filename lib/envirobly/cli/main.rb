@@ -114,7 +114,6 @@ class Envirobly::Cli::Main < Envirobly::Base
     data = [ [ "ID", "Name", "AWS number", "URL" ] ] + accounts.object.map { [ it["id"], it["name"], it["aws_id"], it["url"] ] }
     print_table data, borders: true
 
-    id = nil
     id = ask "Type in the account ID:", limited_to: accounts.object.map { it["id"].to_s }
     puts "Chosen: #{id}"
   rescue Interrupt
