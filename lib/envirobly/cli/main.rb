@@ -120,7 +120,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       puts "Choose default account to deploy this project to:"
 
       data = [ [ "ID", "Name", "AWS number", "URL" ] ] +
-        accounts.object.map { |a| a.values_at("id", "name", "aws_id", "url") }
+        accounts.object.pluck("id", "name", "aws_id", "url")
 
       print_table data, borders: true
 
