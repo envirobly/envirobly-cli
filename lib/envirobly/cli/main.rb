@@ -111,18 +111,12 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     puts "Choose default account to deploy this project to:"
 
-    accounts.object.each do |account|
-      puts
-      puts "    ##{account["id"]} #{account["name"]}"
-      puts faint("    #{downwards_arrow_to_right} #{account["url"]}")
-    end
-
-    puts
+    data = [ [ "ID", "Name", "AWS number", "URL" ] ] + accounts.object.map { [ it["id"], it["name"], it["aws_id"], it["url"] ] }
+    print_table data, borders: true
 
     id = nil
     id = ask "Type in the account ID:", limited_to: accounts.object.map { it["id"].to_s }
     puts "Chosen: #{id}"
-
   rescue Interrupt
     puts "Cancelled"
   end

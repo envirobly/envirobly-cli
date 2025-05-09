@@ -11,6 +11,10 @@ module Envirobly::Colorize
     [ FAINT, text, RESET ].join
   end
 
+  def bold(text)
+    [ BOLD, text, RESET ].join
+  end
+
   def green(text)
     [ GREEN, text, RESET ].join
   end
