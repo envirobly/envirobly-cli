@@ -2,11 +2,9 @@ require "dotenv"
 
 class Envirobly::Config
   DIR = ".envirobly"
-  ENV = "env"
   BASE = "deploy.yml"
+  ENV_VARS = "env"
   OVERRIDES_PATTERN = /deploy\.([a-z0-9\-_]+)\.yml/i
-  DEFAULTS_DIR = File.join DIR, "defaults"
-  DEFAULT_PROJECT_PATH = File.join(DEFAULTS_DIR, "project.yml")
 
   def initialize(dir = DIR)
     @dir = Pathname.new dir
@@ -17,25 +15,6 @@ class Envirobly::Config
       configs:,
       env_vars:
     }
-  end
-
-  def default_project_id
-    if File.exist?(DEFAULT_PROJECT_PATH)
-      content = YAML.safe_load_file(DEFAULT_PROJECT_PATH)
-      if content["url"] =~ /projects\/(\d+)/
-        return $1.to_i
-      end
-    end
-
-    nil
-  end
-
-  def save_default_project(url, force: false)
-    return if !force && File.exist?(DEFAULT_PROJECT_PATH)
-
-    FileUtils.mkdir_p(DEFAULTS_DIR)
-    content = YAML.dump({ "url" => url })
-    File.write(DEFAULT_PROJECT_PATH, content)
   end
 
   private
@@ -50,7 +29,7 @@ class Envirobly::Config
     end
 
     def env_vars
-      Dotenv.parse @dir.join(ENV)
+      Dotenv.parse @dir.join(ENV_VARS)
     end
 
     def config_file?(file)
