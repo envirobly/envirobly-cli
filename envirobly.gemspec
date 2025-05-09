@@ -12,18 +12,17 @@ Gem::Specification.new do |spec|
   spec.files = Dir["lib/**/*", "LICENSE"]
   spec.executables = %w[ envirobly ]
 
+  spec.required_ruby_version = ">= 3.2"
+
   spec.add_dependency "thor", "~> 1.3"
   spec.add_dependency "zeitwerk", "~> 2.6"
-
-  # .rbenv/versions/3.3.5/lib/ruby/3.3.0/json/generic_object.rb:2: warning: ostruct was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.5.0.
-  spec.add_dependency "ostruct", "~> 0.1.0"
   spec.add_dependency "aws-sdk-s3", "~> 1.182"
   spec.add_dependency "concurrent-ruby", "~> 1.3"
   spec.add_dependency "dotenv", "~> 3.1"
+  spec.add_dependency "activesupport", "~> 8.0"
 
-  spec.add_development_dependency "debug"
-  spec.add_development_dependency "minitest"
-  spec.add_development_dependency "mocha"
-  spec.add_development_dependency "activesupport"
-  spec.add_development_dependency "railties"
+  spec.add_development_dependency "debug", "~> 1.10"
+  spec.add_development_dependency "minitest", "~> 5.25"
+  spec.add_development_dependency "mocha", "~> 2.7"
+  spec.add_development_dependency "railties", "~> 8.0"
 end
