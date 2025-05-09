@@ -14,7 +14,7 @@ class Envirobly::Defaults::Account < Envirobly::Default
     end
 
     account = accounts.object.first
-    id = nil
+    id = account["id"]
 
     if accounts.object.size > 1
       puts "Choose default account to deploy this project to:"
@@ -41,5 +41,9 @@ class Envirobly::Defaults::Account < Envirobly::Default
     shell.say green_check
 
     id
+  end
+
+  def require_id_if_none
+    id || require_id
   end
 end

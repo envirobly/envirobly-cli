@@ -42,7 +42,8 @@ class Envirobly::Cli::Main < Envirobly::Base
       commit_ref: options.commit,
       account_id: options.account_id,
       project_name: options.project_name,
-      project_region: options.project_region
+      project_region: options.project_region,
+      shell:
     )
     deployment.perform(dry_run: options.dry_run)
   end

@@ -3,7 +3,7 @@ require "yaml"
 class Envirobly::Deployment
   include Envirobly::Colorize
 
-  def initialize(environ_name:, commit_ref:, account_id:, project_name:, project_region:)
+  def initialize(environ_name:, commit_ref:, account_id:, project_name:, project_region:, shell:)
     @environ_name = environ_name
     @commit = Envirobly::Git::Commit.new commit_ref
 
@@ -17,7 +17,7 @@ class Envirobly::Deployment
     @default_project = Envirobly::Defaults::Project.new(shell:)
 
     if account_id.blank?
-      account_id = @default_account.id
+      account_id = @default_account.require_id_if_none
     end
 
     project_id = nil
