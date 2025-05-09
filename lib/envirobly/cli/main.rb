@@ -125,7 +125,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     account = accounts.object.find { |a| a["id"].to_s == id }
     configs = Envirobly::Configs.new
-    configs.save_default_account account["url"]
+    configs.save_default_account account["url"], force: true
     say "Account ##{account["id"]} set as project default "
     say green_check
   rescue Interrupt
