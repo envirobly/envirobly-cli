@@ -13,8 +13,8 @@ class Envirobly::Deployment
     end
 
     @configs = Envirobly::Config.new
-    @default_account = Envirobly::Defaults::Account.new
-    @default_project = Envirobly::Defaults::Project.new
+    @default_account = Envirobly::Defaults::Account.new(shell:)
+    @default_project = Envirobly::Defaults::Project.new(shell:)
 
     if account_id.blank?
       account_id = @default_account.id

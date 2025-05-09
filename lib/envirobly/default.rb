@@ -1,6 +1,9 @@
 class Envirobly::Default
-  def initialize
+  attr_accessor :shell
+
+  def initialize(shell: nil)
     @path = File.join Envirobly::Config::DIR, "defaults", self.class.file
+    @shell = shell
   end
 
   def id
