@@ -3,7 +3,7 @@ require "yaml"
 class Envirobly::Deployment
   include Envirobly::Colorize
 
-  def initialize(environ_name:, commit_ref:, account_id:, project_name:, project_region:)
+  def initialize(environ_name:, commit_ref:, account_id:, project_name:, project_region:, shell:)
     @environ_name = environ_name
     @commit = Envirobly::Git::Commit.new commit_ref
 
@@ -13,15 +13,17 @@ class Envirobly::Deployment
     end
 
     @configs = Envirobly::Config.new
+    @default_account = Envirobly::Defaults::Account.new(shell:)
+    @default_project = Envirobly::Defaults::Project.new(shell:)
 
-    if account_id.nil?
-      account_id = @configs.default_account_id
+    if account_id.blank?
+      account_id = @default_account.require_id_if_none
     end
 
     project_id = nil
 
     if project_name.nil?
-      project_id = @configs.default_project_id
+      project_id = @default_project.id
 
       if project_id.nil?
         project_name = File.basename(Dir.pwd)
@@ -72,8 +74,8 @@ class Envirobly::Deployment
 
       print "Preparing project..."
 
-      @configs.save_default_account(response.object.fetch("account_url"))
-      @configs.save_default_project(response.object.fetch("project_url"))
+      @default_account.save_if_none response.object.fetch("account_url")
+      @default_project.save_if_none response.object.fetch("project_url")
 
       # Fetch credentials for build context upload
       @deployment_url = response.object.fetch("url")
