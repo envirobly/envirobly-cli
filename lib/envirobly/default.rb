@@ -1,6 +1,6 @@
 class Envirobly::Default
   def initialize
-    @path = File.join Envirobly::Config::DIR, self.class.file
+    @path = File.join Envirobly::Config::DIR, "defaults", self.class.file
   end
 
   def id

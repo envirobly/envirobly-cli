@@ -13,9 +13,10 @@ class Envirobly::Deployment
     end
 
     @configs = Envirobly::Config.new
+    @default_account = Envirobly::Defaults::Account.new
 
-    if account_id.nil?
-      account_id = @configs.default_account_id
+    if account_id.blank?
+      account_id = @default_account.id
     end
 
     project_id = nil
@@ -72,7 +73,7 @@ class Envirobly::Deployment
 
       print "Preparing project..."
 
-      @configs.save_default_account(response.object.fetch("account_url"))
+      @default_account.save_if_none response.object.fetch("account_url")
       @configs.save_default_project(response.object.fetch("project_url"))
 
       # Fetch credentials for build context upload
