@@ -124,8 +124,13 @@ class Envirobly::Cli::Main < Envirobly::Base
 
       print_table data, borders: true
 
-      id = ask "Type in the account ID:", limited_to: accounts.object.map { |a| a["id"].to_s }
-      account = accounts.object.find { |a| a["id"].to_s == id }
+      begin
+        id = ask "Type in the account ID:", limited_to: accounts.object.map { |a| a["id"].to_s }
+        account = accounts.object.find { |a| a["id"].to_s == id }
+      rescue Interrupt
+        say_error "Cancelled"
+        exit
+      end
     end
 
     configs = Envirobly::Configs.new
@@ -133,7 +138,5 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     say "Account ##{account["id"]} set as project default "
     say green_check
-  rescue Interrupt
-    say_error "Cancelled"
   end
 end
