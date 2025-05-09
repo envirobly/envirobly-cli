@@ -25,6 +25,10 @@ class Envirobly::Api
     post_as_json(api_v1_deployments_url, params:, headers: authorization_headers)
   end
 
+  def list_accounts
+    get_as_json api_v1_accounts_url, headers: authorization_headers
+  end
+
   MAX_RETRIES = 20
   RETRY_INTERVAL_SECONDS = 2
   def get_deployment_with_delay_and_retry(url, tries = 1)
@@ -65,6 +69,10 @@ class Envirobly::Api
 
     def api_v1_deployments_url
       URI::HTTPS.build(host: HOST, path: "/api/v1/deployments")
+    end
+
+    def api_v1_accounts_url
+      URI::HTTPS.build(host: HOST, path: "/api/v1/accounts")
     end
 
     def request(url, type:, headers: {})

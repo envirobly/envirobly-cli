@@ -103,4 +103,40 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     puts "Done."
   end
+
+  desc "set_default_account", "Choose default account to deploy to"
+  def set_default_account
+    api = Envirobly::Api.new
+    accounts = api.list_accounts
+
+    if accounts.object.size < 1
+      say_error "Please connect an AWS account to your Envirobly account first."
+      exit 1
+    end
+
+    account = accounts.object.first
+
+    if accounts.object.size > 1
+      puts "Choose default account to deploy this project to:"
+
+      data = [ [ "ID", "Name", "AWS number", "URL" ] ] +
+        accounts.object.map { |a| [ a["id"], a["name"], a["aws_id"], a["url"] ] }
+
+      print_table data, borders: true
+
+      begin
+        id = ask "Type in the account ID:", limited_to: accounts.object.map { |a| a["id"].to_s }
+        account = accounts.object.find { |a| a["id"].to_s == id }
+      rescue Interrupt
+        say_error "Cancelled"
+        exit
+      end
+    end
+
+    configs = Envirobly::Configs.new
+    configs.save_default_account account["url"], force: true
+
+    say "Account ##{account["id"]} set as project default "
+    say green_check
+  end
 end
