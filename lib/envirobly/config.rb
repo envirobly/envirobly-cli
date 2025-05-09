@@ -6,7 +6,6 @@ class Envirobly::Config
   BASE = "deploy.yml"
   OVERRIDES_PATTERN = /deploy\.([a-z0-9\-_]+)\.yml/i
   DEFAULTS_DIR = File.join DIR, "defaults"
-  DEFAULT_ACCOUNT_PATH = File.join(DEFAULTS_DIR, "account.yml")
   DEFAULT_PROJECT_PATH = File.join(DEFAULTS_DIR, "project.yml")
 
   def initialize(dir = DIR)
@@ -29,25 +28,6 @@ class Envirobly::Config
     end
 
     nil
-  end
-
-  def default_account_id
-    if File.exist?(DEFAULT_ACCOUNT_PATH)
-      content = YAML.safe_load_file(DEFAULT_ACCOUNT_PATH)
-      if content["url"] =~ /accounts\/(\d+)/
-        return $1.to_i
-      end
-    end
-
-    nil
-  end
-
-  def save_default_account(url, force: false)
-    return if !force && File.exist?(DEFAULT_ACCOUNT_PATH)
-
-    FileUtils.mkdir_p(DEFAULTS_DIR)
-    content = YAML.dump({ "url" => url })
-    File.write(DEFAULT_ACCOUNT_PATH, content)
   end
 
   def save_default_project(url, force: false)
