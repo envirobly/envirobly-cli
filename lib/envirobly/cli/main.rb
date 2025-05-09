@@ -133,10 +133,10 @@ class Envirobly::Cli::Main < Envirobly::Base
       end
     end
 
-    configs = Envirobly::Config.new
-    configs.save_default_account account["url"], force: true
+    default_account = Envirobly::Defaults::Account.new
+    default_account.save account["url"]
 
-    say "Account ##{account["id"]} set as project default "
+    say "Account ##{default_account.id} set as project default "
     say green_check
   end
 end

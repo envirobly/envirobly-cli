@@ -1,0 +1,2 @@
+module Envirobly::Defaults
+end
