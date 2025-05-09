@@ -109,7 +109,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     api = Envirobly::Api.new
     accounts = api.list_accounts
 
-    if accounts.object.size < 1
+    if accounts.object.blank?
       say_error "Please connect an AWS account to your Envirobly account first."
       exit 1
     end
@@ -120,7 +120,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       puts "Choose default account to deploy this project to:"
 
       data = [ [ "ID", "Name", "AWS number", "URL" ] ] +
-        accounts.object.map { |a| [ a["id"], a["name"], a["aws_id"], a["url"] ] }
+        accounts.object.map { |a| a.values_at("id", "name", "aws_id", "url") }
 
       print_table data, borders: true
 
