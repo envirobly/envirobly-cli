@@ -14,12 +14,20 @@ class Envirobly::Defaults::Region < Envirobly::Default
       response.object.pluck("code", "title", "group_title"), borders: true
 
     code = nil
+    limited_to = response.object.pluck("code")
 
-    begin
-      code = shell.ask("Type in the region name:", limited_to: response.object.map { |r| r["code"] })
-    rescue Interrupt
-      shell.say_error "Cancelled"
-      exit
+    while code.nil?
+      begin
+        code = shell.ask("Type in the region name:", default: "us-east-1")
+      rescue Interrupt
+        shell.say_error "Cancelled"
+        exit
+      end
+
+      unless code.in?(limited_to)
+        shell.say_error "'#{code}' is not a supported region, please try again"
+        code = nil
+      end
     end
 
     save code
