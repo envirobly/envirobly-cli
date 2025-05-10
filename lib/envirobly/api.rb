@@ -29,6 +29,10 @@ class Envirobly::Api
     get_as_json api_v1_accounts_url, headers: authorization_headers
   end
 
+  def list_regions
+    get_as_json api_v1_regions_url, headers: authorization_headers
+  end
+
   MAX_RETRIES = 20
   RETRY_INTERVAL_SECONDS = 2
   def get_deployment_with_delay_and_retry(url, tries = 1)
@@ -64,15 +68,23 @@ class Envirobly::Api
 
   private
     def api_v1_shape_validations_url
-      URI::HTTPS.build(host: HOST, path: "/api/v1/shape_validations")
+      api_url_for "v1/shape_validations"
     end
 
     def api_v1_deployments_url
-      URI::HTTPS.build(host: HOST, path: "/api/v1/deployments")
+      api_url_for "v1/deployments"
     end
 
     def api_v1_accounts_url
-      URI::HTTPS.build(host: HOST, path: "/api/v1/accounts")
+      api_url_for "v1/accounts"
+    end
+
+    def api_v1_regions_url
+      api_url_for "v1/regions"
+    end
+
+    def api_url_for(path)
+      URI::HTTPS.build(host: HOST, path: "/api/#{path}")
     end
 
     def request(url, type:, headers: {})

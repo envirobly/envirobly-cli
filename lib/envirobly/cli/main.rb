@@ -94,4 +94,10 @@ class Envirobly::Cli::Main < Envirobly::Base
   def set_default_account
     Envirobly::Defaults::Account.new(shell:).require_id
   end
+
+  desc "list_regions", "List regions where projects can be provisioned"
+  def list_regions
+    api = Envirobly::Api.new
+    say api.list_regions.object
+  end
 end
