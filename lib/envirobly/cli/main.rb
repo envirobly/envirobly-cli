@@ -27,11 +27,10 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "deploy [[PROJECT_NAME/]ENVIRON_NAME]", <<~TXT
-    Deploy to environment identified by name.
-    When name is empty, current git branch name is used.
-    Environ name can be prefixed by project name with a slash,#{' '}
-    if you'd like to deploy to a project other than the default.
+  desc "deploy [ENVIRON_NAME]", <<~TXT
+    Deploy to environ identified by name.
+    Name can contain letters, numbers, dashes or underscores.
+    If environ name is left blank, current git branch name is used.
   TXT
   method_option :account_id, type: :numeric
   method_option :region, type: :string
