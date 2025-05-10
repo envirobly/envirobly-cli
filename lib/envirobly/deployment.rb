@@ -3,7 +3,7 @@ require "yaml"
 class Envirobly::Deployment
   include Envirobly::Colorize
 
-  def initialize(environ_name:, commit_ref:, account_id:, project_name:, project_region:, shell:)
+  def initialize(environ_name:, commit_ref:, account_id:, project_name:, region:, shell:)
     @environ_name = environ_name
     @commit = Envirobly::Git::Commit.new commit_ref
 
@@ -37,7 +37,7 @@ class Envirobly::Deployment
       project: {
         id: project_id,
         name: project_name,
-        region: project_region
+        region:
       },
       deployment: {
         environ_name:,

@@ -35,14 +35,14 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :dry_run, type: :boolean, default: false
   method_option :account_id, type: :numeric
   method_option :project_name, type: :string
-  method_option :project_region, type: :string
+  method_option :region, type: :string
   def deploy(environ_name = Envirobly::Git.new.current_branch)
     deployment = Envirobly::Deployment.new(
       environ_name:,
       commit_ref: options.commit,
       account_id: options.account_id,
       project_name: options.project_name,
-      project_region: options.project_region,
+      region: options.region,
       shell:
     )
     deployment.perform(dry_run: options.dry_run)
