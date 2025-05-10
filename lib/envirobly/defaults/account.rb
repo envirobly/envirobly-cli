@@ -34,16 +34,11 @@ class Envirobly::Defaults::Account < Envirobly::Default
       account = accounts.object.find { |a| a["id"] == id }
     end
 
-    default_account = Envirobly::Defaults::Account.new
-    default_account.save account["url"]
+    save account["url"]
 
-    shell.say "Account ##{default_account.id} set as project default "
+    shell.say "Account ##{id} set as project default "
     shell.say green_check
 
     id
-  end
-
-  def require_id_if_none
-    id || require_id
   end
 end
