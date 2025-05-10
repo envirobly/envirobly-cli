@@ -61,7 +61,8 @@ envirobly deploy staging
 
 # Deploy to a different project and a named environment. If project is not configured,
 # asks for region to deploy to.
-envirobly deploy beta/staging
+envirobly deploy --project=custom
+envirobly deploy --project=https://on.envirobly.com/projects/123
 
 # Questions can be skipped by specifying answers as arguments.
 envirobly deploy --account-id=1 --region=eu-north-1

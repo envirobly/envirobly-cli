@@ -35,29 +35,26 @@ class Envirobly::Cli::Main < Envirobly::Base
   TXT
   method_option :account_id, type: :numeric
   method_option :region, type: :string
+  method_option :project, type: :string
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
-  def deploy(destination = nil)
+  def deploy(environ_name = nil)
     commit = Envirobly::Git::Commit.new options.commit
 
     unless commit.exists?
-      say_error "Commit #{commit.ref} doesn't exist in this repository. Aborting."
+      say_error "Commit '#{commit.ref}' doesn't exist in this repository. Aborting."
       exit 1
     end
 
+    environ_name = environ_name.presence || commit.current_branch
     project_name = nil
-    environ_name = nil
+    project_id = nil
 
-    if destination.blank?
-      environ_name = commit.current_branch
-    else
-      names = destination.split("/").map &:strip
-
-      if names.size == 1
-        environ_name = names.first
-      elsif names.size == 2
-        project_name = names.first
-        environ_name = names.second
+    if options.project.present?
+      if options.project =~ Envirobly::Defaults::Project.regexp
+        project_id = $1.to_i
+      else
+        project_name = options.project
       end
     end
 
@@ -66,6 +63,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       region: options.region,
       project_name:,
       environ_name:,
+      project_id:,
       commit:,
       shell:
     )
