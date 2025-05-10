@@ -27,22 +27,46 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "deploy [ENVIRON_NAME]", <<~TXT
+  desc "deploy [[PROJECT_NAME/]ENVIRON_NAME]", <<~TXT
     Deploy to environment identified by name.
     When name is empty, current git branch name is used.
+    Environ name can be prefixed by project name with a slash,#{' '}
+    if you'd like to deploy to a project other than the default.
   TXT
+  method_option :account_id, type: :numeric
+  method_option :region, type: :string
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
-  method_option :account_id, type: :numeric
-  method_option :project_name, type: :string
-  method_option :region, type: :string
-  def deploy(environ_name = Envirobly::Git.new.current_branch)
+  def deploy(destination = nil)
+    commit = Envirobly::Git::Commit.new options.commit
+
+    unless commit.exists?
+      say_error "Commit #{commit.ref} doesn't exist in this repository. Aborting."
+      exit 1
+    end
+
+    project_name = nil
+    environ_name = nil
+
+    if destination.blank?
+      environ_name = commit.current_branch
+    else
+      names = destination.split("/").map &:strip
+
+      if names.size == 1
+        environ_name = names.first
+      elsif names.size == 2
+        project_name = names.first
+        environ_name = names.second
+      end
+    end
+
     deployment = Envirobly::Deployment.new(
-      environ_name:,
-      commit_ref: options.commit,
       account_id: options.account_id,
-      project_name: options.project_name,
       region: options.region,
+      project_name:,
+      environ_name:,
+      commit:,
       shell:
     )
     deployment.perform(dry_run: options.dry_run)

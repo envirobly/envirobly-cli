@@ -3,16 +3,10 @@ require "yaml"
 class Envirobly::Deployment
   include Envirobly::Colorize
 
-  def initialize(environ_name:, commit_ref:, account_id:, project_name:, region:, shell:)
+  def initialize(environ_name:, commit:, account_id:, project_name:, region:, shell:)
     @environ_name = environ_name
-    @commit = Envirobly::Git::Commit.new commit_ref
-
-    unless @commit.exists?
-      $stderr.puts "Commit #{commit_ref} doesn't exist in this repository. Aborting."
-      exit 1
-    end
-
-    @configs = Envirobly::Config.new
+    @commit = commit
+    @config = Envirobly::Config.new
     @default_account = Envirobly::Defaults::Account.new(shell:)
     @default_project = Envirobly::Defaults::Project.new(shell:)
 
@@ -45,7 +39,7 @@ class Envirobly::Deployment
         commit_time: @commit.time,
         commit_message: @commit.message,
         object_tree_checksum: @commit.object_tree_checksum,
-        **@configs.to_params
+        **@config.to_params
       }
     }
   end
