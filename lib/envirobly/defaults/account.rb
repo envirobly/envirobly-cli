@@ -24,8 +24,10 @@ class Envirobly::Defaults::Account < Envirobly::Default
 
       shell.print_table data, borders: true
 
+      limited_to = accounts.object.pluck("id").map(&:to_s)
+
       begin
-        id = shell.ask("Type in the account ID:", limited_to: accounts.object.map { |a| a["id"].to_s }).to_i
+        id = shell.ask("Type in the account ID:", limited_to:).to_i
       rescue Interrupt
         shell.say_error "Cancelled"
         exit
