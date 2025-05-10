@@ -98,6 +98,9 @@ class Envirobly::Cli::Main < Envirobly::Base
   desc "list_regions", "List regions where projects can be provisioned"
   def list_regions
     api = Envirobly::Api.new
-    say api.list_regions.object
+    response = api.list_regions
+
+    print_table [ [ "Name", "Location", "Region" ] ] +
+      response.object.pluck("code", "title", "group_title"), borders: true
   end
 end
