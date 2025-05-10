@@ -21,7 +21,7 @@ class Envirobly::Default
   end
 
   def save(url)
-    unless url.to_s =~ self.class.regexp
+    unless url =~ self.class.regexp
       raise ArgumentError, "'#{url}' must match #{self.class.regexp}"
     end
 
