@@ -64,8 +64,8 @@ envirobly deploy staging
 envirobly deploy beta/staging
 
 # Questions can be skipped by specifying answers as arguments.
-envirobly deploy --account=1 --project=foo --region=eu-north-1
+envirobly deploy --account-id=1 --region=eu-north-1
 
-# Use defaults (us-east-1, dir and branch names) and don't ask any questions (for CIs).
+# TODO: Use defaults (us-east-1, dir and branch names) and don't ask any questions (for CIs).
 envirobly deploy --unattended
 ```
