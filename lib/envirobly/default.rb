@@ -1,6 +1,8 @@
 class Envirobly::Default
   attr_accessor :shell
 
+  def self.key = "url"
+
   def initialize(shell: nil)
     @path = File.join Envirobly::Config::DIR, "defaults", self.class.file
     @shell = shell
@@ -10,8 +12,8 @@ class Envirobly::Default
     if File.exist?(@path)
       content = YAML.safe_load_file(@path)
 
-      if content["url"] =~ self.class.regexp
-        return $1.to_i
+      if content[self.class.key] =~ self.class.regexp
+        return cast_id($1)
       end
     end
 
@@ -24,7 +26,7 @@ class Envirobly::Default
     end
 
     FileUtils.mkdir_p(File.dirname(@path))
-    content = YAML.dump({ "url" => url })
+    content = YAML.dump({ self.class.key => url })
     File.write(@path, content)
   end
 
@@ -33,4 +35,13 @@ class Envirobly::Default
 
     save(url)
   end
+
+  def require_if_none
+    id || require_id
+  end
+
+  private
+    def cast_id(value)
+      value.to_i
+    end
 end

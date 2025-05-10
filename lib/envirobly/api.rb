@@ -33,10 +33,11 @@ class Envirobly::Api
     get_as_json api_v1_regions_url, headers: authorization_headers
   end
 
-  MAX_RETRIES = 20
-  RETRY_INTERVAL_SECONDS = 2
+  MAX_RETRIES = 30
+  SHORT_RETRY_INTERVAL = 2.seconds
+  LONG_RETRY_INTERVAL = 6.seconds
   def get_deployment_with_delay_and_retry(url, tries = 1)
-    sleep RETRY_INTERVAL_SECONDS * tries
+    sleep SHORT_RETRY_INTERVAL * tries
     response = get_as_json URI(url)
 
     if response.success?
@@ -45,7 +46,12 @@ class Envirobly::Api
       $stderr.puts "Max retries exhausted while waiting for deployment credentials. Aborting."
       exit 1
     else
-      sleep RETRY_INTERVAL_SECONDS * tries
+      if tries > 3
+        sleep LONG_RETRY_INTERVAL
+      else
+        sleep SHORT_RETRY_INTERVAL
+      end
+
       get_deployment_with_delay_and_retry(url, tries + 1)
     end
   end

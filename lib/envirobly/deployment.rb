@@ -9,9 +9,10 @@ class Envirobly::Deployment
     @config = Envirobly::Config.new
     @default_account = Envirobly::Defaults::Account.new(shell:)
     @default_project = Envirobly::Defaults::Project.new(shell:)
+    @default_region = Envirobly::Defaults::Region.new(shell:)
 
     if account_id.blank?
-      account_id = @default_account.require_id_if_none
+      account_id = @default_account.require_if_none
     end
 
     if project_id.blank? && project_name.blank?
@@ -20,6 +21,10 @@ class Envirobly::Deployment
       if project_id.nil?
         project_name = File.basename(Dir.pwd)
       end
+    end
+
+    if region.blank?
+      region = @default_region.require_if_none
     end
 
     @params = {
@@ -68,6 +73,7 @@ class Envirobly::Deployment
 
       @default_account.save_if_none response.object.fetch("account_url")
       @default_project.save_if_none response.object.fetch("project_url")
+      @default_region.save_if_none response.object.fetch("region")
 
       # Fetch credentials for build context upload
       @deployment_url = response.object.fetch("url")

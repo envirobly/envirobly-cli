@@ -90,14 +90,13 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "set_default_account", "Choose default account to deploy to"
+  desc "set_default_account", "Choose default account to deploy the current project to"
   def set_default_account
     Envirobly::Defaults::Account.new(shell:).require_id
   end
 
-  desc "list_regions", "List regions where projects can be provisioned"
-  def list_regions
-    api = Envirobly::Api.new
-    say api.list_regions.object
+  desc "set_default_region", "Set default region for the current project when deploying for the first time"
+  def set_default_region
+    Envirobly::Defaults::Region.new(shell:).require_id
   end
 end
