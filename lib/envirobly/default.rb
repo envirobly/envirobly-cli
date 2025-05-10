@@ -13,7 +13,7 @@ class Envirobly::Default
       content = YAML.safe_load_file(@path)
 
       if content[self.class.key] =~ self.class.regexp
-        return $1.to_i
+        return cast_id($1)
       end
     end
 
@@ -39,4 +39,9 @@ class Envirobly::Default
   def require_if_none
     id || require_id
   end
+
+  private
+    def cast_id(value)
+      value.to_i
+    end
 end

@@ -29,4 +29,9 @@ class Envirobly::Defaults::Region < Envirobly::Default
 
     id
   end
+
+  private
+    def cast_id(value)
+      value
+    end
 end
