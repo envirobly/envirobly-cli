@@ -34,7 +34,6 @@ class Envirobly::AccessToken
     FileUtils.mkdir_p self.class.dir
     File.write self.class.path, @token
     File.chmod 0600, self.class.path
-    puts "Access token saved to #{self.class.path}"
   end
 
   def as_http_bearer

@@ -13,19 +13,31 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "signin", "Set access token generated at Envirobly"
   def signin
-    token = nil
+    value = nil
 
-    while token.blank?
+    while value.blank?
       begin
-        token = ask("Access Token:", echo: false)
+        value = ask("Access Token:", echo: false)
       rescue Interrupt
         say
         say_error "Cancelled"
         exit
       end
-    end
 
-    Envirobly::AccessToken.new(token).save
+      access_token = Envirobly::AccessToken.new(value)
+      api = Envirobly::Api.new(access_token:)
+
+      if api.list_accounts.success?
+        access_token.save
+        say
+        say "Successfully signed in "
+        say green_check
+      else
+        say
+        say_error "This token is invalid. Please try again"
+        value = nil
+      end
+    end
   end
 
   desc "signout", "Sign out"

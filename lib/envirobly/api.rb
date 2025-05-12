@@ -8,8 +8,8 @@ class Envirobly::Api
   USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION}"
   CONTENT_TYPE = "application/json"
 
-  def initialize
-    @access_token = Envirobly::AccessToken.new
+  def initialize(access_token: Envirobly::AccessToken.new)
+    @access_token = access_token
   end
 
   def validate_shape(params)
