@@ -49,6 +49,11 @@ class Envirobly::AccessToken
   def require!
     return if @token.present?
 
+    shell.say "This action requires you to be signed in."
+    shell.say "Please visit https://on.envirobly.com/profile/access_tokens"
+    shell.say "to generate an access token and then paste it in here."
+    shell.say
+
     set
   end
 
