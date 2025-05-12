@@ -4,12 +4,12 @@ require "socket"
 require "uri"
 
 class Envirobly::Api
-  HOST = ENV["ENVIROBLY_API_HOST"] || "envirobly.com"
+  HOST = ENV["ENVIROBLY_API_HOST"].presence || "on.envirobly.com"
   USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION}"
   CONTENT_TYPE = "application/json"
 
-  def initialize
-    @access_token = Envirobly::AccessToken.new
+  def initialize(access_token: Envirobly::AccessToken.new)
+    @access_token = access_token
   end
 
   def validate_shape(params)

@@ -11,8 +11,34 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
+  desc "signin", "Set access token generated at Envirobly"
+  def signin
+    access_token = Envirobly::AccessToken.new(shell:)
+    access_token.set
+  end
+
+  desc "signout", "Sign out"
+  def signout
+    Envirobly::AccessToken.destroy
+    say "You've signed out."
+    say "This didn't delete the access token itself."
+    say "You can sign in again with `envirobly signin`."
+  end
+
+  desc "set_default_account", "Choose default account to deploy the current project to"
+  def set_default_account
+    Envirobly::Defaults::Account.new(shell:).require_id
+  end
+
+  desc "set_default_region", "Set default region for the current project when deploying for the first time"
+  def set_default_region
+    Envirobly::Defaults::Region.new(shell:).require_id
+  end
+
   desc "validate", "Validates config"
   def validate
+    Envirobly::AccessToken.new(shell:).require!
+
     configs = Envirobly::Config.new
     api = Envirobly::Api.new
 
@@ -45,6 +71,8 @@ class Envirobly::Cli::Main < Envirobly::Base
       exit 1
     end
 
+    Envirobly::AccessToken.new(shell:).require!
+
     environ_name = environ_name.presence || commit.current_branch
     project_name = nil
     project_id = nil
@@ -69,34 +97,11 @@ class Envirobly::Cli::Main < Envirobly::Base
     deployment.perform(dry_run: options.dry_run)
   end
 
-  desc "set_access_token", "Set access token generated at Envirobly"
-  def set_access_token
-    token = ask("Access Token:", echo: false).strip
-
-    if token.blank?
-      $stderr.puts
-      $stderr.puts "Token can't be empty."
-      exit 1
-    end
-
-    Envirobly::AccessToken.new(token).save
-  end
-
   desc "pull", "Download build context"
   def pull(region, bucket, ref, path)
     Envirobly::Duration.measure("Build context download took %s") do
       s3 = Envirobly::Aws::S3.new(region:, bucket:)
       s3.pull ref, path
     end
-  end
-
-  desc "set_default_account", "Choose default account to deploy the current project to"
-  def set_default_account
-    Envirobly::Defaults::Account.new(shell:).require_id
-  end
-
-  desc "set_default_region", "Set default region for the current project when deploying for the first time"
-  def set_default_region
-    Envirobly::Defaults::Region.new(shell:).require_id
   end
 end
