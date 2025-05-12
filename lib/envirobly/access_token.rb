@@ -2,6 +2,10 @@ require "fileutils"
 require "pathname"
 
 class Envirobly::AccessToken
+  include Envirobly::Colorize
+
+  attr_reader :shell
+
   class << self
     def destroy
       if File.exist?(path)
@@ -22,7 +26,9 @@ class Envirobly::AccessToken
     end
   end
 
-  def initialize(token = ENV["ENVIROBLY_ACCESS_TOKEN"].presence)
+  def initialize(token = ENV["ENVIROBLY_ACCESS_TOKEN"].presence, shell: nil)
+    @shell = shell
+
     if token.blank? && File.exist?(self.class.path)
       @token = File.read(self.class.path)
     else
@@ -38,5 +44,38 @@ class Envirobly::AccessToken
 
   def as_http_bearer
     "Bearer #{@token}"
+  end
+
+  def require!
+    return if @token.present?
+
+    set
+  end
+
+  def set
+    @token = nil
+
+    while @token.blank?
+      begin
+        @token = shell.ask("Access Token:", echo: false)
+      rescue Interrupt
+        shell.say
+        shell.say_error "Cancelled"
+        exit
+      end
+
+      api = Envirobly::Api.new(access_token: self)
+
+      if api.list_accounts.success?
+        save
+        shell.say
+        shell.say "Successfully signed in "
+        shell.say green_check
+      else
+        shell.say
+        shell.say_error "This token is invalid. Please try again"
+        @token = nil
+      end
+    end
   end
 end

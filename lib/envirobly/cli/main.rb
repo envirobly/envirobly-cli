@@ -13,31 +13,8 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "signin", "Set access token generated at Envirobly"
   def signin
-    value = nil
-
-    while value.blank?
-      begin
-        value = ask("Access Token:", echo: false)
-      rescue Interrupt
-        say
-        say_error "Cancelled"
-        exit
-      end
-
-      access_token = Envirobly::AccessToken.new(value)
-      api = Envirobly::Api.new(access_token:)
-
-      if api.list_accounts.success?
-        access_token.save
-        say
-        say "Successfully signed in "
-        say green_check
-      else
-        say
-        say_error "This token is invalid. Please try again"
-        value = nil
-      end
-    end
+    access_token = Envirobly::AccessToken.new(shell:)
+    access_token.set
   end
 
   desc "signout", "Sign out"
@@ -60,6 +37,8 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "validate", "Validates config"
   def validate
+    Envirobly::AccessToken.new(shell:).require!
+
     configs = Envirobly::Config.new
     api = Envirobly::Api.new
 
@@ -91,6 +70,8 @@ class Envirobly::Cli::Main < Envirobly::Base
       say_error "Commit '#{commit.ref}' doesn't exist in this repository. Aborting."
       exit 1
     end
+
+    Envirobly::AccessToken.new(shell:).require!
 
     environ_name = environ_name.presence || commit.current_branch
     project_name = nil
