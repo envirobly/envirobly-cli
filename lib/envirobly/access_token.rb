@@ -66,6 +66,7 @@ class Envirobly::AccessToken
 
       api = Envirobly::Api.new(access_token: self)
 
+      # TODO: Eventually replace with custom `whoami` API that returns name, email...
       if api.list_accounts.success?
         save
         shell.say
