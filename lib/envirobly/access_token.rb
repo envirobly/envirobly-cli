@@ -3,26 +3,32 @@ require "pathname"
 
 class Envirobly::AccessToken
   def initialize(token = ENV.fetch("ENVIROBLY_ACCESS_TOKEN", nil))
-    if token.nil? && File.exist?(access_token_path)
-      @token = File.read(access_token_path)
+    if token.nil? && File.exist?(path)
+      @token = File.read(path)
     else
       @token = token
     end
   end
 
   def save
-    FileUtils.mkdir_p config_root
-    File.write access_token_path, @token
-    File.chmod 0600, access_token_path
-    puts "Access token saved to #{access_token_path}"
+    FileUtils.mkdir_p dir
+    File.write path, @token
+    File.chmod 0600, path
+    puts "Access token saved to #{path}"
   end
 
   def as_http_bearer
     "Bearer #{@token}"
   end
 
+  def destroy
+    if File.exist?(path)
+      FileUtils.rm path
+    end
+  end
+
   private
-    def config_root
+    def dir
       if ENV["XDG_CONFIG_HOME"]
         Pathname.new(ENV["XDG_CONFIG_HOME"]).join("envirobly")
       else
@@ -30,7 +36,7 @@ class Envirobly::AccessToken
       end
     end
 
-    def access_token_path
-      config_root.join "access_token"
+    def path
+      dir.join "access_token"
     end
 end
