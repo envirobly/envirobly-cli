@@ -18,8 +18,8 @@ class Envirobly::Cli::Main < Envirobly::Base
     while token.blank?
       begin
         token = ask("Access Token:", echo: false)
-        say
       rescue Interrupt
+        say
         say_error "Cancelled"
         exit
       end
@@ -30,7 +30,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "signout", "Sign out"
   def signout
-    Envirobly::AccessToken.new.destroy
+    Envirobly::AccessToken.destroy
     say "You've signed out."
     say "This didn't delete the API token itself."
     say "You can sign in again with `envirobly signin`."
