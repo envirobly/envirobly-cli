@@ -44,7 +44,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   def signout
     Envirobly::AccessToken.destroy
     say "You've signed out."
-    say "This didn't delete the API token itself."
+    say "This didn't delete the access token itself."
     say "You can sign in again with `envirobly signin`."
   end
 
