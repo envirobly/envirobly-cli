@@ -33,6 +33,10 @@ class Envirobly::Api
     get_as_json api_v1_regions_url, headers: authorization_headers
   end
 
+  def list_instance_types(region)
+    get_as_json api_v1_instance_types_url(region), headers: authorization_headers
+  end
+
   MAX_RETRIES = 30
   SHORT_RETRY_INTERVAL = 2.seconds
   LONG_RETRY_INTERVAL = 6.seconds
@@ -89,8 +93,12 @@ class Envirobly::Api
       api_url_for "v1/regions"
     end
 
-    def api_url_for(path)
-      URI::HTTPS.build(host: HOST, path: "/api/#{path}")
+    def api_v1_instance_types_url(region)
+      api_url_for "v1/instance_types", query: "region=#{region}"
+    end
+
+    def api_url_for(path, query: nil)
+      URI::HTTPS.build(host: HOST, path: "/api/#{path}", query:)
     end
 
     def request(url, type:, headers: {})

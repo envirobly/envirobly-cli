@@ -53,6 +53,26 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
+  desc "instance_types [region]", "List instance types in a given region, including price and performance characteristics."
+  def instance_types(region = nil)
+    default_region = Envirobly::Defaults::Region.new(shell:)
+    region = region.presence || default_region.require_if_none
+
+    api = Envirobly::Api.new
+    table_data = api.list_instance_types(region).object.map do |item|
+      [
+        item["code"],
+        item["vcpu"],
+        Envirobly::Numeric.new(item["memory"], short: true),
+        Envirobly::Numeric.new(item["monthly_price"]),
+        item["group"]
+      ]
+    end
+
+    print_table [ [ "Name", "vCPU", "Memory (GB)", "Monthly price ($)", "Group" ] ] +
+      table_data, borders: true
+  end
+
   desc "deploy [ENVIRON_NAME]", <<~TXT
     Deploy to environ identified by name.
     Name can contain letters, numbers, dashes or underscores.
