@@ -58,7 +58,10 @@ class Envirobly::Cli::Main < Envirobly::Base
   def instance_types
     api = Envirobly::Api.new
     default_region = Envirobly::Defaults::Region.new(shell:)
-    pp api.list_instance_types(options.region || default_region.require_if_none).object
+    region = options.region || default_region.require_if_none
+    print_table [ [ "Name", "vCPU", "Memory (GB)", "Monthly price ($)" ] ] +
+      api.list_instance_types(region).object.pluck("code", "vcpu", "memory", "hourly_price"),
+      borders: true
   end
 
   desc "deploy [ENVIRON_NAME]", <<~TXT
