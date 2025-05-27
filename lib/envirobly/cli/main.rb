@@ -53,6 +53,14 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
+  desc "instance_types", "List instance types in a given region, including price and performance characteristics."
+  method_option :region, type: :string
+  def instance_types
+    api = Envirobly::Api.new
+    default_region = Envirobly::Defaults::Region.new(shell:)
+    pp api.list_instance_types(options.region || default_region.require_if_none).object
+  end
+
   desc "deploy [ENVIRON_NAME]", <<~TXT
     Deploy to environ identified by name.
     Name can contain letters, numbers, dashes or underscores.
