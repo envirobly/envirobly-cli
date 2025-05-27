@@ -59,8 +59,8 @@ class Envirobly::Cli::Main < Envirobly::Base
     api = Envirobly::Api.new
     default_region = Envirobly::Defaults::Region.new(shell:)
     region = options.region || default_region.require_if_none
-    print_table [ [ "Name", "vCPU", "Memory (GB)", "Monthly price ($)" ] ] +
-      api.list_instance_types(region).object.pluck("code", "vcpu", "memory", "hourly_price"),
+    print_table [ [ "Name", "vCPU", "Memory (GB)", "Monthly price ($)", "Group" ] ] +
+      api.list_instance_types(region).object.pluck("code", "vcpu", "memory", "monthly_price", "group"),
       borders: true
   end
 
