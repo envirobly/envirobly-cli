@@ -53,13 +53,12 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "instance_types", "List instance types in a given region, including price and performance characteristics."
-  method_option :region, type: :string
-  def instance_types
-    api = Envirobly::Api.new
+  desc "instance_types [region]", "List instance types in a given region, including price and performance characteristics."
+  def instance_types(region = nil)
     default_region = Envirobly::Defaults::Region.new(shell:)
-    region = options.region || default_region.require_if_none
-    # api.list_instance_types(region).object.pluck("code", "vcpu", "memory", "monthly_price", "group"),
+    region = region.presence || default_region.require_if_none
+
+    api = Envirobly::Api.new
     table_data = api.list_instance_types(region).object.map do |item|
       [
         item["code"],
@@ -69,9 +68,9 @@ class Envirobly::Cli::Main < Envirobly::Base
         item["group"]
       ]
     end
+
     print_table [ [ "Name", "vCPU", "Memory (GB)", "Monthly price ($)", "Group" ] ] +
-      table_data,
-      borders: true
+      table_data, borders: true
   end
 
   desc "deploy [ENVIRON_NAME]", <<~TXT
