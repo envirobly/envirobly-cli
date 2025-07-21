@@ -53,7 +53,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "instance_types [region]", "List instance types in a given region, including price and performance characteristics."
+  desc "instance_types [REGION]", "List instance types in the given region, including price and performance characteristics."
   def instance_types(region = nil)
     default_region = Envirobly::Defaults::Region.new(shell:)
     region = region.presence || default_region.require_if_none
@@ -106,7 +106,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     deployment.perform(dry_run: options.dry_run)
   end
 
-  desc "pull [REGION] [BUCKET] [REF] [PATH]", "Download build context. Used by Envirobly builders."
+  desc "pull REGION BUCKET REF PATH", "Download build context. Used by Envirobly builders."
   def pull(region, bucket, ref, path)
     Envirobly::Duration.measure("Build context download took %s") do
       s3 = Envirobly::Aws::S3.new(region:, bucket:)
@@ -114,8 +114,8 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "exec [SERVICE_NAME]", "Start interactive service shell or execute a command"
-  def exec(service_name)
-    say "TODO"
+  desc "exec SERVICE_NAME [COMMAND] [ARG...]", "Start interactive service shell or execute a command"
+  def exec(service_name, *command)
+    say "exec #{service_name} #{command.join(" ")}"
   end
 end
