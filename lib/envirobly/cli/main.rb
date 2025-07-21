@@ -117,7 +117,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     deployment.perform(dry_run: options.dry_run)
   end
 
-  desc "pull", "Download build context"
+  desc "pull [REGION] [BUCKET] [REF] [PATH]", "Download build context. Used by Envirobly builders."
   def pull(region, bucket, ref, path)
     Envirobly::Duration.measure("Build context download took %s") do
       s3 = Envirobly::Aws::S3.new(region:, bucket:)
