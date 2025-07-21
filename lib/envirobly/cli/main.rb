@@ -113,4 +113,9 @@ class Envirobly::Cli::Main < Envirobly::Base
       s3.pull ref, path
     end
   end
+
+  desc "exec [SERVICE_NAME]", "Start interactive service shell or execute a command"
+  def exec(service_name)
+    say "TODO"
+  end
 end
