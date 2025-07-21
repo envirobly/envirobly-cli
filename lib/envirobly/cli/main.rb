@@ -80,7 +80,8 @@ class Envirobly::Cli::Main < Envirobly::Base
   TXT
   method_option :account_id, type: :numeric
   method_option :region, type: :string
-  method_option :project, type: :string
+  method_option :project_id, type: :numeric
+  method_option :project_name, type: :string
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
   def deploy(environ_name = nil)
@@ -93,24 +94,12 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     Envirobly::AccessToken.new(shell:).require!
 
-    environ_name = environ_name.presence || commit.current_branch
-    project_name = nil
-    project_id = nil
-
-    if options.project.present?
-      if options.project =~ Envirobly::Defaults::Project.regexp
-        project_id = $1.to_i
-      else
-        project_name = options.project
-      end
-    end
-
     deployment = Envirobly::Deployment.new(
       account_id: options.account_id,
       region: options.region,
-      project_name:,
-      environ_name:,
-      project_id:,
+      project_id: options.project_id,
+      project_name: options.project_name,
+      environ_name: environ_name.presence || commit.current_branch,
       commit:,
       shell:
     )
