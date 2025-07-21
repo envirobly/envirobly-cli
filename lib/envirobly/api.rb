@@ -134,8 +134,8 @@ class Envirobly::Api
           (200..299).include?(code.to_i)
         end
 
-        if @exit_on_error && !response.success? && response.object[:error_message].present?
-          puts response.object[:error_message] # TODO: Replace with shell.say_error
+        if @exit_on_error && !response.success? && response.object["error_message"].present?
+          puts response.object["error_message"] # TODO: Replace with shell.say_error
           exit 1
         end
       end
