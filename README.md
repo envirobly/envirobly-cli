@@ -11,7 +11,7 @@ ruby -Ilib/ bin/envirobly version
 ### Creating global alias to the dev executable
 
 ```sh
-alias envirobly="ruby -I$HOME/envirobly/envirobly-cli/lib/ $HOME/envirobly/envirobly-cli/bin/envirobly"
+alias envirobly-dev="ruby -I$HOME/envirobly/envirobly-cli/lib/ $HOME/envirobly/envirobly-cli/bin/envirobly"
 ```
 
 ## Releasing
@@ -26,18 +26,7 @@ gem push envirobly-$(ruby -Ilib/ bin/envirobly version --pure).gem
 
 ```sh
 docker build -t envirobly-cli .
-
-# Testing the build with some commands:
-docker run -it --rm envirobly-cli
-```
-
-## Command examples
-
-### Deploy
-
-```sh
-export ENVIROBLY_API_HOST=hostname # to override the default envirobly.com
-envirobly deploy <env-logical-id-or-url>
+docker run -it --rm envirobly-cli envirobly version
 ```
 
 ### With Docker
@@ -50,23 +39,20 @@ docker run -it --rm -v $(pwd):/app:ro -v ~/.aws:/root/.aws:ro envirobly-cli envi
 ## Ways to deploy
 
 ```sh
-# Deploy to default account and project and environment named after the current branch.
-# If default project is not set (.envirobly/projects/default.yml), ask to
-# fill in project name (defaults to current directory name) and region.
-# If user has access to multiple accounts, ask which account to use.
+# Deploy using saved defaults. If defaults are missing, it will ask you
+# where you want to deploy and save the answers as project defaults. These
+# can then be committed into your repository.
 envirobly deploy
 
-# Deploy to environment named as the first argument, to the default project.
+# Deploy to an environ named "staging"
 envirobly deploy staging
 
-# Deploy to a different project and a named environment. If project is not configured,
-# asks for region to deploy to.
-envirobly deploy --project=custom
-envirobly deploy --project=https://on.envirobly.com/projects/123
+# Specify project name, where otherwise directory name would be used
+envirobly deploy --project-name=custom
+
+# Specify project ID directly
+envirobly deploy --project-id=123
 
 # Questions can be skipped by specifying answers as arguments.
 envirobly deploy --account-id=1 --region=eu-north-1
-
-# TODO: Use defaults (us-east-1, dir and branch names) and don't ask any questions (for CIs).
-envirobly deploy --unattended
 ```
