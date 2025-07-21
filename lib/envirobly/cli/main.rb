@@ -88,7 +88,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     commit = Envirobly::Git::Commit.new options.commit
 
     unless commit.exists?
-      say_error "Commit '#{commit.ref}' doesn't exist in this repository. Aborting."
+      say_error "Commit '#{commit.ref}' doesn't exist in this repository"
       exit 1
     end
 
@@ -115,6 +115,11 @@ class Envirobly::Cli::Main < Envirobly::Base
   end
 
   desc "exec SERVICE_NAME [COMMAND] [ARG...]", "Start interactive service shell or execute a command"
+  method_option :account_id, type: :numeric
+  method_option :project_id, type: :numeric
+  method_option :project_name, type: :string
+  method_option :environ_name, type: :string
+  method_option :instance_slot, type: :numeric
   def exec(service_name, *command)
     say "exec #{service_name} #{command.join(" ")}"
   end
