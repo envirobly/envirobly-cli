@@ -26,6 +26,10 @@ class Envirobly::Api
     post_as_json(api_v1_deployments_url, params:, headers: authorization_headers)
   end
 
+  def create_service_shell_connection(params)
+    post_as_json(api_v1_service_shell_connections_url, params:, headers: authorization_headers)
+  end
+
   def list_accounts
     get_as_json api_v1_accounts_url, headers: authorization_headers
   end
@@ -96,6 +100,10 @@ class Envirobly::Api
 
     def api_v1_instance_types_url(region)
       api_url_for "v1/instance_types", query: "region=#{region}"
+    end
+
+    def api_v1_service_shell_connections_url
+      api_url_for "v1/service_shell_connections"
     end
 
     def api_url_for(path, query: nil)

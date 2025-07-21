@@ -122,10 +122,20 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :project_id, type: :numeric
   method_option :project_name, type: :string
   method_option :environ_name, type: :string
-  method_option :instance_slot, type: :numeric
+  method_option :instance_slot, type: :numeric, default: 0
   method_option :shell, type: :string
   method_option :user, type: :string
   def exec(service_name, *command)
     say "exec #{service_name} #{command.join(" ")}"
+
+    api = Envirobly::Api.new
+    params = {
+      project: { account_id: options.account_id, name: options.project_name, id: options.project_id },
+      environ: { name: options.environ_name },
+      service: { name: service_name },
+      instance: { slot: options.instance_slot }
+    }
+    response = api.create_service_shell_connection params
+    puts response.object
   end
 end
