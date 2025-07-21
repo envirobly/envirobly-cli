@@ -8,7 +8,8 @@ class Envirobly::Api
   USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION}"
   CONTENT_TYPE = "application/json"
 
-  def initialize(access_token: Envirobly::AccessToken.new)
+  def initialize(access_token: Envirobly::AccessToken.new, exit_on_error: true)
+    @exit_on_error = exit_on_error
     @access_token = access_token
   end
 
@@ -117,10 +118,17 @@ class Envirobly::Api
       http.request(request).tap do |response|
         def response.object
           @json_parsed_body ||= JSON.parse(body)
+        rescue
+          @json_parsed_body = { error_message: body }
         end
 
         def response.success?
           (200..299).include?(code.to_i)
+        end
+
+        if @exit_on_error && !response.success? && response.object[:error_message].present?
+          puts response.object[:error_message] # TODO: Replace with shell.say_error
+          exit 1
         end
       end
     end
