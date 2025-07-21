@@ -140,10 +140,8 @@ class Envirobly::Cli::Main < Envirobly::Base
       "AWS_ACCESS_KEY_ID='%s' " +
       "AWS_SECRET_ACCESS_KEY='%s' " +
       "AWS_SESSION_TOKEN='%s' " +
-      # "ENVIROBLY_SERVICE_SHELL_USER=root " +
       "ssh -i %s " +
       "envirobly-service@%s " +
-      # "-o SendEnv=ENVIROBLY_SERVICE_SHELL_USER " +
       "-o StrictHostKeyChecking=accept-new " +
       "-o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %s --region %s'"
 
@@ -164,6 +162,10 @@ class Envirobly::Cli::Main < Envirobly::Base
 
       if options.shell.present?
         cmd = "ENVIROBLY_SERVICE_INTERACTIVE_SHELL='#{options.shell}' #{cmd} -o SendEnv=ENVIROBLY_SERVICE_INTERACTIVE_SHELL"
+      end
+
+      if options.user.present?
+        cmd = "ENVIROBLY_SERVICE_SHELL_USER='#{options.user}' #{cmd} -o SendEnv=ENVIROBLY_SERVICE_SHELL_USER"
       end
 
       if command.present?
