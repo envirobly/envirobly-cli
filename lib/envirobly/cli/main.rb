@@ -109,8 +109,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   desc "pull REGION BUCKET REF PATH", "Download build context. Used by Envirobly builders."
   def pull(region, bucket, ref, path)
     Envirobly::Duration.measure("Build context download took %s") do
-      s3 = Envirobly::Aws::S3.new(region:, bucket:)
-      s3.pull ref, path
+      Envirobly::Aws::S3.new(region:, bucket:).pull ref, path
     end
   end
 
