@@ -114,12 +114,16 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "exec SERVICE_NAME [COMMAND] [ARG...]", "Start interactive service shell or execute a command"
+  desc "exec SERVICE_NAME [COMMAND] [ARG...]", <<~TXT
+    Start interactive service shell when launched without arguments or execute a one-off command.
+    Keep in mind, your container might not have a shell installed. In such cases you won't be able
+    to start an interactive session.
+  TXT
   method_option :account_id, type: :numeric
   method_option :project_id, type: :numeric
   method_option :project_name, type: :string
   method_option :environ_name, type: :string
-  method_option :slot, type: :numeric
+  method_option :instance_slot, type: :numeric
   method_option :shell, type: :string
   method_option :user, type: :string
   def exec(service_name, *command)
