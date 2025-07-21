@@ -69,7 +69,7 @@ class Envirobly::AccessToken
         exit
       end
 
-      api = Envirobly::Api.new(access_token: self)
+      api = Envirobly::Api.new(access_token: self, exit_on_error: false)
 
       # TODO: Eventually replace with custom `whoami` API that returns name, email...
       if api.list_accounts.success?
