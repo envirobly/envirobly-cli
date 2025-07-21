@@ -120,6 +120,8 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :project_name, type: :string
   method_option :environ_name, type: :string
   method_option :instance_slot, type: :numeric
+  method_option :shell, type: :string
+  method_option :user, type: :string
   def exec(service_name, *command)
     say "exec #{service_name} #{command.join(" ")}"
   end
