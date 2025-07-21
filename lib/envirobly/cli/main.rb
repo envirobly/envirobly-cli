@@ -126,8 +126,6 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :shell, type: :string
   method_option :user, type: :string
   def exec(service_name, *command)
-    # say "exec #{service_name} #{command.join(" ")}"
-
     api = Envirobly::Api.new
     params = {
       project: { account_id: options.account_id, name: options.project_name, id: options.project_id },
