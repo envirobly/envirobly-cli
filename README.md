@@ -14,14 +14,6 @@ ruby -Ilib/ bin/envirobly version
 alias envirobly-dev="ruby -I$HOME/envirobly/envirobly-cli/lib/ $HOME/envirobly/envirobly-cli/bin/envirobly"
 ```
 
-## Releasing
-
-```sh
-gem build envirobly.gemspec
-gem install ./envirobly-$(ruby -Ilib/ bin/envirobly version --pure).gem --no-document
-gem push envirobly-$(ruby -Ilib/ bin/envirobly version --pure).gem
-```
-
 ## Docker build
 
 ```sh
