@@ -126,6 +126,6 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :shell, type: :string
   method_option :user, type: :string
   def exec(service_name, *command)
-    Envirobly::ContainerShell.new(options).connect
+    Envirobly::ContainerShell.new(service_name, command, options).connect
   end
 end

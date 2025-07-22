@@ -8,7 +8,9 @@ class Envirobly::ContainerShell
     "-o StrictHostKeyChecking=accept-new " +
     "-o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %s --region %s'"
 
-  def initialize(options)
+  def initialize(service_name, command, options)
+    @command = command
+    @options = options
     @params = {
       project: {
         account_id: options.account_id,
@@ -41,16 +43,16 @@ class Envirobly::ContainerShell
         ssh_params.fetch("region")
       )
 
-      if options.shell.present?
+      if @options.shell.present?
         cmd = "ENVIROBLY_SERVICE_INTERACTIVE_SHELL='#{options.shell}' #{cmd} -o SendEnv=ENVIROBLY_SERVICE_INTERACTIVE_SHELL"
       end
 
-      if options.user.present?
+      if @options.user.present?
         cmd = "ENVIROBLY_SERVICE_SHELL_USER='#{options.user}' #{cmd} -o SendEnv=ENVIROBLY_SERVICE_SHELL_USER"
       end
 
-      if command.present?
-        cmd = "#{cmd} #{command.join(" ")}"
+      if @command.present?
+        cmd = "#{cmd} #{@command.join(" ")}"
       end
 
       system cmd
