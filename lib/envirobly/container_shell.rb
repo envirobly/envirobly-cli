@@ -11,13 +11,14 @@ class Envirobly::ContainerShell
   def initialize(service_name, command, options)
     @command = command
     @options = options
+    commit = Envirobly::Git::Commit.new "HEAD"
     @params = {
       project: {
-        account_id: options.account_id,
-        name: options.project_name,
-        id: options.project_id
+        account_id: options.account_id || Envirobly::Defaults::Account.new.id,
+        name: options.project_name || File.basename(Dir.pwd), # TODO: Extract into Defaults::ProjectName
+        id: options.project_id || Envirobly::Defaults::Project.new.id
       },
-      environ: { name: options.environ_name },
+      environ: { name: options.environ_name || commit.current_branch },
       service: { name: service_name },
       instance: { slot: options.instance_slot }
     }
