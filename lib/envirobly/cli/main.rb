@@ -53,7 +53,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
   end
 
-  desc "instance_types [region]", "List instance types in a given region, including price and performance characteristics."
+  desc "instance_types [REGION]", "List instance types in the given region, including price and performance characteristics."
   def instance_types(region = nil)
     default_region = Envirobly::Defaults::Region.new(shell:)
     region = region.presence || default_region.require_if_none
@@ -88,7 +88,7 @@ class Envirobly::Cli::Main < Envirobly::Base
     commit = Envirobly::Git::Commit.new options.commit
 
     unless commit.exists?
-      say_error "Commit '#{commit.ref}' doesn't exist in this repository. Aborting."
+      say_error "Commit '#{commit.ref}' doesn't exist in this repository"
       exit 1
     end
 
@@ -106,11 +106,26 @@ class Envirobly::Cli::Main < Envirobly::Base
     deployment.perform(dry_run: options.dry_run)
   end
 
-  desc "pull [REGION] [BUCKET] [REF] [PATH]", "Download build context. Used by Envirobly builders."
+  desc "pull REGION BUCKET REF PATH", "Download build context. Used by Envirobly builders."
   def pull(region, bucket, ref, path)
     Envirobly::Duration.measure("Build context download took %s") do
-      s3 = Envirobly::Aws::S3.new(region:, bucket:)
-      s3.pull ref, path
+      Envirobly::Aws::S3.new(region:, bucket:).pull ref, path
     end
+  end
+
+  desc "exec SERVICE_NAME [COMMAND] [ARG...]", <<~TXT
+    Start interactive service shell when launched without arguments or execute a one-off command.
+    Keep in mind, your container might not have a shell installed. In such cases you won't be able
+    to start an interactive session.
+  TXT
+  method_option :account_id, type: :numeric
+  method_option :project_id, type: :numeric
+  method_option :project_name, type: :string
+  method_option :environ_name, type: :string
+  method_option :instance_slot, type: :numeric, default: 0
+  method_option :shell, type: :string
+  method_option :user, type: :string
+  def exec(service_name, *command)
+    Envirobly::ContainerShell.new(service_name, command, options).connect
   end
 end

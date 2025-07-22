@@ -26,6 +26,10 @@ class Envirobly::Api
     post_as_json(api_v1_deployments_url, params:, headers: authorization_headers)
   end
 
+  def create_service_shell_connection(params)
+    post_as_json(api_v1_service_shell_connections_url, params:, headers: authorization_headers)
+  end
+
   def list_accounts
     get_as_json api_v1_accounts_url, headers: authorization_headers
   end
@@ -98,6 +102,10 @@ class Envirobly::Api
       api_url_for "v1/instance_types", query: "region=#{region}"
     end
 
+    def api_v1_service_shell_connections_url
+      api_url_for "v1/service_shell_connections"
+    end
+
     def api_url_for(path, query: nil)
       URI::HTTPS.build(host: HOST, path: "/api/#{path}", query:)
     end
@@ -126,8 +134,8 @@ class Envirobly::Api
           (200..299).include?(code.to_i)
         end
 
-        if @exit_on_error && !response.success? && response.object[:error_message].present?
-          puts response.object[:error_message] # TODO: Replace with shell.say_error
+        if @exit_on_error && !response.success? && response.object["error_message"].present?
+          puts response.object["error_message"] # TODO: Replace with shell.say_error
           exit 1
         end
       end

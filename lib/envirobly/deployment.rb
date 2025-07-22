@@ -87,8 +87,7 @@ class Envirobly::Deployment
 
     Envirobly::Duration.measure do
       # Upload build context
-      s3 = Envirobly::Aws::S3.new(bucket:, region:, credentials:)
-      s3.push @commit
+      Envirobly::Aws::S3.new(bucket:, region:, credentials:).push @commit
 
       # Perform deployment
       api.put_as_json @deployment_url
