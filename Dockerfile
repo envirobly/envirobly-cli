@@ -17,6 +17,8 @@ RUN gem install bundler && \
     gem build *.gemspec
 
 # Final minimal image
+# TODO: add --no-document to gem install
+# TODO: ensure frozen string literal
 FROM ruby:3.4-slim
 RUN apt-get update && apt-get install -y git-core \
     && rm -rf /var/lib/apt/lists/*
