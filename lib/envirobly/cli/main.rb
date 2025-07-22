@@ -169,7 +169,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       end
 
       if command.present?
-        cmd = %(#{cmd} "#{command.join(" ")}")
+        cmd = "#{cmd} #{command.join(" ")}"
       end
 
       system cmd
