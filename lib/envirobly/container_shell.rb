@@ -16,12 +16,16 @@ class Envirobly::ContainerShell
       project: {
         account_id: options.account_id || Envirobly::Defaults::Account.new.id,
         name: options.project_name || File.basename(Dir.pwd), # TODO: Extract into Defaults::ProjectName
-        id: options.project_id || Envirobly::Defaults::Project.new.id
+        id: options.project_id
       },
       environ: { name: options.environ_name || commit.current_branch },
       service: { name: service_name },
       instance: { slot: options.instance_slot }
     }
+
+    if options.project_name.blank? && options.account_id.blank? && options.project_id.blank?
+      @params[:project][:id] = Envirobly::Defaults::Project.new.id
+    end
   end
 
   def connect
@@ -45,11 +49,11 @@ class Envirobly::ContainerShell
       )
 
       if @options.shell.present?
-        cmd = "ENVIROBLY_SERVICE_INTERACTIVE_SHELL='#{options.shell}' #{cmd} -o SendEnv=ENVIROBLY_SERVICE_INTERACTIVE_SHELL"
+        cmd = "ENVIROBLY_SERVICE_INTERACTIVE_SHELL='#{@options.shell}' #{cmd} -o SendEnv=ENVIROBLY_SERVICE_INTERACTIVE_SHELL"
       end
 
       if @options.user.present?
-        cmd = "ENVIROBLY_SERVICE_SHELL_USER='#{options.user}' #{cmd} -o SendEnv=ENVIROBLY_SERVICE_SHELL_USER"
+        cmd = "ENVIROBLY_SERVICE_SHELL_USER='#{@options.user}' #{cmd} -o SendEnv=ENVIROBLY_SERVICE_SHELL_USER"
       end
 
       if @command.present?
