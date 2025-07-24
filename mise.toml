@@ -1,0 +1,2 @@
+[env]
+RUBYOPT = "--enable=frozen-string-literal"

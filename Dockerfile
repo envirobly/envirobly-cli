@@ -17,14 +17,13 @@ RUN gem install bundler && \
     gem build *.gemspec
 
 # Final minimal image
-# TODO: add --no-document to gem install
-# TODO: ensure frozen string literal
 FROM ruby:3.4-slim
 RUN apt-get update && apt-get install -y git-core \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+ENV RUBYOPT="--enable=frozen-string-literal"
 COPY --from=builder /build/*.gem ./
-RUN gem install *.gem && \
+RUN gem install *.gem --no-document && \
     rm *.gem
 
 CMD ["envirobly", "version"]

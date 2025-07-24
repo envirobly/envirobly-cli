@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Envirobly::Default
   attr_accessor :shell
 

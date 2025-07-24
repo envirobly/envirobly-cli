@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Envirobly::Numeric < Numeric
   def initialize(value, short: false)
     @value = value

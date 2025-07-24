@@ -1,2 +1,7 @@
-inherit_gem:
-  rubocop-rails-omakase: rubocop.yml
+# Omakase Ruby styling for Rails
+inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+# Ensure all Ruby files have the magic comment
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always

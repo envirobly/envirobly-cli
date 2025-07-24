@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @deprecated
 class Envirobly::Aws::Credentials
   def initialize(params)
