@@ -13,7 +13,7 @@ class Envirobly::ContainerShell
   ]
   USER_AND_HOST = "envirobly-service@%s"
 
-  attr_reader :option, :service_name
+  attr_reader :options, :service_name
 
   def initialize(service_name, inner_command, options)
     @service_name = service_name
@@ -39,7 +39,7 @@ class Envirobly::ContainerShell
 
   def connect
     with_private_key do
-      system join(env_vars, ssh, user_and_host)
+      system join(env_vars, ssh, user_and_host, @inner_command)
     end
   end
 
@@ -99,14 +99,12 @@ class Envirobly::ContainerShell
     end
 
     def ssh
-      result = sprintf(
+      sprintf(
         join(SSH),
         @private_key_path,
         connect_data.fetch("instance").fetch("aws_id"),
         connect_data.fetch("region")
       )
-
-      join result, @inner_command
     end
 
     def user_and_host
