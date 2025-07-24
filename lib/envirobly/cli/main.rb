@@ -126,6 +126,27 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :shell, type: :string
   method_option :user, type: :string
   def exec(service_name, *command)
-    Envirobly::ContainerShell.new(service_name, command, options).connect
+    Envirobly::ContainerShell.new(service_name, options).exec(command)
+  end
+
+  desc "rsync [SERVICE_NAME:]SOURCE_PATH [SERVICE_NAME:]DESTINATION_PATH", <<~TXT
+    Synchronize files between you and your service's data volume.
+  TXT
+  method_option :account_id, type: :numeric
+  method_option :project_id, type: :numeric
+  method_option :project_name, type: :string
+  method_option :environ_name, type: :string
+  method_option :args, type: :string, default: "-avzP"
+  def rsync(source, destination)
+    service_name = nil
+
+    [ source, destination ].each do |path|
+      if path =~ /\A([a-z0-9\-_]+):/i
+        service_name = $1
+        break
+      end
+    end
+
+    Envirobly::ContainerShell.new(service_name, options).rsync(source, destination)
   end
 end
