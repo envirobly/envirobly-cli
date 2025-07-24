@@ -29,7 +29,7 @@ class Envirobly::ContainerShell
       },
       environ: { name: options.environ_name || commit.current_branch },
       service: { name: service_name },
-      instance: { slot: options.instance_slot }
+      instance: { slot: options.instance_slot || 0 }
     }
 
     if options.project_name.blank? && options.account_id.blank? && options.project_id.blank?
@@ -48,8 +48,8 @@ class Envirobly::ContainerShell
       system join(
         env_vars,
         %(rsync #{options.args} -e "#{ssh}"),
-        source.replace("#{service_name}:", "#{user_and_host}:"),
-        destination.replace("#{service_name}:", "#{user_and_host}:")
+        source.sub("#{service_name}:", "#{user_and_host}:"),
+        destination.sub("#{service_name}:", "#{user_and_host}:")
       )
     end
   end
