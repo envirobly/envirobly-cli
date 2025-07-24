@@ -1,5 +1,5 @@
 class Envirobly::ContainerShell
-  ENV = [
+  AWS_ENV = [
     "AWS_ACCESS_KEY_ID='%s'",
     "AWS_SECRET_ACCESS_KEY='%s'",
     "AWS_SESSION_TOKEN='%s'"
@@ -37,7 +37,7 @@ class Envirobly::ContainerShell
   def connect
     with_private_key do |private_key_path|
       cmd = sprintf(
-        join(ENV, SSH, USER_AND_HOST),
+        join(AWS_ENV, SSH, USER_AND_HOST),
         ssh_params.fetch("open_tunnel_credentials").fetch("access_key_id"),
         ssh_params.fetch("open_tunnel_credentials").fetch("secret_access_key"),
         ssh_params.fetch("open_tunnel_credentials").fetch("session_token"),
