@@ -126,7 +126,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :shell, type: :string
   method_option :user, type: :string
   def exec(service_name, *command)
-    Envirobly::ContainerShell.new(service_name, command, options).connect
+    Envirobly::ContainerShell.new(service_name, options).exec(command)
   end
 
   desc "rsync SERVICE_NAME:SOURCE_PATH DESTINATION_PATH", <<~TXT
@@ -147,6 +147,6 @@ class Envirobly::Cli::Main < Envirobly::Base
       end
     end
 
-    Envirobly::ContainerShell.new(service_name, nil, options).rsync(source, destination)
+    Envirobly::ContainerShell.new(service_name, options).rsync(source, destination)
   end
 end

@@ -15,9 +15,8 @@ class Envirobly::ContainerShell
 
   attr_reader :options, :service_name
 
-  def initialize(service_name, inner_command, options)
+  def initialize(service_name, options)
     @service_name = service_name
-    @inner_command = inner_command
     @options = options
     commit = Envirobly::Git::Commit.new "HEAD"
 
@@ -37,9 +36,9 @@ class Envirobly::ContainerShell
     end
   end
 
-  def connect
+  def exec(command = nil)
     with_private_key do
-      system join(env_vars, ssh, user_and_host, @inner_command)
+      system join(env_vars, ssh, user_and_host, command)
     end
   end
 
