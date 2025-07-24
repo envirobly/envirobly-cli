@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Envirobly::Git
   def initialize(working_dir = Dir.getwd)
     @working_dir = working_dir

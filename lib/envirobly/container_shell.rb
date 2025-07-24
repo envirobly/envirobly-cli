@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Envirobly::ContainerShell
   AWS_ENV = [
     "AWS_ACCESS_KEY_ID='%s'",

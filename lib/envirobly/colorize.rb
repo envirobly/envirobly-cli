@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Envirobly::Colorize
   GREEN  = "\e[32m"
   RED    = "\e[31m"

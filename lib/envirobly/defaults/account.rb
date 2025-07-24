@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Envirobly::Defaults::Account < Envirobly::Default
   include Envirobly::Colorize
 
