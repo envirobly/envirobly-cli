@@ -30,14 +30,10 @@ class Envirobly::Deployment
     end
 
     @params = {
-      account: {
-        id: account_id
-      },
-      project: {
-        id: project_id,
-        name: project_name,
-        region:
-      },
+      account_id:,
+      project_id:,
+      project_name:,
+      region:,
       deployment: {
         environ_name:,
         commit_ref: @commit.ref,
