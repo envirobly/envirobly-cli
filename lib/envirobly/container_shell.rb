@@ -28,7 +28,7 @@ class Envirobly::ContainerShell
       project_id: options.project_id,
       environ_name: options.environ_name || commit.current_branch,
       service_name: service_name,
-      instance_slot: options.instance_slot
+      instance_slot: options.instance_slot || 0
     }
 
     if options.project_name.blank? && options.account_id.blank? && options.project_id.blank?
