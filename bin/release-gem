@@ -13,4 +13,8 @@ gem build envirobly.gemspec
 gem install ./envirobly-$RELEASE_VERSION.gem --no-document
 gem push envirobly-$RELEASE_VERSION.gem
 
+# Tag and push to GitHub for CI to build and publish a Docker image
+git tag v$RELEASE_VERSION
+git push origin tag v$RELEASE_VERSION
+
 echo "Done."
