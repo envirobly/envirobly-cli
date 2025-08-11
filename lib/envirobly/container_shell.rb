@@ -107,6 +107,6 @@ class Envirobly::ContainerShell
     end
 
     def user_and_host
-      sprintf USER_AND_HOST, connect_data.fetch("instance").fetch("private_ipv4")
+      sprintf USER_AND_HOST, connect_data.fetch("instance").fetch("public_ipv6")
     end
 end
