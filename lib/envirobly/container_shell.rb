@@ -8,7 +8,8 @@ class Envirobly::ContainerShell
   ]
   SSH = [
     "ssh -i %s",
-    "-o StrictHostKeyChecking=accept-new",
+    "-o StrictHostKeyChecking=no",
+    "-o UserKnownHostsFile=/dev/null",
     "-o SendEnv=ENVIROBLY_SERVICE_INTERACTIVE_SHELL",
     "-o SendEnv=ENVIROBLY_SERVICE_SHELL_USER",
     "-o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %s --region %s'"
@@ -107,6 +108,6 @@ class Envirobly::ContainerShell
     end
 
     def user_and_host
-      sprintf USER_AND_HOST, connect_data.fetch("instance").fetch("public_ipv6")
+      sprintf USER_AND_HOST, connect_data.fetch("instance").fetch("private_ipv4")
     end
 end
