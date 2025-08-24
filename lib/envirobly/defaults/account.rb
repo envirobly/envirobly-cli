@@ -12,8 +12,8 @@ class Envirobly::Defaults::Account < Envirobly::Default
       exit 1
     end
 
-    account = accounts.object.first
-    id = account["id"]
+    # If only one account exists, it will be used
+    id = accounts.object.first.fetch("id")
 
     if accounts.object.size > 1
       puts "Choose default account to deploy this project to:"
@@ -31,11 +31,9 @@ class Envirobly::Defaults::Account < Envirobly::Default
         shell.say_error "Cancelled"
         exit
       end
-
-      account = accounts.object.find { |a| a["id"] == id }
     end
 
-    save account["url"]
+    save id
 
     shell.say "Account ##{id} set as project default "
     shell.say green_check

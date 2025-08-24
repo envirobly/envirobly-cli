@@ -69,8 +69,8 @@ class Envirobly::Deployment
 
       print "Preparing project..."
 
-      @default_account.save_if_none response.object.fetch("account_url")
-      @default_project.save_if_none response.object.fetch("project_url")
+      @default_account.save_if_none response.object.fetch("account_id")
+      @default_project.save_if_none response.object.fetch("project_id")
       @default_region.save_if_none response.object.fetch("region")
 
       # Fetch credentials for build context upload
