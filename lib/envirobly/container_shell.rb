@@ -25,7 +25,7 @@ class Envirobly::ContainerShell
 
     @params = {
       account_id: options.account_id || Envirobly::Defaults::Account.new.value,
-      project_name: options.project_name || Envirobly::Defaults::Project.name, # TODO: Extract into Defaults::ProjectName
+      project_name: options.project_name || Envirobly::Defaults::Project.dirname,
       project_id: options.project_id,
       environ_name: options.environ_name || commit.current_branch,
       service_name: service_name,
