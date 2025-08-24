@@ -10,7 +10,7 @@ class Envirobly::Default
 
   def value
     if File.exist?(@path)
-      cast_value File.read(@path)
+      cast_value File.read(@path).strip
     else
       nil
     end

@@ -21,7 +21,7 @@ class Envirobly::Deployment
       project_id = @default_project.value
 
       if project_id.blank?
-        project_name = File.basename(Dir.pwd)
+        project_name = Envirobly::Defaults::Project.name
       end
     end
 
