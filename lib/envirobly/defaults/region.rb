@@ -3,11 +3,7 @@
 class Envirobly::Defaults::Region < Envirobly::Default
   include Envirobly::Colorize
 
-  def self.file = "region.yml"
-  def self.regexp = /([a-z0-9\-)]+)/
-  def self.key = "code"
-
-  def require_id
+  def require_value
     api = Envirobly::Api.new
     response = api.list_regions
 
@@ -34,14 +30,14 @@ class Envirobly::Defaults::Region < Envirobly::Default
 
     save code
 
-    shell.say "Region '#{id}' set as project default "
+    shell.say "Region '#{code}' set as project default "
     shell.say green_check
 
-    id
+    code
   end
 
   private
-    def cast_id(value)
-      value
+    def cast_value(value)
+      value.to_s
     end
 end

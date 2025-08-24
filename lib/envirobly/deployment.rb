@@ -18,9 +18,9 @@ class Envirobly::Deployment
     end
 
     if project_id.blank? && project_name.blank?
-      project_id = @default_project.id
+      project_id = @default_project.value
 
-      if project_id.nil?
+      if project_id.blank?
         project_name = File.basename(Dir.pwd)
       end
     end

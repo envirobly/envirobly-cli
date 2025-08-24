@@ -3,10 +3,7 @@
 class Envirobly::Defaults::Account < Envirobly::Default
   include Envirobly::Colorize
 
-  def self.file = "account.yml"
-  def self.regexp = /accounts\/(\d+)/
-
-  def require_id
+  def require_value
     api = Envirobly::Api.new
     accounts = api.list_accounts
 
