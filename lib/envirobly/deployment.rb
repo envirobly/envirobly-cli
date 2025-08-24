@@ -18,10 +18,10 @@ class Envirobly::Deployment
     end
 
     if project_id.blank? && project_name.blank?
-      project_id = @default_project.id
+      project_id = @default_project.value
 
-      if project_id.nil?
-        project_name = File.basename(Dir.pwd)
+      if project_id.blank?
+        project_name = Envirobly::Defaults::Project.dirname
       end
     end
 
@@ -69,8 +69,8 @@ class Envirobly::Deployment
 
       print "Preparing project..."
 
-      @default_account.save_if_none response.object.fetch("account_url")
-      @default_project.save_if_none response.object.fetch("project_url")
+      @default_account.save_if_none response.object.fetch("account_id")
+      @default_project.save_if_none response.object.fetch("project_id")
       @default_region.save_if_none response.object.fetch("region")
 
       # Fetch credentials for build context upload

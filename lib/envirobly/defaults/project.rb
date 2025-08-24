@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Envirobly::Defaults::Project < Envirobly::Default
-  def self.file = "project.yml"
-  def self.regexp = /projects\/(\d+)/
+  def self.dirname
+    File.basename(Dir.pwd)
+  end
 end

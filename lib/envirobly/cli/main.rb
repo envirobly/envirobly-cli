@@ -29,12 +29,12 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "set_default_account", "Choose default account to deploy the current project to"
   def set_default_account
-    Envirobly::Defaults::Account.new(shell:).require_id
+    Envirobly::Defaults::Account.new(shell:).require_value
   end
 
   desc "set_default_region", "Set default region for the current project when deploying for the first time"
   def set_default_region
-    Envirobly::Defaults::Region.new(shell:).require_id
+    Envirobly::Defaults::Region.new(shell:).require_value
   end
 
   desc "validate", "Validates config"

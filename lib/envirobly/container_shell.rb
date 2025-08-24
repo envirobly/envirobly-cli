@@ -24,8 +24,8 @@ class Envirobly::ContainerShell
     commit = Envirobly::Git::Commit.new "HEAD"
 
     @params = {
-      account_id: options.account_id || Envirobly::Defaults::Account.new.id,
-      project_name: options.project_name || File.basename(Dir.pwd), # TODO: Extract into Defaults::ProjectName
+      account_id: options.account_id || Envirobly::Defaults::Account.new.value,
+      project_name: options.project_name || Envirobly::Defaults::Project.dirname,
       project_id: options.project_id,
       environ_name: options.environ_name || commit.current_branch,
       service_name: service_name,
@@ -33,7 +33,7 @@ class Envirobly::ContainerShell
     }
 
     if options.project_name.blank? && options.account_id.blank? && options.project_id.blank?
-      @params[:project_id] = Envirobly::Defaults::Project.new.id
+      @params[:project_id] = Envirobly::Defaults::Project.new.value
     end
   end
 

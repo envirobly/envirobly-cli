@@ -3,47 +3,36 @@
 class Envirobly::Default
   attr_accessor :shell
 
-  def self.key = "url"
-
   def initialize(shell: nil)
-    @path = File.join Envirobly::Config::DIR, "defaults", self.class.file
+    @path = File.join Envirobly::Config::DIR, "defaults", self.class.name.demodulize.downcase
     @shell = shell
   end
 
-  def id
+  def value
     if File.exist?(@path)
-      content = YAML.safe_load_file(@path)
-
-      if content[self.class.key] =~ self.class.regexp
-        return cast_id($1)
-      end
+      cast_value File.read(@path).strip
+    else
+      nil
     end
-
-    nil
   end
 
-  def save(url)
-    unless url =~ self.class.regexp
-      raise ArgumentError, "'#{url}' must match #{self.class.regexp}"
-    end
-
+  def save(value)
     FileUtils.mkdir_p(File.dirname(@path))
-    content = YAML.dump({ self.class.key => url })
-    File.write(@path, content)
+    File.write(@path, value)
   end
 
-  def save_if_none(url)
-    return if id.present?
+  def save_if_none(new_value)
+    return if value.present?
 
-    save(url)
+    save(new_value)
   end
 
   def require_if_none
-    id || require_id
+    value || require_value
   end
 
   private
-    def cast_id(value)
+    def cast_value(value)
       value.to_i
     end
 end
