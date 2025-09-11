@@ -18,7 +18,15 @@ module Envirobly
     end
 
     def missing_params
-      []
+      [].tap do |result|
+        if project_id.blank? && account_id.blank?
+          result << :account_id
+        end
+
+        if project_id.blank? && region.blank?
+          result << :region
+        end
+      end
     end
 
     def account_id
