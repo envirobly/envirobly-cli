@@ -15,6 +15,7 @@ module Envirobly
       @default_project_id = default_project_id
       @default_region = default_region
       @account_id = account_id
+      @project_id = project_id
     end
 
     def missing_params

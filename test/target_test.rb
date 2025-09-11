@@ -27,6 +27,18 @@ module Envirobly
       assert_equal "eu-north-1", target.region
     end
 
+    test "all defaults exist, override project_id" do
+      target = Target.new(
+        default_account_id: 1,
+        default_project_id: 2,
+        default_region: "eu-north-1",
+        project_id: 3
+      )
+      assert_nil target.account_id
+      assert_equal 3, target.project_id
+      assert_equal "eu-north-1", target.region
+    end
+
     test "missing_params" do
       target = Target.new
       assert_equal %i[ account_id region ], target.missing_params
