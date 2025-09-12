@@ -9,6 +9,7 @@ module Envirobly
         default_project_id: nil,
         default_region: nil,
         default_project_name: nil,
+        default_environ_name: nil,
         account_id: nil,
         project_id: nil,
         region: nil,
@@ -18,6 +19,7 @@ module Envirobly
       @default_project_id = default_project_id
       @default_region = default_region
       @default_project_name = default_project_name
+      @default_environ_name = default_environ_name
       @account_id = account_id
       @project_id = project_id
       @region = region
@@ -51,7 +53,11 @@ module Envirobly
     def project_name
       return if @project_id
 
-      @project_name.presence
+      @project_name.presence || @default_project_name
+    end
+
+    def environ_name
+      @default_environ_name
     end
 
     def region
