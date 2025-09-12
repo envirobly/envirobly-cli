@@ -69,5 +69,21 @@ module Envirobly
       target.region = "us-east-2"
       assert_empty target.missing_params
     end
+
+    test "project_name overrides default_project_id" do
+      target = Target.new(
+        default_account_id: 1,
+        default_project_id: 2,
+        project_name: "custom"
+      )
+      assert_equal 1, target.account_id
+      assert_nil target.project_id
+      assert_equal "custom", target.project_name
+    end
+
+    test "project_id overrides project_name" do
+      skip
+      # target = Target.new
+    end
   end
 end

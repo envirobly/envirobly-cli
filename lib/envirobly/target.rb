@@ -2,6 +2,7 @@
 
 module Envirobly
   class Target
+    attr_reader :project_name
     attr_accessor :account_id, :project_id, :region
 
     def initialize(
@@ -10,7 +11,8 @@ module Envirobly
         default_region: nil,
         account_id: nil,
         project_id: nil,
-        region: nil
+        region: nil,
+        project_name: nil
       )
       @default_account_id = default_account_id
       @default_project_id = default_project_id
@@ -18,6 +20,7 @@ module Envirobly
       @account_id = account_id
       @project_id = project_id
       @region = region
+      @project_name = project_name
     end
 
     def missing_params
@@ -39,7 +42,7 @@ module Envirobly
     end
 
     def project_id
-      return if @account_id
+      return if @account_id || (@project_name.present? && @project_id.blank?)
 
       @project_id || @default_project_id
     end
