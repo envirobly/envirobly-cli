@@ -47,7 +47,7 @@ module Envirobly
     end
 
     def project_id
-      return if @account_id || (@project_name.present? && @project_id.blank?)
+      return if @project_id.blank? && (@account_id.present? || @project_name.present?)
 
       @project_id || @default_project_id
     end

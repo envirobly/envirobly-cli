@@ -41,22 +41,29 @@ module Envirobly
 
     test "ignored_params when project_id is specified" do
       target = Target.new(
+        default_account_id: 1,
+        default_project_id: 2,
+        default_project_name: "dirname",
+        project_name: "custom",
         account_id: 6,
         project_id: 3,
         region: "us-east-2"
       )
-      assert_equal %i[ account_id region ], target.ignored_params
+      assert_equal %i[ account_id region project_name ], target.ignored_params
+      assert_empty target.missing_params
 
       target = Target.new(
         project_id: 3,
         region: "us-east-2"
       )
       assert_equal %i[ region ], target.ignored_params
+      assert_empty target.missing_params
 
       target = Target.new(
         project_id: 3
       )
       assert_empty target.ignored_params
+      assert_empty target.missing_params
     end
 
     test "missing_params" do
