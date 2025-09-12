@@ -101,7 +101,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       region: options.region,
       project_id: options.project_id,
       project_name: options.project_name,
-      environ_name: environ_name.presence || commit.current_branch,
+      environ_name: environ_name.presence,
       commit:,
       shell:
     )
@@ -128,7 +128,7 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :shell, type: :string
   method_option :user, type: :string
   def exec(service_name, *command)
-    Envirobly::ContainerShell.new(service_name, options).exec(command)
+    Envirobly::ContainerShell.new(service_name, options, shell:).exec(command)
   end
 
   desc "rsync [SERVICE_NAME:]SOURCE_PATH [SERVICE_NAME:]DESTINATION_PATH", <<~TXT
@@ -149,6 +149,6 @@ class Envirobly::Cli::Main < Envirobly::Base
       end
     end
 
-    Envirobly::ContainerShell.new(service_name, options).rsync(source, destination)
+    Envirobly::ContainerShell.new(service_name, options, shell:).rsync(source, destination)
   end
 end
