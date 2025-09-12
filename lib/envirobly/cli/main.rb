@@ -101,7 +101,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       region: options.region,
       project_id: options.project_id,
       project_name: options.project_name,
-      environ_name: environ_name.presence || commit.current_branch,
+      environ_name: environ_name.presence,
       commit:,
       shell:
     )
