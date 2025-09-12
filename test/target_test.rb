@@ -36,7 +36,27 @@ module Envirobly
       )
       assert_nil target.account_id
       assert_equal 3, target.project_id
-      assert_equal "eu-north-1", target.region
+      assert_nil target.region
+    end
+
+    test "ignored_params when project_id is specified" do
+      target = Target.new(
+        account_id: 6,
+        project_id: 3,
+        region: "us-east-2"
+      )
+      assert_equal %i[ account_id region ], target.ignored_params
+
+      target = Target.new(
+        project_id: 3,
+        region: "us-east-2"
+      )
+      assert_equal %i[ region ], target.ignored_params
+
+      target = Target.new(
+        project_id: 3
+      )
+      assert_empty target.ignored_params
     end
 
     test "missing_params" do
