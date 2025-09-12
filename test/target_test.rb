@@ -79,6 +79,7 @@ module Envirobly
       assert_equal 1, target.account_id
       assert_nil target.project_id
       assert_equal "custom", target.project_name
+      assert_equal %i[ region ], target.missing_params
     end
 
     test "project_id overrides project_name" do
@@ -92,6 +93,7 @@ module Envirobly
       assert_equal 3, target.project_id
       assert_nil target.project_name
       assert_nil target.region
+      assert_empty target.missing_params
     end
   end
 end
