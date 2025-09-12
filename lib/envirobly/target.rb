@@ -13,7 +13,8 @@ module Envirobly
         account_id: nil,
         project_id: nil,
         region: nil,
-        project_name: nil
+        project_name: nil,
+        environ_name: nil
       )
       @default_account_id = default_account_id
       @default_project_id = default_project_id
@@ -24,6 +25,7 @@ module Envirobly
       @project_id = project_id
       @region = region
       @project_name = project_name
+      @environ_name = environ_name
     end
 
     def missing_params
@@ -57,7 +59,7 @@ module Envirobly
     end
 
     def environ_name
-      @default_environ_name
+      @environ_name.presence || @default_environ_name
     end
 
     def region
