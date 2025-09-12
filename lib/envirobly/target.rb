@@ -2,7 +2,6 @@
 
 module Envirobly
   class Target
-    attr_reader :project_name
     attr_accessor :account_id, :project_id, :region
 
     def initialize(
@@ -45,6 +44,12 @@ module Envirobly
       return if @account_id || (@project_name.present? && @project_id.blank?)
 
       @project_id || @default_project_id
+    end
+
+    def project_name
+      return if @project_id
+
+      @project_name.presence
     end
 
     def region

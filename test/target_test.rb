@@ -82,8 +82,16 @@ module Envirobly
     end
 
     test "project_id overrides project_name" do
-      skip
-      # target = Target.new
+      target = Target.new(
+        default_account_id: 1,
+        default_project_id: 2,
+        project_name: "custom",
+        project_id: 3
+      )
+      assert_nil target.account_id
+      assert_equal 3, target.project_id
+      assert_nil target.project_name
+      assert_nil target.region
     end
   end
 end
