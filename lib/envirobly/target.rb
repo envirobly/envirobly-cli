@@ -8,6 +8,7 @@ module Envirobly
         default_account_id: nil,
         default_project_id: nil,
         default_region: nil,
+        default_project_name: nil,
         account_id: nil,
         project_id: nil,
         region: nil,
@@ -16,6 +17,7 @@ module Envirobly
       @default_account_id = default_account_id
       @default_project_id = default_project_id
       @default_region = default_region
+      @default_project_name = default_project_name
       @account_id = account_id
       @project_id = project_id
       @region = region
@@ -66,6 +68,10 @@ module Envirobly
 
         if @project_id && @region
           result << :region
+        end
+
+        if @project_id && @project_name.present?
+          result << :project_name
         end
       end
     end

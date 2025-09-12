@@ -86,6 +86,7 @@ module Envirobly
       target = Target.new(
         default_account_id: 1,
         default_project_id: 2,
+        default_project_name: "dirname",
         project_name: "custom",
         project_id: 3
       )
@@ -94,6 +95,7 @@ module Envirobly
       assert_nil target.project_name
       assert_nil target.region
       assert_empty target.missing_params
+      assert_equal %i[ project_name ], target.ignored_params
     end
   end
 end
