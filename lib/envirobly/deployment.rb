@@ -29,6 +29,14 @@ module Envirobly
         environ_name:
       )
 
+      if target.missing_params.include?(:account_id)
+        target.account_id = @default_account.require_value
+      end
+
+      if target.missing_params.include?(:region)
+        target.region = @default_region.require_value
+      end
+
       @params = {
         account_id: target.account_id,
         project_id: target.project_id,
