@@ -4,7 +4,7 @@ require "test_helper"
 
 module Envirobly
   class DeploymentTest < ActiveSupport::TestCase
-    test "all required params specified" do
+    test "all required params specified, no defaults used" do
       skip "TODO needs .envirobly dir in working_dir"
 
       commit = Envirobly::Git::Commit.new(repo1_commits.first, working_dir:)
