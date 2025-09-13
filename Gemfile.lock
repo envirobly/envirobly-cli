@@ -1,10 +1,3 @@
-GIT
-  remote: https://github.com/klevo/testerobly.git
-  revision: da8e0ad00e2451e0079fd95b438ef59cbf9592cb
-  specs:
-    testerobly (1.0.0)
-      listen (~> 3.9.0)
-
 PATH
   remote: .
   specs:
@@ -184,6 +177,8 @@ GEM
     ruby2_keywords (0.0.5)
     securerandom (0.4.1)
     stringio (3.1.7)
+    testerobly (1.0.0)
+      listen (~> 3.9.0)
     thor (1.4.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -205,7 +200,7 @@ DEPENDENCIES
   mocha (~> 2.7)
   railties (~> 8.0)
   rubocop-rails-omakase (~> 1.1, >= 0)
-  testerobly (~> 1.0.0)!
+  testerobly
 
 BUNDLED WITH
    2.7.1

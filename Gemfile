@@ -10,5 +10,5 @@ group :rubocop do
 end
 
 group :development do
-  gem "testerobly", "~> 1.0.0", github: "klevo/testerobly"
+  gem "testerobly"
 end
