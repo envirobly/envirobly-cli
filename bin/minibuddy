@@ -28,8 +28,8 @@ file_listener = Listen.to(Dir.getwd, relative: true, latency: 0.5) do |modified,
 
   changes.each do |path|
     case path
-    when /^lib\/envirobly\/.*\.rb$/
-      result = path.gsub %r{^lib/envirobly/(.+)\.rb$}, 'test/\1_test.rb'
+    when /^lib\/.*\.rb$/
+      result = path.gsub %r{^lib/(.+)\.rb$}, 'test/\1_test.rb'
       tests << result if File.exist?(result)
     when /^test\/.*_test\.rb$/
       tests << path
