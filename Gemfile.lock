@@ -190,8 +190,11 @@ GEM
     zeitwerk (2.7.3)
 
 PLATFORMS
-  arm64-darwin-23
-  arm64-darwin-24
+  aarch64-linux-musl
+  arm64-darwin
+  x86_64-darwin
+  x86_64-linux
+  x86_64-linux-musl
 
 DEPENDENCIES
   debug (~> 1.10)
