@@ -9,12 +9,12 @@ module Envirobly
     attr_reader :params
 
     def initialize(environ_name:, commit:, account_id:, project_name:, project_id:, region:, shell:)
-      @environ_name = environ_name
       @commit = commit
       @config = Config.new
       @default_account = Defaults::Account.new(shell:)
       @default_project = Defaults::Project.new(shell:)
       @default_region = Defaults::Region.new(shell:)
+      @shell = shell
 
       target = Target.new(
         default_account_id: @default_account.value,
@@ -41,6 +41,7 @@ module Envirobly
         shell.say "--#{param.to_s.parameterize} ignored, due to other arguments overriding it"
       end
 
+      @environ_name = target.environ_name
       @params = {
         account_id: target.account_id,
         project_id: target.project_id,
@@ -73,11 +74,6 @@ module Envirobly
 
       Duration.measure do
         response = api.create_deployment @params
-
-        unless response.success?
-          display_config_errors response.object.fetch("errors")
-          exit 1
-        end
 
         print "Preparing project..."
 

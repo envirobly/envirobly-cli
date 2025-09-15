@@ -6,6 +6,8 @@ require "socket"
 require "uri"
 
 class Envirobly::Api
+  include Envirobly::Colorize
+
   HOST = ENV["ENVIROBLY_API_HOST"].presence || "on.envirobly.com"
   USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION}"
   CONTENT_TYPE = "application/json"
@@ -16,12 +18,7 @@ class Envirobly::Api
   end
 
   def validate_shape(params)
-    post_as_json(api_v1_shape_validations_url, params:, headers: authorization_headers).tap do |response|
-      unless response.success?
-        $stderr.puts "Validation request responded with #{response.code}. Aborting."
-        exit 1
-      end
-    end
+    post_as_json(api_v1_shape_validations_url, params:, headers: authorization_headers)
   end
 
   def create_deployment(params)
@@ -49,7 +46,7 @@ class Envirobly::Api
   LONG_RETRY_INTERVAL = 6.seconds
   def get_deployment_with_delay_and_retry(url, tries = 1)
     sleep SHORT_RETRY_INTERVAL * tries
-    response = get_as_json URI(url)
+    response = get_as_json URI(url), retriable: true
 
     if response.success?
       response
@@ -67,8 +64,8 @@ class Envirobly::Api
     end
   end
 
-  def get_as_json(url, headers: {})
-    request(url, type: Net::HTTP::Get, headers:)
+  def get_as_json(url, headers: {}, retriable: false)
+    request(url, type: Net::HTTP::Get, headers:, retriable:)
   end
 
   def post_as_json(url, params: {}, headers: {})
@@ -112,7 +109,11 @@ class Envirobly::Api
       URI::HTTPS.build(host: HOST, path: "/api/#{path}", query:)
     end
 
-    def request(url, type:, headers: {})
+    def request(url, type:, headers: {}, retriable: false)
+      if ENV["ENVIROBLY_CLI_LOG_LEVEL"] == "debug"
+        puts "[Envirobly::Api] request #{url} #{type} #{headers}"
+      end
+
       uri = URI(url)
       http = Net::HTTP.new uri.host, uri.port
       http.use_ssl = true
@@ -126,18 +127,41 @@ class Envirobly::Api
       yield request if block_given?
 
       http.request(request).tap do |response|
+        if ENV["ENVIROBLY_CLI_LOG_LEVEL"] == "debug"
+          puts "[Envirobly::Api] response #{response.code} => #{response.body}"
+        end
+
         def response.object
           @json_parsed_body ||= JSON.parse(body)
         rescue
-          @json_parsed_body = { error_message: body }
+          @json_parsed_body = { "error_message" => body }
         end
 
         def response.success?
           (200..299).include?(code.to_i)
         end
 
-        if @exit_on_error && !response.success? && response.object["error_message"].present?
-          puts response.object["error_message"] # TODO: Replace with shell.say_error
+        if !retriable && @exit_on_error && !response.success?
+          informed = false
+
+          if response.object.try(:key?, "error_message")
+            puts response.object["error_message"]
+            informed = true
+          end
+
+          if response.object.try(:key?, "config_errors")
+            display_config_errors response.object["config_errors"]
+            informed = true
+          end
+
+          unless informed
+            puts red("Error response (#{response.code}) from the API")
+          end
+
+          if response.code.to_i == 401
+            puts "Run `envirobly signin` to ensure you're signed in with a valid access token"
+          end
+
           exit 1
         end
       end
@@ -149,5 +173,18 @@ class Envirobly::Api
 
     def authorization_headers
       { "Authorization" => @access_token.as_http_bearer }
+    end
+
+    def display_config_errors(errors)
+      puts "#{red(cross)} Config contains the following issues:"
+
+      errors.each do |error|
+        puts
+        puts "  #{error["message"]}"
+
+        if error["path"]
+          puts faint("  #{downwards_arrow_to_right} #{error["path"]}")
+        end
+      end
     end
 end
