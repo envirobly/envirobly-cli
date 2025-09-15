@@ -40,17 +40,4 @@ module Envirobly::Colorize
   def cross
     "✖"
   end
-
-  def display_config_errors(errors)
-    puts "#{red(cross)} Config contains the following issues:"
-
-    errors.each do |error|
-      puts
-      puts "  #{error["message"]}"
-
-      if error["path"]
-        puts faint("  #{downwards_arrow_to_right} #{error["path"]}")
-      end
-    end
-  end
 end

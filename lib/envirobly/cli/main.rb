@@ -22,9 +22,8 @@ class Envirobly::Cli::Main < Envirobly::Base
   desc "signout", "Sign out"
   def signout
     Envirobly::AccessToken.destroy
-    say "You've signed out."
-    say "This didn't delete the access token itself."
-    say "You can sign in again with `envirobly signin`."
+    say "You've signed out"
+    say "You can sign in again with `envirobly signin`"
   end
 
   desc "set_default_account", "Choose default account to deploy the current project to"
@@ -45,14 +44,9 @@ class Envirobly::Cli::Main < Envirobly::Base
     api = Envirobly::Api.new
 
     params = { validation: configs.to_params }
-    response = api.validate_shape params
+    api.validate_shape params
 
-    if response.object.fetch("valid")
-      puts "Config is valid #{green_check}"
-    else
-      display_config_errors response.object.fetch("errors")
-      exit 1
-    end
+    say "Config is valid #{green_check}"
   end
 
   desc "instance_types [REGION]", "List instance types in the given region, including price and performance characteristics."

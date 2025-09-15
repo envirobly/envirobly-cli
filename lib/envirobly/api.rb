@@ -138,18 +138,28 @@ class Envirobly::Api
         end
 
         def response.success?
-          (200..299).include?(code.to_i) || 422 == code.to_i
+          (200..299).include?(code.to_i)
         end
 
         if @exit_on_error && !response.success?
-          puts red("Error response (#{response.code}) from the API")
+          informed = false
+
+          if response.object.try(:key?, "error_message")
+            puts response.object["error_message"]
+            informed = true
+          end
+
+          if response.object.try(:key?, "config_errors")
+            display_config_errors response.object["config_errors"]
+            informed = true
+          end
+
+          unless informed
+            puts red("Error response (#{response.code}) from the API")
+          end
 
           if response.code.to_i == 401
             puts "Run `envirobly signin` to ensure you're signed in with a valid access token"
-          end
-
-          if response.object["error_message"].present?
-            puts response.object["error_message"] # TODO: Replace with shell.say_error
           end
 
           exit 1
@@ -163,5 +173,18 @@ class Envirobly::Api
 
     def authorization_headers
       { "Authorization" => @access_token.as_http_bearer }
+    end
+
+    def display_config_errors(errors)
+      puts "#{red(cross)} Config contains the following issues:"
+
+      errors.each do |error|
+        puts
+        puts "  #{error["message"]}"
+
+        if error["path"]
+          puts faint("  #{downwards_arrow_to_right} #{error["path"]}")
+        end
+      end
     end
 end

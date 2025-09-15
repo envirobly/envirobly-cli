@@ -75,11 +75,6 @@ module Envirobly
       Duration.measure do
         response = api.create_deployment @params
 
-        if response.code.to_i == 422
-          display_config_errors response.object.fetch("errors", Array.new)
-          exit 1
-        end
-
         print "Preparing project..."
 
         @default_account.save_if_none response.object.fetch("account_id")
