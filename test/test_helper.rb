@@ -26,6 +26,8 @@ class ActiveSupport::TestCase
   setup do
     @data_home_dir = Dir.mktmpdir "envirobly-cli-test"
     ENV["ENVIROBLY_CLI_DATA_HOME"] = @data_home_dir
+
+    Net::HTTP.any_instance.stubs(:request).returns(Net::HTTPOK.new("1.1", "200", "Stubbed"))
   end
 
   teardown do
