@@ -46,7 +46,7 @@ class Envirobly::Api
   LONG_RETRY_INTERVAL = 6.seconds
   def get_deployment_with_delay_and_retry(url, tries = 1)
     sleep SHORT_RETRY_INTERVAL * tries
-    response = get_as_json URI(url)
+    response = get_as_json URI(url), retriable: true
 
     if response.success?
       response
@@ -64,8 +64,8 @@ class Envirobly::Api
     end
   end
 
-  def get_as_json(url, headers: {})
-    request(url, type: Net::HTTP::Get, headers:)
+  def get_as_json(url, headers: {}, retriable: false)
+    request(url, type: Net::HTTP::Get, headers:, retriable:)
   end
 
   def post_as_json(url, params: {}, headers: {})
@@ -109,7 +109,7 @@ class Envirobly::Api
       URI::HTTPS.build(host: HOST, path: "/api/#{path}", query:)
     end
 
-    def request(url, type:, headers: {})
+    def request(url, type:, headers: {}, retriable: false)
       if ENV["ENVIROBLY_CLI_LOG_LEVEL"] == "debug"
         puts "[Envirobly::Api] request #{url} #{type} #{headers}"
       end
@@ -141,7 +141,7 @@ class Envirobly::Api
           (200..299).include?(code.to_i)
         end
 
-        if @exit_on_error && !response.success?
+        if !retriable && @exit_on_error && !response.success?
           informed = false
 
           if response.object.try(:key?, "error_message")
