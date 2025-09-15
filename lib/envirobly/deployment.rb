@@ -75,13 +75,8 @@ module Envirobly
       Duration.measure do
         response = api.create_deployment @params
 
-        unless response.success?
-          if response.object.key?("errors")
-            display_config_errors response.object.fetch("errors")
-          else
-            @shell.say_error "Error response (#{response.code}) from the API", :red
-          end
-
+        if response.code.to_i == 422
+          display_config_errors response.object.fetch("errors", Array.new)
           exit 1
         end
 

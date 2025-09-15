@@ -6,6 +6,8 @@ require "socket"
 require "uri"
 
 class Envirobly::Api
+  include Envirobly::Colorize
+
   HOST = ENV["ENVIROBLY_API_HOST"].presence || "on.envirobly.com"
   USER_AGENT = "Envirobly CLI v#{Envirobly::VERSION}"
   CONTENT_TYPE = "application/json"
@@ -16,12 +18,7 @@ class Envirobly::Api
   end
 
   def validate_shape(params)
-    post_as_json(api_v1_shape_validations_url, params:, headers: authorization_headers).tap do |response|
-      unless response.success?
-        $stderr.puts "Validation request responded with #{response.code}. Aborting."
-        exit 1
-      end
-    end
+    post_as_json(api_v1_shape_validations_url, params:, headers: authorization_headers)
   end
 
   def create_deployment(params)
@@ -113,6 +110,10 @@ class Envirobly::Api
     end
 
     def request(url, type:, headers: {})
+      if ENV["ENVIROBLY_CLI_LOG_LEVEL"] == "debug"
+        puts "[Envirobly::Api] request #{url} #{type} #{headers}"
+      end
+
       uri = URI(url)
       http = Net::HTTP.new uri.host, uri.port
       http.use_ssl = true
@@ -126,6 +127,10 @@ class Envirobly::Api
       yield request if block_given?
 
       http.request(request).tap do |response|
+        if ENV["ENVIROBLY_CLI_LOG_LEVEL"] == "debug"
+          puts "[Envirobly::Api] response #{response.code} => #{response.body}"
+        end
+
         def response.object
           @json_parsed_body ||= JSON.parse(body)
         rescue
@@ -133,11 +138,20 @@ class Envirobly::Api
         end
 
         def response.success?
-          (200..299).include?(code.to_i)
+          (200..299).include?(code.to_i) || 422 == code.to_i
         end
 
-        if @exit_on_error && !response.success? && response.object["error_message"].present?
-          puts response.object["error_message"] # TODO: Replace with shell.say_error
+        if @exit_on_error && !response.success?
+          puts red("Error response (#{response.code}) from the API")
+
+          if response.code.to_i == 401
+            puts "Run `envirobly signin` to ensure you're signed in with a valid access token"
+          end
+
+          if response.object["error_message"].present?
+            puts response.object["error_message"] # TODO: Replace with shell.say_error
+          end
+
           exit 1
         end
       end
