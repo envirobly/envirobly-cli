@@ -134,7 +134,7 @@ class Envirobly::Api
         def response.object
           @json_parsed_body ||= JSON.parse(body)
         rescue
-          @json_parsed_body = { error_message: body }
+          @json_parsed_body = { "error_message" => body }
         end
 
         def response.success?
