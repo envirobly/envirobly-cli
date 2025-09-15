@@ -6,6 +6,8 @@ require "pathname"
 class Envirobly::AccessToken
   include Envirobly::Colorize
 
+  APP_NAME = "envirobly"
+
   attr_reader :shell
 
   class << self
@@ -15,16 +17,24 @@ class Envirobly::AccessToken
       end
     end
 
-    def dir
-      if ENV["XDG_CONFIG_HOME"]
-        Pathname.new(ENV["XDG_CONFIG_HOME"]).join("envirobly")
+    def storage_base_dir
+      if dir = ENV["ENVIROBLY_CLI_DATA_HOME"].presence
+        return dir
+      end
+
+      if Gem.win_platform?
+        ENV["APPDATA"] || File.join(Dir.home, "AppData", "Roaming")
       else
-        Pathname.new(Dir.home).join(".envirobly")
+        ENV["XDG_DATA_HOME"] || File.join(Dir.home, ".local", "share")
       end
     end
 
+    def storage_dir
+      File.join(storage_base_dir, APP_NAME)
+    end
+
     def path
-      dir.join "access_token"
+      Pathname.new(storage_dir).join "access_token"
     end
   end
 
@@ -39,7 +49,7 @@ class Envirobly::AccessToken
   end
 
   def save
-    FileUtils.mkdir_p self.class.dir
+    FileUtils.mkdir_p self.class.storage_dir
     File.write self.class.path, @token
     File.chmod 0600, self.class.path
   end

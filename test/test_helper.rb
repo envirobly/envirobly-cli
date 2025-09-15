@@ -22,4 +22,13 @@ class ActiveSupport::TestCase
     "#{Dir.getwd}/test/fixtures/repo1"
   end
   alias :working_dir :repo1_working_dir
+
+  setup do
+    @data_home_dir = Dir.mktmpdir "envirobly-cli-test"
+    ENV["ENVIROBLY_CLI_DATA_HOME"] = @data_home_dir
+  end
+
+  teardown do
+    FileUtils.rm_rf @data_home_dir
+  end
 end
