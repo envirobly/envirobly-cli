@@ -88,6 +88,22 @@ class Envirobly::Cli::Main < Envirobly::Base
       exit 1
     end
 
+    if commit.uncommited_changes?
+      say "You have uncommited changes in this repository:"
+      say
+      commit.uncommited_changes.each do |path|
+        say "  #{path}"
+      end
+      say
+      say "These won't be deployed. ", :red
+      say "Instead contents of commit #{commit.short_ref} will be."
+      say
+      unless ask("Continue deploying? [y/N]")[0]&.downcase == "y"
+        say "Cancelled"
+        exit
+      end
+    end
+
     Envirobly::AccessToken.new(shell:).require!
 
     deployment = Envirobly::Deployment.new(
