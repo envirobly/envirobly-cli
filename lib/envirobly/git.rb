@@ -16,4 +16,18 @@ class Envirobly::Git
   def current_branch
     git("branch --show-current").stdout.strip
   end
+
+  def uncommited_changes
+    @uncommited_changes ||= git("status --porcelain").stdout.lines.map do |line|
+      _, path = line.split(" ", 2)
+
+      next if path.start_with?("#{Envirobly::Config::DIR}/")
+
+      path
+    end.compact
+  end
+
+  def uncommited_changes?
+    uncommited_changes.any?
+  end
 end
