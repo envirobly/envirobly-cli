@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "dotenv"
-
 class Envirobly::Config
   DIR = ".envirobly"
   BASE = "deploy.yml"

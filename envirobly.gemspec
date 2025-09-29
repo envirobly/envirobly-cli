@@ -20,7 +20,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "zeitwerk", "~> 2.6"
   spec.add_dependency "aws-sdk-s3", "~> 1.182"
   spec.add_dependency "concurrent-ruby", "~> 1.3"
-  spec.add_dependency "dotenv", "~> 3.1"
   spec.add_dependency "activesupport", "~> 8.0"
 
   spec.add_development_dependency "debug", "~> 1.10"
