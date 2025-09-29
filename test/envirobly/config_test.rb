@@ -3,20 +3,13 @@
 require "test_helper"
 
 class Envirobly::ConfigTest < ActiveSupport::TestCase
-  test "load" do
-    configs = Envirobly::Config.new("test/fixtures/configs")
+  test "configs" do
+    config = Envirobly::Config.new("test/fixtures/configs")
 
     expected = {
-      configs: {
-        ".envirobly/deploy.yml" => File.read("test/fixtures/configs/deploy.yml"),
-        ".envirobly/deploy.staging.yml" => File.read("test/fixtures/configs/deploy.staging.yml")
-      },
-      env_vars: {
-        "JUST_A_NUMBER" => "1",
-        "POEM" => "some multiline\ntext with an emoji: 🦄",
-        "INTERPOLATED_COMMAND" => "interpolated"
-      }
+      ".envirobly/deploy.yml" => File.read("test/fixtures/configs/deploy.yml"),
+      ".envirobly/deploy.staging.yml" => File.read("test/fixtures/configs/deploy.staging.yml")
     }
-    assert_equal expected, configs.to_params
+    assert_equal expected, config.configs
   end
 end
