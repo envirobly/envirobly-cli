@@ -31,7 +31,7 @@ class Envirobly::Config
     end
 
     def env_vars
-      Dotenv.parse @dir.join(ENV_VARS), overwrite: true
+      Dotenv.parse @dir.join(ENV_VARS)
     end
 
     def config_file?(file)
