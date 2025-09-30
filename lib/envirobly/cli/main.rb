@@ -40,10 +40,10 @@ class Envirobly::Cli::Main < Envirobly::Base
   def validate
     Envirobly::AccessToken.new(shell:).require!
 
-    configs = Envirobly::Config.new
+    config = Envirobly::Config.new
     api = Envirobly::Api.new
 
-    params = { validation: configs.to_params }
+    params = { validation: { configs: config.configs } }
     api.validate_shape params
 
     say "Config is valid #{green_check}"

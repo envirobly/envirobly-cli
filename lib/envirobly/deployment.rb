@@ -53,7 +53,7 @@ module Envirobly
           commit_time: @commit.time,
           commit_message: @commit.message,
           object_tree_checksum: @commit.object_tree_checksum,
-          **@config.to_params
+          configs: @config.configs
         }
       }
     end
