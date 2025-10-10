@@ -25,3 +25,5 @@ module Envirobly
     end
   end
 end
+
+YAML.add_tag("!secret", Envirobly::Secret)
