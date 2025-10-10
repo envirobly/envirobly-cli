@@ -12,18 +12,17 @@ module Envirobly
       assert_equal "eu-north-1", target.region
     end
 
-    # test "all defaults exist, override account_id" do
-    #   target = Target.new(
-    #     default_account_id: 1,
-    #     default_project_id: 2,
-    #     default_region: "eu-north-1",
-    #     account_id: 3
-    #   )
-    #   assert_equal 3, target.account_id
-    #   assert_nil target.project_id
-    #   assert_equal "eu-north-1", target.region
-    # end
-    #
+    test "all defaults exist, override account_url" do
+      target = Target.new(
+        account_url: "https://example.com/accounts/3",
+        config_path: Pathname.new("test/fixtures/targets")
+      )
+      assert_equal "https://example.com/accounts/3", target.account_url
+      assert_equal 3, target.account_id
+      assert_equal "world", target.project_name
+      assert_equal "eu-north-1", target.region
+    end
+
     # test "all defaults exist, override project_id" do
     #   target = Target.new(
     #     default_account_id: 1,
