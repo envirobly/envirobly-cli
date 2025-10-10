@@ -5,10 +5,11 @@ require "test_helper"
 module Envirobly
   class TargetTest < ActiveSupport::TestCase
     test "all defaults exist, no overrides" do
-      target = Target.new config_path: Pathname.new("test/fixtures/targets")
+      target = Target.new config_path: Pathname.new("test/fixtures/targets"), default_project_name: "123", default_environ_name: "abcd"
       assert_equal "https://example.com/accounts/1", target.account_url
       assert_equal 1, target.account_id
       assert_equal "world", target.project_name
+      assert_equal "abcd", target.environ_name
       assert_equal "eu-north-1", target.region
     end
 
@@ -25,6 +26,7 @@ module Envirobly
 
     test "all defaults exist, override project_name" do
       target = Target.new(
+        default_project_name: "dirname",
         project_name: "home",
         config_path: Pathname.new("test/fixtures/targets")
       )
