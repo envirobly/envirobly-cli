@@ -60,6 +60,8 @@ module Envirobly
 
     def perform(dry_run:)
       shell.say "This is a dry run, nothing will be deployed.", :green
+
+      # TODO: Replace with shell
       puts [ "Deploying commit", yellow(@commit.short_ref), faint("→"), green(@environ_name) ].join(" ")
       puts
       puts "    #{@commit.message}"
