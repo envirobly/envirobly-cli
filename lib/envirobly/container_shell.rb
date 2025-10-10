@@ -42,10 +42,6 @@ module Envirobly
         target.account_id = default_account.require_value
       end
 
-      target.ignored_params.each do |param|
-        shell.say "--#{param.to_s.parameterize} ignored, due to other arguments overriding it"
-      end
-
       @params = {
         account_id: target.account_id,
         project_id: target.project_id,

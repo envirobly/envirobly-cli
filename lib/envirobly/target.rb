@@ -64,22 +64,6 @@ module Envirobly
       @region.presence || default_region
     end
 
-    def ignored_params
-      [].tap do |result|
-        if @account_id && @project_id
-          result << :account_id
-        end
-
-        if @project_id && @region
-          result << :region
-        end
-
-        if @project_id && @project_name.present?
-          result << :project_name
-        end
-      end
-    end
-
     private
       def default_value_for(type)
         File.read(@default_target_dir.join(type)).strip

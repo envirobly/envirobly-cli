@@ -33,33 +33,6 @@ module Envirobly
       assert_equal "eu-north-1", target.region
     end
 
-    # test "ignored_params when project_id is specified" do
-    #   target = Target.new(
-    #     default_account_id: 1,
-    #     default_project_id: 2,
-    #     default_project_name: "dirname",
-    #     project_name: "custom",
-    #     account_id: 6,
-    #     project_id: 3,
-    #     region: "us-east-2"
-    #   )
-    #   assert_equal %i[ account_id region project_name ], target.ignored_params
-    #   assert_empty target.missing_params
-    #
-    #   target = Target.new(
-    #     project_id: 3,
-    #     region: "us-east-2"
-    #   )
-    #   assert_equal %i[ region ], target.ignored_params
-    #   assert_empty target.missing_params
-    #
-    #   target = Target.new(
-    #     project_id: 3
-    #   )
-    #   assert_empty target.ignored_params
-    #   assert_empty target.missing_params
-    # end
-    #
     # test "missing_params" do
     #   target = Target.new
     #   assert_equal %i[ account_id region ], target.missing_params
@@ -97,7 +70,6 @@ module Envirobly
     #   assert_nil target.project_name
     #   assert_nil target.region
     #   assert_empty target.missing_params
-    #   assert_equal %i[ project_name ], target.ignored_params
     # end
     #
     # test "default_project_name and default_environ_name and no other defaults" do
@@ -111,7 +83,6 @@ module Envirobly
     #   assert_equal "main", target.environ_name
     #   assert_nil target.region
     #   assert_equal %i[ account_id region ], target.missing_params
-    #   assert_empty target.ignored_params
     # end
     #
     # test "environ_name override" do
@@ -126,7 +97,6 @@ module Envirobly
     #   assert_equal "production", target.environ_name
     #   assert_nil target.region
     #   assert_equal %i[ account_id region ], target.missing_params
-    #   assert_empty target.ignored_params
     # end
   end
 end
