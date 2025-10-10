@@ -53,7 +53,7 @@ module Envirobly
           commit_time: @commit.time,
           commit_message: @commit.message,
           object_tree_checksum: @commit.object_tree_checksum,
-          config: @config.merge(@environ_name)
+          config: @config.merge(@environ_name).to_yaml
         }
       }
     end
@@ -70,7 +70,7 @@ module Envirobly
 
       if dry_run
         puts green("Config:")
-        puts YAML.dump(@params[:deployment][:config])
+        puts @params[:deployment][:config]
 
         shell.say
         shell.say "Targeting:", :green

@@ -36,14 +36,14 @@ class Envirobly::Cli::Main < Envirobly::Base
     Envirobly::Defaults::Region.new(shell:).require_value
   end
 
-  desc "validate", "Validates config"
-  def validate
+  desc "validate", "Validates config (for given environ)"
+  def validate(environ_name = nil)
     Envirobly::AccessToken.new(shell:).require!
 
     config = Envirobly::Config.new
     api = Envirobly::Api.new
 
-    params = { validation: { configs: config.configs } }
+    params = { validation: { config: config.merge(environ_name).to_yaml } }
     api.validate_shape params
 
     say "Config is valid #{green_check}"
