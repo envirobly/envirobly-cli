@@ -34,7 +34,7 @@ module Envirobly
         if configs.key?(override_path)
           other_yaml = configs.fetch(override_path)
           override = parse other_yaml, override_path
-          result = result.deep_merge(override)
+          result = result.deep_merge(override) if override.is_a?(Hash)
         end
       end
 
@@ -47,7 +47,14 @@ module Envirobly
       end
 
       def parse(content, path)
-        YAML.safe_load ERB.new(content).result, aliases: true, symbolize_names: true
+        begin
+          yaml = ERB.new(content).result
+        rescue Exception => e
+          @errors << { message: e.message, path: }
+          return
+        end
+
+        YAML.safe_load yaml, aliases: true, symbolize_names: true
       rescue Psych::Exception => e
         @errors << { message: e.message, path: }
       end
