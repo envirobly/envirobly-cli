@@ -62,4 +62,12 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     assert_equal expected, config.merge("staging")
     assert_empty config.errors
   end
+
+  test "invalid YAML" do
+    config = Envirobly::Config.new("test/fixtures/invalid_configs")
+    assert_nil config.merge
+    assert_equal 1, config.errors.size
+    assert_equal "(<unknown>): did not find expected node content while parsing a flow node at line 2 column 3", config.errors.first[:message]
+    assert_equal ".envirobly/deploy.yml", config.errors.first[:path]
+  end
 end

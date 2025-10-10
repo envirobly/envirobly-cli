@@ -26,19 +26,19 @@ module Envirobly
     def merge(environ_name = nil)
       path = Pathname.new(DIR).join(BASE).to_s
       yaml = configs.fetch(path)
-      base = parse yaml
+      result = parse yaml, path
 
       if environ_name.present?
         override_path = Pathname.new(DIR).join("deploy.#{environ_name}.yml").to_s
 
         if configs.key?(override_path)
           other_yaml = configs.fetch(override_path)
-          override = parse other_yaml
-          return base.deep_merge(override)
+          override = parse other_yaml, override_path
+          result = result.deep_merge(override)
         end
       end
 
-      base
+      @errors.empty? ? result : nil
     end
 
     private
@@ -46,8 +46,10 @@ module Envirobly
         file == BASE || file.match?(OVERRIDES_PATTERN)
       end
 
-      def parse(content)
+      def parse(content, path)
         YAML.safe_load ERB.new(content).result, aliases: true, symbolize_names: true
+      rescue Psych::Exception => e
+        @errors << { message: e.message, path: }
       end
   end
 end
