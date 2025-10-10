@@ -5,8 +5,11 @@ class Envirobly::Config
   BASE = "deploy.yml"
   OVERRIDES_PATTERN = /deploy\.([a-z0-9\-_]+)\.yml/i
 
+  attr_reader :errors
+
   def initialize(dir = DIR)
     @dir = Pathname.new dir
+    @errors = []
   end
 
   def configs

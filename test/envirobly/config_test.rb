@@ -32,6 +32,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
       }
     }
     assert_equal expected, config.merge
+    assert_empty config.errors
   end
 
   test "merge with environ override" do
@@ -55,5 +56,6 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
       }
     }
     assert_equal expected, config.merge("staging")
+    assert_empty config.errors
   end
 end
