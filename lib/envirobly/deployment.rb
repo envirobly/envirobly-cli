@@ -53,7 +53,7 @@ module Envirobly
           commit_time: @commit.time,
           commit_message: @commit.message,
           object_tree_checksum: @commit.object_tree_checksum,
-          configs: @config.configs
+          config: @config.merge(@environ_name)
         }
       }
     end

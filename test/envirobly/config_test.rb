@@ -16,17 +16,17 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   test "merge without override" do
     config = Envirobly::Config.new("test/fixtures/configs")
     expected = {
-      x: {
-        shared_env: {
-          SECRET: Envirobly::Secret.new("mySecret")
+      "x" => {
+        "shared_env" => {
+          "SECRET" => Envirobly::Secret.new("mySecret")
         }
       },
-      services: {
-        app: {
-          public: true,
-          env: {
-            SECRET: Envirobly::Secret.new("mySecret"),
-            APP_ENV: "production"
+      "services" => {
+        "app" => {
+          "public" => true,
+          "env" => {
+            "SECRET" => Envirobly::Secret.new("mySecret"),
+            "APP_ENV" => "production"
           }
         }
       }
@@ -42,19 +42,19 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   test "merge with environ override" do
     config = Envirobly::Config.new("test/fixtures/configs")
     expected = {
-      x: {
-        shared_env: {
-          SECRET: Envirobly::Secret.new("mySecret")
+      "x" => {
+        "shared_env" => {
+          "SECRET" => Envirobly::Secret.new("mySecret")
         }
       },
-      services: {
-        app: {
-          public: false,
-          instance_type: "t4g.micro",
-          env: {
-            SECRET: Envirobly::Secret.new("mySecret"),
-            APP_ENV: "staging",
-            STAGING_VAR: "abcd"
+      "services" => {
+        "app" => {
+          "public" => false,
+          "instance_type" => "t4g.micro",
+          "env" => {
+            "SECRET" => Envirobly::Secret.new("mySecret"),
+            "APP_ENV" => "staging",
+            "STAGING_VAR" => "abcd"
           }
         }
       }
