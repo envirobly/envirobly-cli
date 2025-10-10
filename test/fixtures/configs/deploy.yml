@@ -1,3 +1,10 @@
+x:
+  shared_env: &shared_env
+    VERSION: 1
+
 services:
   app:
     public: true
+    env:
+      <<: *shared_env
+      APP_ENV: production

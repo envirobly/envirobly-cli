@@ -12,4 +12,16 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     }
     assert_equal expected, config.configs
   end
+
+  test "merge without override" do
+    config = Envirobly::Config.new("test/fixtures/configs")
+    expected = <<~YAML
+      services:
+    YAML
+    assert_equal expected, config.merge
+  end
+
+  test "merge with environ override" do
+    skip "todo"
+  end
 end
