@@ -64,6 +64,7 @@ module Envirobly
       # TODO: Replace with shell
       puts [ "Deploying commit", yellow(@commit.short_ref), faint("→"), green(@environ_name) ].join(" ")
       puts
+      # TODO: Multiline indent
       puts "    #{@commit.message}"
       puts
 
