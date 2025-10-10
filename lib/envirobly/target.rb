@@ -13,7 +13,7 @@ module Envirobly
         config_path: Config::TARGETS_PATH
       )
       @name = name
-      @account_url = account_id
+      @account_url = account_url
       @region = region
       @project_id = project_id
       @project_name = project_name
@@ -53,9 +53,7 @@ module Envirobly
     end
 
     def project_name
-      return if @project_id
-
-      @project_name.presence || @default_project_name
+      @project_name.presence || default_project_name
     end
 
     def environ_name
@@ -63,9 +61,7 @@ module Envirobly
     end
 
     def region
-      return if @project_id
-
-      @region || @default_region
+      @region.presence || default_region
     end
 
     def ignored_params
@@ -87,6 +83,14 @@ module Envirobly
     private
       def default_account_url
         File.read(@default_target_dir.join("account_url")).strip
+      end
+
+      def default_project_name
+        File.read(@default_target_dir.join("project_name")).strip
+      end
+
+      def default_region
+        File.read(@default_target_dir.join("region")).strip
       end
   end
 end
