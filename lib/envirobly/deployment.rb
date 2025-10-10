@@ -69,7 +69,7 @@ module Envirobly
       puts
 
       if dry_run
-        puts green("Your config:")
+        puts green("Config:")
         puts YAML.dump(@params[:deployment][:config])
 
         shell.say
