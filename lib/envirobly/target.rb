@@ -2,30 +2,24 @@
 
 module Envirobly
   class Target
-    attr_accessor :account_id, :project_id, :region
+    attr_accessor :project_id, :region
 
     def initialize(
-        default_account_id: nil,
-        default_project_id: nil,
-        default_region: nil,
-        default_project_name: nil,
-        default_environ_name: nil,
-        account_id: nil,
-        project_id: nil,
+        name: nil,
+        account_url: nil,
         region: nil,
         project_name: nil,
-        environ_name: nil
+        environ_name: nil,
+        config_path: Config::TARGETS_PATH
       )
-      @default_account_id = default_account_id
-      @default_project_id = default_project_id
-      @default_region = default_region
-      @default_project_name = default_project_name
-      @default_environ_name = default_environ_name
-      @account_id = account_id
-      @project_id = project_id
+      @name = name
+      @account_url = account_id
       @region = region
+      @project_id = project_id
       @project_name = project_name
       @environ_name = environ_name
+      @config_path = config_path
+      @default_target_dir = config_path.join(".default")
     end
 
     def missing_params
@@ -40,10 +34,16 @@ module Envirobly
       end
     end
 
-    def account_id
-      return if @project_id
+    def account_url
+      @account_url.presence || default_account_url
+    end
 
-      @account_id || @default_account_id
+    def account_id
+      if account_url =~ /accounts\/(\d)+/i
+        $1.to_i
+      else
+        nil
+      end
     end
 
     def project_id
@@ -83,5 +83,10 @@ module Envirobly
         end
       end
     end
+
+    private
+      def default_account_url
+        File.read(@default_target_dir.join("account_url")).strip
+      end
   end
 end
