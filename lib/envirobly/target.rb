@@ -10,6 +10,8 @@ module Envirobly
         region: nil,
         project_name: nil,
         environ_name: nil,
+        default_environ_name: nil,
+        default_project_name: nil,
         config_path: Config::TARGETS_PATH
       )
       @name = name
@@ -17,6 +19,8 @@ module Envirobly
       @region = region
       @project_name = project_name
       @environ_name = environ_name
+      @default_environ_name = default_environ_name
+      @default_project_name = default_project_name
       @config_path = config_path
       @default_target_dir = config_path.join(".default")
     end
@@ -46,7 +50,7 @@ module Envirobly
     end
 
     def project_name
-      @project_name.presence || default_project_name
+      @project_name.presence || default_project_name.presence || @default_project_name
     end
 
     def environ_name
