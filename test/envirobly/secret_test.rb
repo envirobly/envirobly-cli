@@ -12,5 +12,12 @@ module Envirobly
       secret2 = Secret.new("b")
       assert_not_equal secret1, secret2
     end
+
+    test "dump" do
+      yaml = {
+        secret: Secret.new("hello")
+      }.to_yaml
+      assert_equal "---\n:secret: !secret hello\n", yaml
+    end
   end
 end
