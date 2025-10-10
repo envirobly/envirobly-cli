@@ -61,6 +61,13 @@ module Envirobly
       @region.presence || default_region
     end
 
+    def save_defaults
+      FileUtils.mkdir_p @default_target_dir
+      File.write @default_target_dir.join("account_url"), account_url
+      File.write @default_target_dir.join("project_name"), project_name
+      File.write @default_target_dir.join("region"), region
+    end
+
     private
       def default_value_for(type)
         File.read(@default_target_dir.join(type)).strip
