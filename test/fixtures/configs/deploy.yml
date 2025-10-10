@@ -1,5 +1,3 @@
-project: https://envirobly.com/projects/1
-
 services:
   app:
     public: true
