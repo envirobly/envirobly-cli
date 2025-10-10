@@ -25,10 +25,12 @@ class Envirobly::Config
     base = YAML.safe_load yaml, aliases: true, symbolize_names: true
 
     if environ_name.present?
-      override_path = path.split("/").insert(1, environ_name).join("/")
+      override_path = Pathname.new(DIR).join("deploy.#{environ_name}.yml").to_s
 
       if configs.key?(override_path)
-        return configs.fetch(override_path)
+        other_yaml = configs.fetch(override_path)
+        override = YAML.safe_load other_yaml, aliases: true, symbolize_names: true
+        return base.deep_merge(override)
       end
     end
 

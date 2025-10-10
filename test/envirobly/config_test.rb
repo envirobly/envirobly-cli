@@ -16,15 +16,44 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
   test "merge without override" do
     config = Envirobly::Config.new("test/fixtures/configs")
     expected = {
-      x: { shared_env: { VERSION: 1 } },
+      x: {
+        shared_env: {
+          VERSION: 1
+        }
+      },
       services: {
-        app: { public: true, env: { VERSION: 1, APP_ENV: "production" } }
+        app: {
+          public: true,
+          env: {
+            VERSION: 1,
+            APP_ENV: "production"
+          }
+        }
       }
     }
     assert_equal expected, config.merge
   end
 
   test "merge with environ override" do
-    skip "todo"
+    config = Envirobly::Config.new("test/fixtures/configs")
+    expected = {
+      x: {
+        shared_env: {
+          VERSION: 1
+        }
+      },
+      services: {
+        app: {
+          public: false,
+          instance_type: "t4g.micro",
+          env: {
+            VERSION: 1,
+            APP_ENV: "staging",
+            STAGING_VAR: "abcd"
+          }
+        }
+      }
+    }
+    assert_equal expected, config.merge("staging")
   end
 end

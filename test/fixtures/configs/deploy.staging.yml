@@ -1,7 +1,7 @@
 services:
   app:
+    public: false
     instance_type: t4g.micro
     env:
-      <<: *shared_env
       APP_ENV: staging
       STAGING_VAR: abcd
