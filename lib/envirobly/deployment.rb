@@ -59,13 +59,15 @@ module Envirobly
     end
 
     def perform(dry_run:)
+      puts green("This is a dry run, nothing will be deployed.")
       puts [ "Deploying commit", yellow(@commit.short_ref), faint("→"), green(@environ_name) ].join(" ")
       puts
       puts "    #{@commit.message}"
       puts
 
       if dry_run
-        puts YAML.dump(@params)
+        puts green("Your config:")
+        puts YAML.dump(@params[:deployment][:config])
         return
       end
 
