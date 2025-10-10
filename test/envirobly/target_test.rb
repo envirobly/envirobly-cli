@@ -59,18 +59,18 @@ module Envirobly
       assert_equal %i[ account_url region ], target.missing_params
     end
 
-    # test "environ_name override" do
-    #   target = Target.new(
-    #     default_project_name: "dirname",
-    #     default_environ_name: "main",
-    #     environ_name: "production"
-    #   )
-    #   assert_nil target.account_id
-    #   assert_nil target.project_id
-    #   assert_equal "dirname", target.project_name
-    #   assert_equal "production", target.environ_name
-    #   assert_nil target.region
-    #   assert_equal %i[ account_id region ], target.missing_params
-    # end
+    test "environ_name override" do
+      target = Target.new(
+        default_project_name: "dirname",
+        default_environ_name: "main",
+        environ_name: "production"
+      )
+      assert_nil target.account_url
+      assert_nil target.account_id
+      assert_equal "dirname", target.project_name
+      assert_equal "production", target.environ_name
+      assert_nil target.region
+      assert_equal %i[ account_url region ], target.missing_params
+    end
   end
 end
