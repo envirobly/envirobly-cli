@@ -26,14 +26,14 @@ module Envirobly
     def merge(environ_name = nil)
       path = Pathname.new(DIR).join(BASE).to_s
       yaml = configs.fetch(path)
-      base = YAML.safe_load ERB.new(yaml).result, aliases: true, symbolize_names: true
+      base = parse yaml
 
       if environ_name.present?
         override_path = Pathname.new(DIR).join("deploy.#{environ_name}.yml").to_s
 
         if configs.key?(override_path)
           other_yaml = configs.fetch(override_path)
-          override = YAML.safe_load ERB.new(other_yaml).result, aliases: true, symbolize_names: true
+          override = parse other_yaml
           return base.deep_merge(override)
         end
       end
@@ -44,6 +44,10 @@ module Envirobly
     private
       def config_file?(file)
         file == BASE || file.match?(OVERRIDES_PATTERN)
+      end
+
+      def parse(content)
+        YAML.safe_load ERB.new(content).result, aliases: true, symbolize_names: true
       end
   end
 end
