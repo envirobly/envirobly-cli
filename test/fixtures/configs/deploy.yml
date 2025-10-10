@@ -1,5 +1,10 @@
-project: https://envirobly.com/projects/1
+x:
+  shared_env: &shared_env
+    SECRET: !secret mySecret
 
 services:
   app:
-    public: true
+    public: <%= "true" %>
+    env:
+      <<: *shared_env
+      APP_ENV: production

@@ -6,7 +6,7 @@ module Envirobly
   class Deployment
     include Colorize
 
-    attr_reader :params
+    attr_reader :params, :shell
 
     def initialize(environ_name:, commit:, account_id:, project_name:, project_id:, region:, shell:)
       @commit = commit
@@ -53,19 +53,40 @@ module Envirobly
           commit_time: @commit.time,
           commit_message: @commit.message,
           object_tree_checksum: @commit.object_tree_checksum,
-          configs: @config.configs
+          config: @config.merge(@environ_name).to_yaml
         }
       }
     end
 
     def perform(dry_run:)
+      if dry_run
+        shell.say "This is a dry run, nothing will be deployed.", :green
+      end
+
+      # TODO: Replace with shell
       puts [ "Deploying commit", yellow(@commit.short_ref), faint("→"), green(@environ_name) ].join(" ")
       puts
+      # TODO: Multiline indent
       puts "    #{@commit.message}"
       puts
 
       if dry_run
-        puts YAML.dump(@params)
+        puts green("Config:")
+        puts @params[:deployment][:config]
+
+        shell.say
+        shell.say "Targeting:", :green
+
+        targets_and_values = [
+          [ "Account ID", @params[:account_id].to_s ],
+          [ "Project ID", @params[:project_id].to_s ],
+          [ "Region", @params[:region] ],
+          [ "Project Name", @params[:project_name] ],
+          [ "Environ Name", @params[:deployment][:environ_name] ]
+        ]
+
+        shell.print_table targets_and_values, borders: true
+
         return
       end
 

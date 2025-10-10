@@ -1,3 +1,7 @@
 services:
   app:
+    public: <%= "false" if true %>
     instance_type: t4g.micro
+    env:
+      APP_ENV: staging
+      STAGING_VAR: abcd
