@@ -63,9 +63,9 @@ module Envirobly
 
     def save_defaults
       FileUtils.mkdir_p @default_target_dir
-      File.write @default_target_dir.join("account_url"), account_url
-      File.write @default_target_dir.join("project_name"), project_name
-      File.write @default_target_dir.join("region"), region
+      write_default "account_url"
+      write_default "project_name"
+      write_default "region"
     end
 
     private
@@ -73,6 +73,10 @@ module Envirobly
         File.read(@default_target_dir.join(type)).strip
       rescue Errno::ENOENT
         nil
+      end
+
+      def write_default(type)
+        File.write @default_target_dir.join(type), send(type)
       end
 
       def default_account_url
