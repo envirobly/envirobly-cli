@@ -33,17 +33,18 @@ module Envirobly
       assert_equal "eu-north-1", target.region
     end
 
-    # test "missing_params" do
-    #   target = Target.new
-    #   assert_equal %i[ account_id region ], target.missing_params
-    #
-    #   target.account_id = 6
-    #   assert_equal %i[ region ], target.missing_params
-    #
-    #   target.region = "us-east-2"
-    #   assert_empty target.missing_params
-    # end
-    #
+    test "missing_params" do
+      target = Target.new
+      assert_equal %i[ account_url region ], target.missing_params
+
+      target.account_url = "https://example.com/accounts/3"
+      assert_equal 3, target.account_id
+      assert_equal %i[ region ], target.missing_params
+
+      target.region = "us-east-2"
+      assert_empty target.missing_params
+    end
+
     # test "project_name overrides default_project_id and default_project_name" do
     #   target = Target.new(
     #     default_account_id: 1,

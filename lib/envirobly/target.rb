@@ -2,7 +2,7 @@
 
 module Envirobly
   class Target
-    attr_accessor :project_id, :region
+    attr_accessor :account_url, :project_name, :region
 
     def initialize(
         name: nil,
@@ -24,11 +24,11 @@ module Envirobly
 
     def missing_params
       [].tap do |result|
-        if project_id.blank? && account_id.blank?
-          result << :account_id
+        if account_url.blank?
+          result << :account_url
         end
 
-        if project_id.blank? && region.blank?
+        if region.blank?
           result << :region
         end
       end
@@ -67,6 +67,8 @@ module Envirobly
     private
       def default_value_for(type)
         File.read(@default_target_dir.join(type)).strip
+      rescue Errno::ENOENT
+        nil
       end
 
       def default_account_url
