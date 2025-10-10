@@ -54,7 +54,7 @@ module Envirobly
           return
         end
 
-        YAML.safe_load yaml, aliases: true, symbolize_names: true
+        YAML.safe_load yaml, aliases: true, symbolize_names: true, permitted_classes: [ Secret ]
       rescue Psych::Exception => e
         @errors << { message: e.message, path: }
       end

@@ -18,14 +18,14 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     expected = {
       x: {
         shared_env: {
-          VERSION: 1
+          SECRET: Envirobly::Secret.new("mySecret")
         }
       },
       services: {
         app: {
           public: true,
           env: {
-            VERSION: 1,
+            SECRET: Envirobly::Secret.new("mySecret"),
             APP_ENV: "production"
           }
         }
@@ -44,7 +44,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
     expected = {
       x: {
         shared_env: {
-          VERSION: 1
+          SECRET: Envirobly::Secret.new("mySecret")
         }
       },
       services: {
@@ -52,7 +52,7 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
           public: false,
           instance_type: "t4g.micro",
           env: {
-            VERSION: 1,
+            SECRET: Envirobly::Secret.new("mySecret"),
             APP_ENV: "staging",
             STAGING_VAR: "abcd"
           }

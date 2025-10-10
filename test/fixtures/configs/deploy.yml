@@ -1,6 +1,6 @@
 x:
   shared_env: &shared_env
-    VERSION: 1
+    SECRET: !secret mySecret
 
 services:
   app:
