@@ -15,7 +15,6 @@ module Envirobly
       @name = name
       @account_url = account_url
       @region = region
-      @project_id = project_id
       @project_name = project_name
       @environ_name = environ_name
       @config_path = config_path
@@ -44,12 +43,6 @@ module Envirobly
       else
         nil
       end
-    end
-
-    def project_id
-      return if @project_id.blank? && (@account_id.present? || @project_name.present?)
-
-      @project_id || @default_project_id
     end
 
     def project_name
