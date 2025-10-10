@@ -15,9 +15,12 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
 
   test "merge without override" do
     config = Envirobly::Config.new("test/fixtures/configs")
-    expected = <<~YAML
-      services:
-    YAML
+    expected = {
+      x: { shared_env: { VERSION: 1 } },
+      services: {
+        app: { public: true, env: { VERSION: 1, APP_ENV: "production" } }
+      }
+    }
     assert_equal expected, config.merge
   end
 
