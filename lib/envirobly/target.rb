@@ -81,16 +81,20 @@ module Envirobly
     end
 
     private
+      def default_value_for(type)
+        File.read(@default_target_dir.join(type)).strip
+      end
+
       def default_account_url
-        File.read(@default_target_dir.join("account_url")).strip
+        default_value_for "account_url"
       end
 
       def default_project_name
-        File.read(@default_target_dir.join("project_name")).strip
+        default_value_for "project_name"
       end
 
       def default_region
-        File.read(@default_target_dir.join("region")).strip
+        default_value_for "region"
       end
   end
 end
