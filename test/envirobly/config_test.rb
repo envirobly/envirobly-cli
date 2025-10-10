@@ -31,7 +31,11 @@ class Envirobly::ConfigTest < ActiveSupport::TestCase
         }
       }
     }
+
     assert_equal expected, config.merge
+    assert_empty config.errors
+
+    assert_equal expected, config.merge("xyz"), "This override doens't exist"
     assert_empty config.errors
   end
 
