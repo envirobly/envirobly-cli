@@ -111,5 +111,11 @@ module Envirobly
       target = Target.new("puma", context: :service)
       assert_equal "puma", target.service_name
     end
+
+    test "environ name and service name as path in the service context" do
+      target = Target.new("production/puma", context: :service, default_environ_name: "main")
+      assert_equal "puma", target.service_name
+      assert_equal "production", target.environ_name
+    end
   end
 end

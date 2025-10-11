@@ -102,6 +102,8 @@ module Envirobly
           case parts.size
           when 1
             @service_name = parts.first
+          when 2
+            @environ_name, @service_name = parts
           end
 
           return
