@@ -75,7 +75,7 @@ module Envirobly
         @config_path.join(@name)
       end
 
-      def default_value_for(type)
+      def stored_value_for(type)
         File.read(storage_dir.join(type)).strip
       rescue Errno::ENOENT
         nil
@@ -86,15 +86,15 @@ module Envirobly
       end
 
       def default_account_url
-        default_value_for "account_url"
+        stored_value_for "account_url"
       end
 
       def default_project_name
-        default_value_for "project_name"
+        stored_value_for "project_name"
       end
 
       def default_region
-        default_value_for "region"
+        stored_value_for "region"
       end
 
       def load_path(path)
