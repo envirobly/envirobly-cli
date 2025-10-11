@@ -160,7 +160,7 @@ module Envirobly
         shell.print_table data, borders: true
 
         limited_to = accounts.object.pluck("id").map(&:to_s)
-        account_id = limited_to.first
+        account_id = send(:account_id).to_s.presence || limited_to.first
 
         begin
           account_id = shell.ask("Choose Account ID:", limited_to:, default: account_id).to_i
