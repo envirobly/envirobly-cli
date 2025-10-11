@@ -162,13 +162,23 @@ module Envirobly
       end
 
       def configure_project_name
-        begin
-          @project_name = shell.ask("Name your project:", default: project_name)
-        rescue interrupt
-          shell.say_error "cancelled", :red
-          exit
+        result = nil
+
+        while result.nil?
+          begin
+            result = shell.ask("Name your project:", default: project_name)
+          rescue interrupt
+            shell.say_error "cancelled", :red
+          end
+
+          name = Name.new(result)
+          unless name.validate
+            result = nil
+            shell.say_error "Name #{name.error}"
+          end
         end
 
+        @project_name = result
         save_attribute "project_name"
       end
 
