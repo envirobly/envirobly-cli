@@ -33,6 +33,17 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     target = Envirobly::Target.new(default_project_name: File.basename(Dir.pwd), shell:)
     target.name = name if name.present?
+
+    errors = target.errors :name
+
+    if errors.any?
+      errors.each do |message|
+        shell.say_error message
+      end
+
+      exit 1
+    end
+
     target.configure!(missing_only: options.missing_only)
 
     shell.say "#{green_check} "

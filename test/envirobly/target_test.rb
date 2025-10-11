@@ -144,8 +144,8 @@ module Envirobly
     test "name validation" do
       target = Target.new("factory!/production@")
       assert_equal 2, target.errors.size
-      assert_equal "'factory!' is invalid. Name #{Name::ERROR_MESSAGE}", target.errors.first
-      assert_equal "'production@' is invalid. Name #{Name::ERROR_MESSAGE}", target.errors.second
+      assert_equal "Name 'factory!' #{Name::ERROR_MESSAGE}", target.errors.first
+      assert_equal "Name 'production@' #{Name::ERROR_MESSAGE}", target.errors.second
     end
   end
 end

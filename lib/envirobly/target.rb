@@ -31,15 +31,17 @@ module Envirobly
       load_path path
     end
 
-    def errors
+    def errors(attributes = %i[ name project_name environ_name ])
       [].tap do |result|
-        [ name, project_name, environ_name ].each_with_index do |value, index|
+        Array(attributes).each_with_index do |attr, index|
+          value = send attr
+
           next if index.zero? && value == DEFAULT_NAME
 
           name = Name.new(value)
 
           unless name.validate
-            result << "'#{value}' is invalid. Name #{name.error}"
+            result << "Name '#{value}' #{name.error}"
           end
         end
       end.uniq
