@@ -5,6 +5,8 @@ module Envirobly
     attr_accessor :account_url, :project_name, :region, :name
     attr_reader :service_name, :shell
 
+    DEFAULT_NAME = ".default"
+
     def initialize(
         path = nil,
         account_url: nil,
@@ -23,7 +25,7 @@ module Envirobly
       @default_project_name = default_project_name
       @config_path = config_path
       @context = context
-      @name = ".default"
+      @name = DEFAULT_NAME
       @shell = shell
 
       load_path path
@@ -31,13 +33,16 @@ module Envirobly
 
     def errors
       [].tap do |result|
-        unless @name == ".default"
-          name = Name.new(@name)
+        [ name, project_name, environ_name ].each_with_index do |value, index|
+          next if index.zero? && value == DEFAULT_NAME
+
+          name = Name.new(value)
+
           unless name.validate
-            result << "'#{@name}' is invalid. Name #{name.error}"
+            result << "'#{value}' is invalid. Name #{name.error}"
           end
         end
-      end
+      end.uniq
     end
 
     def missing_params
