@@ -3,7 +3,7 @@
 module Envirobly
   class Name
     NAME_FORMAT = /\A[a-z0-9\-_]+\z/i
-    ERROR_MESSAGE = "must contain only alphanumerical characters, dashes and undercores"
+    ERROR_MESSAGE = "must contain only alphanumerical characters, dashes and underscores"
 
     attr_reader :error
 
