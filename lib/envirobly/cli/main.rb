@@ -26,15 +26,24 @@ class Envirobly::Cli::Main < Envirobly::Base
     say "You can sign in again with `envirobly signin`"
   end
 
-  desc "set_default_account", "Choose default account to deploy the current project to"
-  def set_default_account
-    Envirobly::Defaults::Account.new(shell:).require_value
+  desc "target [NAME]", "Configure deployment (default) target"
+  def target(name = nil)
+    Envirobly::AccessToken.new(shell:).require!
+
+    target = Envirobly::Target.new(default_project_name: Envirobly::Defaults::Project.dirname, shell:)
+    target.name = name if name.present?
+    target.configure!
   end
 
-  desc "set_default_region", "Set default region for the current project when deploying for the first time"
-  def set_default_region
-    Envirobly::Defaults::Region.new(shell:).require_value
-  end
+  # desc "set_default_account", "Choose default account to deploy the current project to"
+  # def set_default_account
+  #   Envirobly::Defaults::Account.new(shell:).require_value
+  # end
+  #
+  # desc "set_default_region", "Set default region for the current project when deploying for the first time"
+  # def set_default_region
+  #   Envirobly::Defaults::Region.new(shell:).require_value
+  # end
 
   desc "validate", "Validates config (for given environ)"
   def validate(environ_name = nil)

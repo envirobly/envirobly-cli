@@ -2,8 +2,8 @@
 
 module Envirobly
   class Target
-    attr_accessor :account_url, :project_name, :region
-    attr_reader :name, :service_name
+    attr_accessor :account_url, :project_name, :region, :name
+    attr_reader :service_name, :shell
 
     def initialize(
         path = nil,
@@ -13,7 +13,8 @@ module Envirobly
         default_environ_name: nil,
         default_project_name: nil,
         config_path: Config::TARGETS_PATH,
-        context: nil
+        context: nil,
+        shell: nil
       )
       @account_url = account_url
       @region = region
@@ -23,6 +24,7 @@ module Envirobly
       @config_path = config_path
       @context = context
       @name = ".default"
+      @shell = shell
 
       load_path path
     end
@@ -64,10 +66,49 @@ module Envirobly
     end
 
     def save
-      FileUtils.mkdir_p storage_dir
       write_default "account_url"
       write_default "project_name"
       write_default "region"
+    end
+
+    def configure!
+      shell.say "Configuring "
+      shell.say "#{@name} ", :green
+      shell.say "deploy target"
+      shell.say
+
+      api = Envirobly::Api.new
+      accounts = api.list_accounts
+
+      if accounts.object.blank?
+        shell.say_error "Please connect an AWS account to your Envirobly account first."
+        exit 1
+      end
+
+      data = [ [ "ID", "Name", "AWS number", "URL" ] ] +
+        accounts.object.pluck("id", "name", "aws_id", "url")
+
+      shell.say "Available accounts:"
+      shell.print_table data, borders: true
+
+      limited_to = accounts.object.pluck("id").map(&:to_s)
+      account_id = limited_to.first
+
+      begin
+        account_id = shell.ask("Choose Account ID:", limited_to:, default: account_id).to_i
+      rescue Interrupt
+        shell.say_error "Cancelled", :red
+        exit
+      end
+
+      accounts.object.each do |account|
+        if account_id == account["id"]
+          @account_url = account["url"]
+          break
+        end
+      end
+
+      write_default "account_url"
     end
 
     private
@@ -82,6 +123,7 @@ module Envirobly
       end
 
       def write_default(type)
+        FileUtils.mkdir_p storage_dir
         File.write storage_dir.join(type), send(type)
       end
 
