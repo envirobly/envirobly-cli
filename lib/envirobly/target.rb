@@ -3,7 +3,7 @@
 module Envirobly
   class Target
     attr_accessor :account_url, :project_name, :region
-    attr_reader :service_name
+    attr_reader :name, :service_name
 
     def initialize(
         path = nil,
@@ -21,8 +21,8 @@ module Envirobly
       @default_environ_name = default_environ_name
       @default_project_name = default_project_name
       @config_path = config_path
-      @default_target_dir = config_path.join(".default")
       @context = context
+      @name = ".default"
 
       load_path path
     end
@@ -63,22 +63,26 @@ module Envirobly
       @region.presence || default_region
     end
 
-    def save_defaults
-      FileUtils.mkdir_p @default_target_dir
+    def save
+      FileUtils.mkdir_p storage_dir
       write_default "account_url"
       write_default "project_name"
       write_default "region"
     end
 
     private
+      def storage_dir
+        @config_path.join(@name)
+      end
+
       def default_value_for(type)
-        File.read(@default_target_dir.join(type)).strip
+        File.read(storage_dir.join(type)).strip
       rescue Errno::ENOENT
         nil
       end
 
       def write_default(type)
-        File.write @default_target_dir.join(type), send(type)
+        File.write storage_dir.join(type), send(type)
       end
 
       def default_account_url
@@ -105,7 +109,8 @@ module Envirobly
           when 2
             @environ_name, @service_name = parts
           when 3
-            @default_project_name, @environ_name, @service_name = parts
+            @name, @environ_name, @service_name = parts
+            @default_project_name = @name
           end
 
           return
@@ -115,7 +120,8 @@ module Envirobly
         when 1
           @environ_name = parts.first
         when 2
-          @default_project_name, @environ_name = parts
+          @name, @environ_name = parts
+          @default_project_name = @name
         end
       end
   end

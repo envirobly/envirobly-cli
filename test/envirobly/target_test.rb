@@ -12,6 +12,7 @@ module Envirobly
       assert_equal "abcd", target.environ_name
       assert_equal "eu-north-1", target.region
       assert_nil target.service_name
+      assert_equal ".default", target.name
     end
 
     test "all defaults exist, override account_url" do
@@ -60,10 +61,10 @@ module Envirobly
       assert_equal %i[ account_url region ], target.missing_params
     end
 
-    test "save_defaults" do
+    test "save" do
       config_path = Pathname.new Dir.mktmpdir
       target = Target.new(config_path:, account_url: "https://example.com/accounts/3", region: "us-east-2", project_name: "yes")
-      target.save_defaults
+      target.save
       assert_equal "https://example.com/accounts/3", File.read(config_path.join ".default/account_url")
       assert_equal "us-east-2", File.read(config_path.join ".default/region")
       assert_equal "yes", File.read(config_path.join ".default/project_name")
@@ -84,6 +85,7 @@ module Envirobly
       assert_nil target.region
       assert_equal %i[ account_url region ], target.missing_params
       assert_nil target.service_name
+      assert_equal ".default", target.name
     end
 
     test "target name prefix in path set default project name" do
@@ -120,6 +122,7 @@ module Envirobly
 
     test "target name, environ name and service name as path in the service context" do
       target = Target.new("factory/production/puma", context: :service, default_environ_name: "main", default_project_name: "dir")
+      assert_equal "factory", target.name
       assert_equal "puma", target.service_name
       assert_equal "production", target.environ_name
       assert_equal "factory", target.project_name
