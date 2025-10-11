@@ -11,6 +11,7 @@ module Envirobly
       assert_equal "world", target.project_name
       assert_equal "abcd", target.environ_name
       assert_equal "eu-north-1", target.region
+      assert_nil target.service_name
     end
 
     test "all defaults exist, override account_url" do
@@ -82,6 +83,7 @@ module Envirobly
       assert_equal "production", target.environ_name
       assert_nil target.region
       assert_equal %i[ account_url region ], target.missing_params
+      assert_nil target.service_name
     end
 
     test "target name prefix in path set default project name" do
@@ -103,6 +105,11 @@ module Envirobly
       )
       assert_equal "stars", target.project_name
       assert_equal "production", target.environ_name
+    end
+
+    test "service name as path in the service context" do
+      target = Target.new("puma", context: :service)
+      assert_equal "puma", target.service_name
     end
   end
 end

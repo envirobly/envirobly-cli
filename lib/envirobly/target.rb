@@ -3,6 +3,7 @@
 module Envirobly
   class Target
     attr_accessor :account_url, :project_name, :region
+    attr_reader :service_name
 
     def initialize(
         path = nil,
@@ -11,7 +12,8 @@ module Envirobly
         project_name: nil,
         default_environ_name: nil,
         default_project_name: nil,
-        config_path: Config::TARGETS_PATH
+        config_path: Config::TARGETS_PATH,
+        context: nil
       )
       @account_url = account_url
       @region = region
@@ -20,6 +22,7 @@ module Envirobly
       @default_project_name = default_project_name
       @config_path = config_path
       @default_target_dir = config_path.join(".default")
+      @context = context
 
       load_path path
     end
@@ -94,6 +97,15 @@ module Envirobly
         return if path.blank?
 
         parts = path.split("/").map &:strip
+
+        if @context == :service
+          case parts.size
+          when 1
+            @service_name = parts.first
+          end
+
+          return
+        end
 
         case parts.size
         when 1
