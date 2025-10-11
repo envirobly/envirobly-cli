@@ -7,9 +7,9 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :pure, type: :boolean, default: false
   def version
     if options.pure
-      puts Envirobly::VERSION
+      say Envirobly::VERSION
     else
-      puts "envirobly CLI v#{Envirobly::VERSION}"
+      say "envirobly CLI v#{Envirobly::VERSION}"
     end
   end
 
@@ -115,6 +115,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     Envirobly::AccessToken.new(shell:).require!
 
+    # TODO: Move Target use out of deployment and in here
     deployment = Envirobly::Deployment.new(
       account_id: options.account_id,
       region: options.region,
