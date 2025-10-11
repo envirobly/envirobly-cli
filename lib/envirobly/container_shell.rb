@@ -32,35 +32,33 @@ module Envirobly
     end
 
     def exec(command = nil, dry_run: false)
-      if dry_run
-        @shell.say "Dry run", :green
-        @shell.say @params.to_yaml
-        exit
-      end
+      do_dry_run if dry_run
 
       with_private_key do
         system join(env_vars, ssh, user_and_host, command)
       end
     end
 
-    def rsync(source, destination, dry_run: false)
-      if dry_run
-        @shell.say "Dry run", :green
-        @shell.say @params.yaml
-        exit
-      end
+    def rsync(source, destination, path:, dry_run: false)
+      do_dry_run if dry_run
 
       with_private_key do
         system join(
           env_vars,
           %(rsync #{@rsync_args} -e "#{ssh}"),
-          source.sub("#{@params[:service_name]}:", "#{user_and_host}:"),
-          destination.sub("#{@params[:service_name]}:", "#{user_and_host}:")
+          source.sub("#{path}:", "#{user_and_host}:"),
+          destination.sub("#{path}:", "#{user_and_host}:")
         )
       end
     end
 
     private
+      def do_dry_run
+        @shell.say "Dry run", :green
+        @shell.say @params.to_yaml
+        exit
+      end
+
       def join(*parts)
         parts.flatten.compact.join(" ")
       end
