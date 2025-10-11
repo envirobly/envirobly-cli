@@ -141,6 +141,13 @@ module Envirobly
       assert_equal "factory", target.project_name
     end
 
+    test "path with / suffix means specifying target name only" do
+      target = Target.new("factory/", default_environ_name: "main", default_project_name: "dir")
+      assert_equal "factory", target.name
+      assert_equal "main", target.environ_name
+      assert_equal "factory", target.project_name
+    end
+
     test "name validation" do
       target = Target.new("factory!/production@")
       assert_equal 2, target.errors.size

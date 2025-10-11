@@ -143,7 +143,12 @@ module Envirobly
 
         case parts.size
         when 1
-          @environ_name = parts.first
+          if path.end_with?("/")
+            @name = parts.first
+            @default_project_name = parts.first
+          else
+            @environ_name = parts.first
+          end
         when 2
           @name, @environ_name = parts
           @default_project_name = @name
