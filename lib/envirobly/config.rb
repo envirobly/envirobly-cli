@@ -4,7 +4,8 @@ module Envirobly
   class Config
     DIR = ".envirobly"
     BASE = "deploy.yml"
-    OVERRIDES_PATTERN = /deploy\.([a-z0-9\-_]+)\.yml/i
+    ENVIRON_OVERRIDE_REGEXP = /deploy\.([a-z0-9\-_]+)\.yml/i
+    TARGETS_PATH = Pathname.new(DIR).join(".targets")
 
     attr_reader :errors
 
@@ -43,7 +44,7 @@ module Envirobly
 
     private
       def config_file?(file)
-        file == BASE || file.match?(OVERRIDES_PATTERN)
+        file == BASE || file.match?(ENVIRON_OVERRIDE_REGEXP)
       end
 
       def parse(content, path)

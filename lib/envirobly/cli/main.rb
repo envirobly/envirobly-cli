@@ -3,13 +3,15 @@
 class Envirobly::Cli::Main < Envirobly::Base
   include Envirobly::Colorize
 
+  class_option :unattended, type: :boolean, default: false
+
   desc "version", "Show Envirobly CLI version"
   method_option :pure, type: :boolean, default: false
   def version
     if options.pure
-      puts Envirobly::VERSION
+      say Envirobly::VERSION
     else
-      puts "envirobly CLI v#{Envirobly::VERSION}"
+      say "envirobly CLI v#{Envirobly::VERSION}"
     end
   end
 
@@ -26,14 +28,28 @@ class Envirobly::Cli::Main < Envirobly::Base
     say "You can sign in again with `envirobly signin`"
   end
 
-  desc "set_default_account", "Choose default account to deploy the current project to"
-  def set_default_account
-    Envirobly::Defaults::Account.new(shell:).require_value
-  end
+  desc "target [NAME]", "Configure deployment (default) target"
+  method_option :missing_only, type: :boolean, default: false
+  def target(name = nil)
+    Envirobly::AccessToken.new(shell:).require!
 
-  desc "set_default_region", "Set default region for the current project when deploying for the first time"
-  def set_default_region
-    Envirobly::Defaults::Region.new(shell:).require_value
+    target = Envirobly::Target.new(default_project_name: File.basename(Dir.pwd), shell:)
+    target.name = name if name.present?
+
+    errors = target.errors :name
+
+    if errors.any?
+      errors.each do |message|
+        shell.say_error message
+      end
+
+      exit 1
+    end
+
+    target.configure!(missing_only: options.missing_only)
+
+    shell.say "#{green_check} "
+    shell.say "Target configured.", :green
   end
 
   desc "validate", "Validates config (for given environ)"
@@ -69,18 +85,17 @@ class Envirobly::Cli::Main < Envirobly::Base
       table_data, borders: true
   end
 
-  desc "deploy [ENVIRON_NAME]", <<~TXT
+  desc "deploy [[TARGET/[ENVIRON_NAME]]", <<~TXT
     Deploy to environ identified by name.
     Name can contain letters, numbers, dashes or underscores.
     If environ name is left blank, current git branch name is used.
   TXT
-  method_option :account_id, type: :numeric
+  method_option :account_url, type: :string
   method_option :region, type: :string
-  method_option :project_id, type: :numeric
   method_option :project_name, type: :string
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
-  def deploy(environ_name = nil)
+  def deploy(path = nil)
     commit = Envirobly::Git::Commit.new options.commit
 
     unless commit.exists?
@@ -106,15 +121,8 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     Envirobly::AccessToken.new(shell:).require!
 
-    deployment = Envirobly::Deployment.new(
-      account_id: options.account_id,
-      region: options.region,
-      project_id: options.project_id,
-      project_name: options.project_name,
-      environ_name: environ_name.presence,
-      commit:,
-      shell:
-    )
+    target = create_target(path:, commit:)
+    deployment = Envirobly::Deployment.new(target:, commit:, shell:)
     deployment.perform(dry_run: options.dry_run)
   end
 
@@ -130,35 +138,65 @@ class Envirobly::Cli::Main < Envirobly::Base
     Keep in mind, your container might not have a shell installed. In such cases you won't be able
     to start an interactive session.
   TXT
-  method_option :account_id, type: :numeric
-  method_option :project_id, type: :numeric
+  method_option :account_url, type: :string
   method_option :project_name, type: :string
   method_option :environ_name, type: :string
   method_option :instance_slot, type: :numeric, default: 0
   method_option :shell, type: :string
   method_option :user, type: :string
-  def exec(service_name, *command)
-    Envirobly::ContainerShell.new(service_name, options, shell:).exec(command)
+  method_option :dry_run, type: :boolean, default: false
+  def exec(path, *command)
+    target = create_target(path:, context: :service)
+
+    Envirobly::ContainerShell.
+      new(target:, instance_slot: options.instance_slot, shell:, exec_shell: options.shell, exec_user: options.user).
+      exec(command, dry_run: options.dry_run)
   end
 
   desc "rsync [SERVICE_NAME:]SOURCE_PATH [SERVICE_NAME:]DESTINATION_PATH", <<~TXT
     Synchronize files between you and your service's data volume.
   TXT
-  method_option :account_id, type: :numeric
-  method_option :project_id, type: :numeric
+  method_option :account_url, type: :string
   method_option :project_name, type: :string
   method_option :environ_name, type: :string
   method_option :args, type: :string, default: "-avzP"
+  method_option :dry_run, type: :boolean, default: false
   def rsync(source, destination)
-    service_name = nil
-
-    [ source, destination ].each do |path|
-      if path =~ /\A([a-z0-9\-_]+):/i
-        service_name = $1
+    path = nil
+    [ source, destination ].each do |arg|
+      if arg =~ /\A([a-z0-9\-_\/]+):/i
+        path = $1
         break
       end
     end
 
-    Envirobly::ContainerShell.new(service_name, options, shell:).rsync(source, destination)
+    target = create_target(path:, context: :service)
+
+    Envirobly::ContainerShell.
+      new(target:, shell:, rsync_args: options.args).
+      rsync(source, destination, path:, dry_run: options.dry_run)
   end
+
+  private
+    def create_target(path:, commit: Envirobly::Git::Commit.new("HEAD"), context: nil)
+      target = Envirobly::Target.new(
+        path,
+        account_url: options.account_url,
+        project_name: options.project_name,
+        region: options.region,
+        default_project_name: File.basename(Dir.pwd),
+        default_environ_name: commit.current_branch,
+        shell:,
+        context:
+      )
+      target.render_and_exit_on_errors!
+
+      if options.unattended
+        target.save
+      else
+        target.configure!(missing_only: true)
+      end
+
+      target
+    end
 end

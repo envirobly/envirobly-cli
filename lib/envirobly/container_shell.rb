@@ -17,67 +17,48 @@ module Envirobly
     ]
     USER_AND_HOST = "envirobly-service@%s"
 
-    attr_reader :options, :service_name
-
-    def initialize(service_name, options, shell:)
-      @service_name = service_name
-      @options = options
-
-      commit = Git::Commit.new "HEAD"
-      default_account = Defaults::Account.new(shell:)
-      default_project = Defaults::Project.new(shell:)
-
-      target = Target.new(
-        default_account_id: default_account.value,
-        default_project_id: default_project.value,
-        default_project_name: Defaults::Project.dirname,
-        default_environ_name: commit.current_branch,
-        account_id: options.account_id,
-        project_id: options.project_id,
-        project_name: options.project_name,
-        environ_name: options.environ_name
-      )
-
-      if target.missing_params.include?(:account_id)
-        target.account_id = default_account.require_value
-      end
-
-      target.ignored_params.each do |param|
-        shell.say "--#{param.to_s.parameterize} ignored, due to other arguments overriding it"
-      end
-
+    def initialize(target:, shell:, instance_slot: 0, rsync_args: nil, exec_shell: nil, exec_user: nil)
+      @shell = shell
+      @rsync_args = rsync_args
+      @exec_shell = exec_shell
+      @exec_user = exec_user
       @params = {
         account_id: target.account_id,
-        project_id: target.project_id,
         project_name: target.project_name,
         environ_name: target.environ_name,
-        service_name:,
-        instance_slot: options.instance_slot || 0
+        service_name: target.service_name,
+        instance_slot: instance_slot
       }
-
-      if options.project_name.blank? && options.account_id.blank? && options.project_id.blank?
-        @params[:project_id] = Defaults::Project.new.value
-      end
     end
 
-    def exec(command = nil)
+    def exec(command = nil, dry_run: false)
+      do_dry_run if dry_run
+
       with_private_key do
         system join(env_vars, ssh, user_and_host, command)
       end
     end
 
-    def rsync(source, destination)
+    def rsync(source, destination, path:, dry_run: false)
+      do_dry_run if dry_run
+
       with_private_key do
         system join(
           env_vars,
-          %(rsync #{options.args} -e "#{ssh}"),
-          source.sub("#{service_name}:", "#{user_and_host}:"),
-          destination.sub("#{service_name}:", "#{user_and_host}:")
+          %(rsync #{@rsync_args} -e "#{ssh}"),
+          source.sub("#{path}:", "#{user_and_host}:"),
+          destination.sub("#{path}:", "#{user_and_host}:")
         )
       end
     end
 
     private
+      def do_dry_run
+        @shell.say "Dry run", :green
+        @shell.say @params.to_yaml
+        exit
+      end
+
       def join(*parts)
         parts.flatten.compact.join(" ")
       end
@@ -110,12 +91,12 @@ module Envirobly
           credentials.fetch("session_token")
         )
 
-        if options.shell.present?
-          result = join "ENVIROBLY_SERVICE_INTERACTIVE_SHELL='#{options.shell}'", result
+        if @exec_shell.present?
+          result = join "ENVIROBLY_SERVICE_INTERACTIVE_SHELL='#{@exec_shell}'", result
         end
 
-        if options.user.present?
-          result = join "ENVIROBLY_SERVICE_SHELL_USER='#{options.user}'", result
+        if @exec_user.present?
+          result = join "ENVIROBLY_SERVICE_SHELL_USER='#{@exec_user}'", result
         end
 
         result
