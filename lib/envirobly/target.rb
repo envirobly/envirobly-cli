@@ -74,6 +74,7 @@ module Envirobly
     def configure!
       configure_account
       configure_project_name
+      configure_region
     end
 
     private
@@ -162,13 +163,42 @@ module Envirobly
 
       def configure_project_name
         begin
-          @project_name = shell.ask("Name your Project:", default: project_name)
-        rescue Interrupt
-          shell.say_error "Cancelled", :red
+          @project_name = shell.ask("Name your project:", default: project_name)
+        rescue interrupt
+          shell.say_error "cancelled", :red
           exit
         end
 
         save_attribute "project_name"
+      end
+
+      def configure_region
+        api = Envirobly::Api.new
+        response = api.list_regions
+
+        shell.say "Choose region:"
+        shell.print_table [ [ "Name", "Location", "Group" ] ] +
+          response.object.pluck("code", "title", "group_title"), borders: true
+
+        code = nil
+        limited_to = response.object.pluck("code")
+
+        while code.nil?
+          begin
+            code = shell.ask("Region name:", default: "us-east-1")
+          rescue Interrupt
+            shell.say_error "Cancelled", :red
+            exit
+          end
+
+          unless code.in?(limited_to)
+            shell.say_error "'#{code}' is not a supported region, please try again"
+            code = nil
+          end
+        end
+
+        @region = code
+        save_attribute "region"
       end
   end
 end
