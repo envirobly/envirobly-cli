@@ -50,8 +50,8 @@ module Envirobly
         targets_and_values = [
           [ "Account", @target.account_url ],
           [ "Region", params[:region] ],
-          [ "Project Name", params[:project_name] ],
-          [ "Environ Name", params[:deployment][:environ_name] ]
+          [ "Project", params[:project_name] ],
+          [ "Environ", params[:deployment][:environ_name] ]
         ]
 
         shell.print_table targets_and_values, borders: true

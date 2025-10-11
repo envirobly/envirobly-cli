@@ -129,6 +129,7 @@ class Envirobly::Cli::Main < Envirobly::Base
       shell:
     )
     target.render_and_exit_on_errors!
+    target.configure!(missing_only: true)
 
     deployment = Envirobly::Deployment.new(target:, commit:, shell:)
     deployment.perform(dry_run: options.dry_run)
