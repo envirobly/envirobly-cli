@@ -30,9 +30,12 @@ class Envirobly::Cli::Main < Envirobly::Base
   def target(name = nil)
     Envirobly::AccessToken.new(shell:).require!
 
-    target = Envirobly::Target.new(default_project_name: Envirobly::Defaults::Project.dirname, shell:)
+    target = Envirobly::Target.new(default_project_name: File.basename(Dir.pwd), shell:)
     target.name = name if name.present?
     target.configure!
+
+    shell.say "#{green_check} "
+    shell.say "Target configured.", :green
   end
 
   # desc "set_default_account", "Choose default account to deploy the current project to"

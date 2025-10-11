@@ -66,13 +66,14 @@ module Envirobly
     end
 
     def save
-      write_default "account_url"
-      write_default "project_name"
-      write_default "region"
+      save_attribute "account_url"
+      save_attribute "project_name"
+      save_attribute "region"
     end
 
     def configure!
       configure_account
+      configure_project_name
     end
 
     private
@@ -86,7 +87,7 @@ module Envirobly
         nil
       end
 
-      def write_default(type)
+      def save_attribute(type)
         FileUtils.mkdir_p storage_dir
         File.write storage_dir.join(type), send(type)
       end
@@ -156,7 +157,18 @@ module Envirobly
           end
         end
 
-        write_default "account_url"
+        save_attribute "account_url"
+      end
+
+      def configure_project_name
+        begin
+          @project_name = shell.ask("Name your Project:", default: project_name)
+        rescue Interrupt
+          shell.say_error "Cancelled", :red
+          exit
+        end
+
+        save_attribute "project_name"
       end
   end
 end
