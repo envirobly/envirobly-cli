@@ -190,7 +190,13 @@ class Envirobly::Cli::Main < Envirobly::Base
         context:
       )
       target.render_and_exit_on_errors!
-      target.configure!(missing_only: true) unless options.unattended
+
+      if options.unattended
+        target.save
+      else
+        target.configure!(missing_only: true)
+      end
+
       target
     end
 end
