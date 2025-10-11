@@ -13,7 +13,6 @@ module Envirobly
         default_project_name: nil,
         config_path: Config::TARGETS_PATH
       )
-      load_path path
       @account_url = account_url
       @region = region
       @project_name = project_name
@@ -21,6 +20,8 @@ module Envirobly
       @default_project_name = default_project_name
       @config_path = config_path
       @default_target_dir = config_path.join(".default")
+
+      load_path path
     end
 
     def missing_params
@@ -92,11 +93,13 @@ module Envirobly
       def load_path(path)
         return if path.blank?
 
-        parts = path.split("/")
+        parts = path.split("/").map &:strip
 
         case parts.size
         when 1
           @environ_name = parts.first
+        when 2
+          @default_project_name, @environ_name = parts
         end
       end
   end

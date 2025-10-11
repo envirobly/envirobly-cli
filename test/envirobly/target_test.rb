@@ -83,5 +83,26 @@ module Envirobly
       assert_nil target.region
       assert_equal %i[ account_url region ], target.missing_params
     end
+
+    test "target name prefix in path set default project name" do
+      target = Target.new(
+        "candy/production",
+        default_project_name: "dirname",
+        default_environ_name: "main"
+      )
+      assert_equal "candy", target.project_name
+      assert_equal "production", target.environ_name
+    end
+
+    test "target name prefix in path set default project name, overriden by project_name arg" do
+      target = Target.new(
+        "candy/production",
+        default_project_name: "dirname",
+        default_environ_name: "main",
+        project_name: "stars"
+      )
+      assert_equal "stars", target.project_name
+      assert_equal "production", target.environ_name
+    end
   end
 end
