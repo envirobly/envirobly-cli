@@ -71,10 +71,10 @@ module Envirobly
       save_attribute "region"
     end
 
-    def configure!
-      configure_account
-      configure_project_name
-      configure_region
+    def configure!(missing_only: false)
+      configure_account unless missing_only && stored_value_for("account_url").present?
+      configure_project_name unless missing_only && stored_value_for("project_name").present?
+      configure_region unless missing_only && stored_value_for("region").present?
     end
 
     private
@@ -185,7 +185,7 @@ module Envirobly
 
         while code.nil?
           begin
-            code = shell.ask("Region name:", default: "us-east-1")
+            code = shell.ask("Region name:", default: region.presence || "us-east-1")
           rescue Interrupt
             shell.say_error "Cancelled", :red
             exit

@@ -27,12 +27,13 @@ class Envirobly::Cli::Main < Envirobly::Base
   end
 
   desc "target [NAME]", "Configure deployment (default) target"
+  method_option :missing_only, type: :boolean, default: false
   def target(name = nil)
     Envirobly::AccessToken.new(shell:).require!
 
     target = Envirobly::Target.new(default_project_name: File.basename(Dir.pwd), shell:)
     target.name = name if name.present?
-    target.configure!
+    target.configure!(missing_only: options.missing_only)
 
     shell.say "#{green_check} "
     shell.say "Target configured.", :green
