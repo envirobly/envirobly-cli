@@ -119,18 +119,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     Envirobly::AccessToken.new(shell:).require!
 
-    target = Envirobly::Target.new(
-      path,
-      account_url: options.account_url,
-      project_name: options.project_name,
-      region: options.region,
-      default_project_name: File.basename(Dir.pwd),
-      default_environ_name: commit.current_branch,
-      shell:
-    )
-    target.render_and_exit_on_errors!
-    target.configure!(missing_only: true)
-
+    target = create_target(path:, commit:)
     deployment = Envirobly::Deployment.new(target:, commit:, shell:)
     deployment.perform(dry_run: options.dry_run)
   end
@@ -156,23 +145,10 @@ class Envirobly::Cli::Main < Envirobly::Base
   method_option :dry_run, type: :boolean, default: false
   def exec(path, *command)
     commit = Envirobly::Git::Commit.new "HEAD"
-
-    # TODO: Extract to create_target
-    target = Envirobly::Target.new(
-      path,
-      account_url: options.account_url,
-      project_name: options.project_name,
-      region: options.region,
-      default_project_name: File.basename(Dir.pwd),
-      default_environ_name: commit.current_branch,
-      shell:,
-      context: :service
-    )
-    target.render_and_exit_on_errors!
-    target.configure!(missing_only: true)
+    target = create_target(path:, commit:, context: :service)
 
     Envirobly::ContainerShell.
-      new(target:, instance_slot: options.instance_slot, shell:).
+      new(target:, instance_slot: options.instance_slot, shell:, exec_shell: options.shell, exec_user: options.user).
       exec(command, dry_run: options.dry_run)
   end
 
@@ -195,7 +171,24 @@ class Envirobly::Cli::Main < Envirobly::Base
     end
 
     Envirobly::ContainerShell.
-      new(service_name, options, shell:).
+      new(target:, shell:, rsync_args: options.args).
       rsync(source, destination, dry_run: options.dry_run)
   end
+
+  private
+    def create_target(path:, commit:, context: nil)
+      target = Envirobly::Target.new(
+        path,
+        account_url: options.account_url,
+        project_name: options.project_name,
+        region: options.region,
+        default_project_name: File.basename(Dir.pwd),
+        default_environ_name: commit.current_branch,
+        shell:,
+        context:
+      )
+      target.render_and_exit_on_errors!
+      target.configure!(missing_only: true)
+      target
+    end
 end

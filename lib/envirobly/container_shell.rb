@@ -17,10 +17,11 @@ module Envirobly
     ]
     USER_AND_HOST = "envirobly-service@%s"
 
-    attr_reader :options, :service_name
-
-    def initialize(target:, shell:, instance_slot: 0)
+    def initialize(target:, shell:, instance_slot: 0, rsync_args: nil, exec_shell: nil, exec_user: nil)
       @shell = shell
+      @rsync_args = rsync_args
+      @exec_shell = exec_shell
+      @exec_user = exec_user
       @params = {
         account_id: target.account_id,
         project_name: target.project_name,
@@ -52,9 +53,9 @@ module Envirobly
       with_private_key do
         system join(
           env_vars,
-          %(rsync #{options.args} -e "#{ssh}"),
-          source.sub("#{service_name}:", "#{user_and_host}:"),
-          destination.sub("#{service_name}:", "#{user_and_host}:")
+          %(rsync #{@rsync_args} -e "#{ssh}"),
+          source.sub("#{@params[:service_name]}:", "#{user_and_host}:"),
+          destination.sub("#{@params[:service_name]}:", "#{user_and_host}:")
         )
       end
     end
@@ -92,12 +93,12 @@ module Envirobly
           credentials.fetch("session_token")
         )
 
-        if options.shell.present?
-          result = join "ENVIROBLY_SERVICE_INTERACTIVE_SHELL='#{options.shell}'", result
+        if @exec_shell.present?
+          result = join "ENVIROBLY_SERVICE_INTERACTIVE_SHELL='#{@exec_shell}'", result
         end
 
-        if options.user.present?
-          result = join "ENVIROBLY_SERVICE_SHELL_USER='#{options.user}'", result
+        if @exec_user.present?
+          result = join "ENVIROBLY_SERVICE_SHELL_USER='#{@exec_user}'", result
         end
 
         result
