@@ -147,15 +147,33 @@ class Envirobly::Cli::Main < Envirobly::Base
     Keep in mind, your container might not have a shell installed. In such cases you won't be able
     to start an interactive session.
   TXT
-  method_option :account_id, type: :numeric
-  method_option :project_id, type: :numeric
+  method_option :account_url, type: :string
   method_option :project_name, type: :string
   method_option :environ_name, type: :string
   method_option :instance_slot, type: :numeric, default: 0
   method_option :shell, type: :string
   method_option :user, type: :string
-  def exec(service_name, *command)
-    Envirobly::ContainerShell.new(service_name, options, shell:).exec(command)
+  method_option :dry_run, type: :boolean, default: false
+  def exec(path, *command)
+    commit = Envirobly::Git::Commit.new "HEAD"
+
+    # TODO: Extract to create_target
+    target = Envirobly::Target.new(
+      path,
+      account_url: options.account_url,
+      project_name: options.project_name,
+      region: options.region,
+      default_project_name: File.basename(Dir.pwd),
+      default_environ_name: commit.current_branch,
+      shell:,
+      context: :service
+    )
+    target.render_and_exit_on_errors!
+    target.configure!(missing_only: true)
+
+    Envirobly::ContainerShell.
+      new(target:, instance_slot: options.instance_slot, shell:).
+      exec(command, dry_run: options.dry_run)
   end
 
   desc "rsync [SERVICE_NAME:]SOURCE_PATH [SERVICE_NAME:]DESTINATION_PATH", <<~TXT
@@ -176,6 +194,8 @@ class Envirobly::Cli::Main < Envirobly::Base
       end
     end
 
-    Envirobly::ContainerShell.new(service_name, options, shell:).rsync(source, destination)
+    Envirobly::ContainerShell.
+      new(service_name, options, shell:).
+      rsync(source, destination, dry_run: options.dry_run)
   end
 end

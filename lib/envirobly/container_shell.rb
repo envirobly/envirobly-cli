@@ -19,50 +19,36 @@ module Envirobly
 
     attr_reader :options, :service_name
 
-    def initialize(service_name, options, shell:)
-      @service_name = service_name
-      @options = options
-
-      commit = Git::Commit.new "HEAD"
-      default_account = Defaults::Account.new(shell:)
-      default_project = Defaults::Project.new(shell:)
-
-      target = Target.new(
-        default_account_id: default_account.value,
-        default_project_id: default_project.value,
-        default_project_name: Defaults::Project.dirname,
-        default_environ_name: commit.current_branch,
-        account_id: options.account_id,
-        project_id: options.project_id,
-        project_name: options.project_name,
-        environ_name: options.environ_name
-      )
-
-      if target.missing_params.include?(:account_id)
-        target.account_id = default_account.require_value
-      end
-
+    def initialize(target:, shell:, instance_slot: 0)
+      @shell = shell
       @params = {
         account_id: target.account_id,
-        project_id: target.project_id,
         project_name: target.project_name,
         environ_name: target.environ_name,
-        service_name:,
-        instance_slot: options.instance_slot || 0
+        service_name: target.service_name,
+        instance_slot: instance_slot
       }
-
-      if options.project_name.blank? && options.account_id.blank? && options.project_id.blank?
-        @params[:project_id] = Defaults::Project.new.value
-      end
     end
 
-    def exec(command = nil)
+    def exec(command = nil, dry_run: false)
+      if dry_run
+        @shell.say "Dry run", :green
+        @shell.say @params.to_yaml
+        exit
+      end
+
       with_private_key do
         system join(env_vars, ssh, user_and_host, command)
       end
     end
 
-    def rsync(source, destination)
+    def rsync(source, destination, dry_run: false)
+      if dry_run
+        @shell.say "Dry run", :green
+        @shell.say @params.yaml
+        exit
+      end
+
       with_private_key do
         system join(
           env_vars,
