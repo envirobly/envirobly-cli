@@ -5,20 +5,18 @@ module Envirobly
     attr_accessor :account_url, :project_name, :region
 
     def initialize(
-        name: nil,
+        path = nil,
         account_url: nil,
         region: nil,
         project_name: nil,
-        environ_name: nil,
         default_environ_name: nil,
         default_project_name: nil,
         config_path: Config::TARGETS_PATH
       )
-      @name = name
+      load_path path
       @account_url = account_url
       @region = region
       @project_name = project_name
-      @environ_name = environ_name
       @default_environ_name = default_environ_name
       @default_project_name = default_project_name
       @config_path = config_path
@@ -89,6 +87,17 @@ module Envirobly
 
       def default_region
         default_value_for "region"
+      end
+
+      def load_path(path)
+        return if path.blank?
+
+        parts = path.split("/")
+
+        case parts.size
+        when 1
+          @environ_name = parts.first
+        end
       end
   end
 end

@@ -59,20 +59,6 @@ module Envirobly
       assert_equal %i[ account_url region ], target.missing_params
     end
 
-    test "environ_name override" do
-      target = Target.new(
-        default_project_name: "dirname",
-        default_environ_name: "main",
-        environ_name: "production"
-      )
-      assert_nil target.account_url
-      assert_nil target.account_id
-      assert_equal "dirname", target.project_name
-      assert_equal "production", target.environ_name
-      assert_nil target.region
-      assert_equal %i[ account_url region ], target.missing_params
-    end
-
     test "save_defaults" do
       config_path = Pathname.new Dir.mktmpdir
       target = Target.new(config_path:, account_url: "https://example.com/accounts/3", region: "us-east-2", project_name: "yes")
@@ -82,6 +68,20 @@ module Envirobly
       assert_equal "yes", File.read(config_path.join ".default/project_name")
     ensure
       FileUtils.rm_rf config_path
+    end
+
+    test "path as environ name overrides default" do
+      target = Target.new(
+        "production",
+        default_project_name: "dirname",
+        default_environ_name: "main"
+      )
+      assert_nil target.account_url
+      assert_nil target.account_id
+      assert_equal "dirname", target.project_name
+      assert_equal "production", target.environ_name
+      assert_nil target.region
+      assert_equal %i[ account_url region ], target.missing_params
     end
   end
 end
