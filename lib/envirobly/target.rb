@@ -47,6 +47,17 @@ module Envirobly
       end.uniq
     end
 
+    def render_and_exit_on_errors!
+      messages = errors
+      return if messages.empty?
+
+      messages.each do |message|
+        shell.say_error message
+      end
+
+      exit 1
+    end
+
     def missing_params
       [].tap do |result|
         if account_url.blank?

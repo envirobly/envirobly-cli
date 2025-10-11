@@ -50,16 +50,6 @@ class Envirobly::Cli::Main < Envirobly::Base
     shell.say "Target configured.", :green
   end
 
-  # desc "set_default_account", "Choose default account to deploy the current project to"
-  # def set_default_account
-  #   Envirobly::Defaults::Account.new(shell:).require_value
-  # end
-  #
-  # desc "set_default_region", "Set default region for the current project when deploying for the first time"
-  # def set_default_region
-  #   Envirobly::Defaults::Region.new(shell:).require_value
-  # end
-
   desc "validate", "Validates config (for given environ)"
   def validate(environ_name = nil)
     Envirobly::AccessToken.new(shell:).require!
@@ -93,18 +83,17 @@ class Envirobly::Cli::Main < Envirobly::Base
       table_data, borders: true
   end
 
-  desc "deploy [ENVIRON_NAME]", <<~TXT
+  desc "deploy [[TARGET/[ENVIRON_NAME]]", <<~TXT
     Deploy to environ identified by name.
     Name can contain letters, numbers, dashes or underscores.
     If environ name is left blank, current git branch name is used.
   TXT
-  method_option :account_id, type: :numeric
+  method_option :account_url, type: :string
   method_option :region, type: :string
-  method_option :project_id, type: :numeric
   method_option :project_name, type: :string
   method_option :commit, type: :string, default: "HEAD"
   method_option :dry_run, type: :boolean, default: false
-  def deploy(environ_name = nil)
+  def deploy(path = nil)
     commit = Envirobly::Git::Commit.new options.commit
 
     unless commit.exists?
@@ -130,16 +119,18 @@ class Envirobly::Cli::Main < Envirobly::Base
 
     Envirobly::AccessToken.new(shell:).require!
 
-    # TODO: Move Target use out of deployment and in here
-    deployment = Envirobly::Deployment.new(
-      account_id: options.account_id,
-      region: options.region,
-      project_id: options.project_id,
+    target = Envirobly::Target.new(
+      path,
+      account_url: options.account_url,
       project_name: options.project_name,
-      environ_name: environ_name.presence,
-      commit:,
+      region: options.region,
+      default_project_name: File.basename(Dir.pwd),
+      default_environ_name: commit.current_branch,
       shell:
     )
+    target.render_and_exit_on_errors!
+
+    deployment = Envirobly::Deployment.new(target:, commit:, shell:)
     deployment.perform(dry_run: options.dry_run)
   end
 
