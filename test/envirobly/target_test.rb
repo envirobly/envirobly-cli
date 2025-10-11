@@ -61,13 +61,25 @@ module Envirobly
       assert_equal %i[ account_url region ], target.missing_params
     end
 
-    test "save" do
+    test "save default" do
       config_path = Pathname.new Dir.mktmpdir
       target = Target.new(config_path:, account_url: "https://example.com/accounts/3", region: "us-east-2", project_name: "yes")
       target.save
       assert_equal "https://example.com/accounts/3", File.read(config_path.join ".default/account_url")
       assert_equal "us-east-2", File.read(config_path.join ".default/region")
       assert_equal "yes", File.read(config_path.join ".default/project_name")
+    ensure
+      FileUtils.rm_rf config_path
+    end
+
+    test "save custom name" do
+      config_path = Pathname.new Dir.mktmpdir
+      target = Target.new("factory/main",
+        config_path:, account_url: "https://example.com/accounts/3", region: "us-east-2", project_name: "yes")
+      target.save
+      assert_equal "https://example.com/accounts/3", File.read(config_path.join "factory/account_url")
+      assert_equal "us-east-2", File.read(config_path.join "factory/region")
+      assert_equal "yes", File.read(config_path.join "factory/project_name")
     ensure
       FileUtils.rm_rf config_path
     end
