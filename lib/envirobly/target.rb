@@ -104,6 +104,8 @@ module Envirobly
             @service_name = parts.first
           when 2
             @environ_name, @service_name = parts
+          when 3
+            @default_project_name, @environ_name, @service_name = parts
           end
 
           return
