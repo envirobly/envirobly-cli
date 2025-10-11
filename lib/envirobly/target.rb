@@ -29,6 +29,17 @@ module Envirobly
       load_path path
     end
 
+    def errors
+      [].tap do |result|
+        unless @name == ".default"
+          name = Name.new(@name)
+          unless name.validate
+            result << "'#{@name}' is invalid. Name #{name.error}"
+          end
+        end
+      end
+    end
+
     def missing_params
       [].tap do |result|
         if account_url.blank?

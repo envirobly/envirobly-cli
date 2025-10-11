@@ -13,6 +13,7 @@ module Envirobly
       assert_equal "eu-north-1", target.region
       assert_nil target.service_name
       assert_equal ".default", target.name
+      assert_empty target.errors
     end
 
     test "all defaults exist, override account_url" do
@@ -138,6 +139,12 @@ module Envirobly
       assert_equal "puma", target.service_name
       assert_equal "production", target.environ_name
       assert_equal "factory", target.project_name
+    end
+
+    test "name validation" do
+      target = Target.new("factory!/production")
+      assert_equal 1, target.errors.size
+      assert_equal "'factory!' is invalid. Name #{Name::ERROR_MESSAGE}", target.errors.first
     end
   end
 end
