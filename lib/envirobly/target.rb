@@ -40,7 +40,7 @@ module Envirobly
     end
 
     def account_url
-      @account_url.presence || default_account_url
+      @account_url.presence || stored_value_for("account_url")
     end
 
     def account_id
@@ -52,7 +52,7 @@ module Envirobly
     end
 
     def project_name
-      @project_name.presence || default_project_name.presence || @default_project_name
+      @project_name.presence || stored_value_for("project_name").presence || @default_project_name
     end
 
     def environ_name
@@ -60,7 +60,7 @@ module Envirobly
     end
 
     def region
-      @region.presence || default_region
+      @region.presence || stored_value_for("region")
     end
 
     def save
@@ -83,18 +83,6 @@ module Envirobly
 
       def write_default(type)
         File.write storage_dir.join(type), send(type)
-      end
-
-      def default_account_url
-        stored_value_for "account_url"
-      end
-
-      def default_project_name
-        stored_value_for "project_name"
-      end
-
-      def default_region
-        stored_value_for "region"
       end
 
       def load_path(path)
