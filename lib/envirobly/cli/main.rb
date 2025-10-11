@@ -3,6 +3,8 @@
 class Envirobly::Cli::Main < Envirobly::Base
   include Envirobly::Colorize
 
+  class_option :unattented, type: :boolean, default: false
+
   desc "version", "Show Envirobly CLI version"
   method_option :pure, type: :boolean, default: false
   def version
@@ -188,7 +190,7 @@ class Envirobly::Cli::Main < Envirobly::Base
         context:
       )
       target.render_and_exit_on_errors!
-      target.configure!(missing_only: true)
+      target.configure!(missing_only: true) unless options.unattented
       target
     end
 end
