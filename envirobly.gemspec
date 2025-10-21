@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "aws-sdk-s3", "~> 1.182"
   spec.add_dependency "concurrent-ruby", "~> 1.3"
   spec.add_dependency "activesupport", "~> 8.0"
-  spec.add_dependency "openssl", "~> 3.3.1"
+  spec.add_dependency "openssl", ">= 3.3.1"
 
   spec.add_development_dependency "debug", "~> 1.10"
   spec.add_development_dependency "minitest", "~> 5.25"
