@@ -106,6 +106,11 @@ module Envirobly
       configure_region unless missing_only && stored_value_for("region").present?
     end
 
+    def region_or_configure
+      configure_region unless stored_value_for("region").present?
+      region
+    end
+
     private
       def storage_dir
         @config_path.join(@name)

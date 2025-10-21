@@ -3,6 +3,7 @@
 module Envirobly
 end
 
+require "openssl"
 require "active_support"
 require "active_support/core_ext"
 require "zeitwerk"
