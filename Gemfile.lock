@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    envirobly (1.11.1)
+    envirobly (1.11.2)
       activesupport (~> 8.0)
       aws-sdk-s3 (~> 1.182)
       concurrent-ruby (~> 1.3)

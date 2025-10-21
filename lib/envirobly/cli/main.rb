@@ -67,7 +67,7 @@ class Envirobly::Cli::Main < Envirobly::Base
 
   desc "instance_types [REGION]", "List instance types in the given region, including price and performance characteristics."
   def instance_types(region = nil)
-    target = Envirobly::Target.new
+    target = Envirobly::Target.new(shell:)
     region = region.presence || target.region_or_configure
 
     api = Envirobly::Api.new
