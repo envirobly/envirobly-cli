@@ -1,6 +1,6 @@
 # Envirobly CLI 🚀
 
-Deploy to Envirobly from your terminal.
+Deploy to [Envirobly](https://envirobly.com/) from your terminal.
 
 ## ⚡️ Quick start
 - Install Ruby >= 3.2.
